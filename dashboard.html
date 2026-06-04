@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adaptive Adventures — DM Dashboard</title>
+<script src="adventures/manifest.js"></script>
+<!-- Optional: private, unpublished adventures. 404s harmlessly when absent (e.g. a fresh clone). -->
+<script src="adventures/manifest.local.js" onerror="this.remove()"></script>
+<style>
+:root {
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --surface2: #0f3460;
+  --border: #334;
+  --text: #e0e0e0;
+  --text-dim: #888;
+  --gold: #f5c842;
+  --green: #66bb6a;
+  --red: #ef5350;
+  --blue: #4fc3f7;
+  --purple: #b388ff;
+  --orange: #ffa726;
+  --teal: #26a69a;
+  --sidebar-w: 220px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 14px;
+}
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* --- Loading Screen --- */
+#load-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 20px;
+  padding: 40px;
+}
+#load-screen h1 {
+  font-size: 28px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+#load-screen p { color: var(--text-dim); max-width: 480px; text-align: center; }
+.load-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 380px;
+}
+.load-row { display: flex; flex-direction: column; gap: 6px; }
+.load-row label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); }
+.load-row select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+}
+.load-row select:focus { outline: none; border-color: var(--gold); }
+#launch-btn {
+  background: var(--gold);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-top: 4px;
+}
+#launch-btn:hover { opacity: 0.85; }
+#launch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+#load-error { color: var(--red); font-size: 13px; min-height: 20px; text-align: center; }
+
+/* --- Dashboard Layout --- */
+#dashboard { display: none; }
+#sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 12px 0;
+  z-index: 10;
+}
+#main {
+  margin-left: var(--sidebar-w);
+  padding: 24px 32px 60px;
+  max-width: 960px;
+}
+
+/* --- Sidebar --- */
+.sb-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 16px 4px;
+}
+.sb-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 8px 12px;
+}
+.sb-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  padding: 5px 16px 5px 20px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.sb-item:hover { background: var(--surface2); }
+.sb-item.active { background: var(--surface2); color: var(--gold); border-left: 3px solid var(--gold); padding-left: 17px; }
+.sb-item .sb-id {
+  display: block;
+  font-weight: 700;
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+.sb-item .sb-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.sb-item.active .sb-id { color: var(--gold); }
+.sb-section { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); padding: 10px 16px 2px; }
+
+/* --- Main Content --- */
+.room-header { margin-bottom: 20px; }
+.room-header h1 { font-size: 24px; color: var(--gold); margin-bottom: 4px; }
+.room-header .room-meta { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+/* Connection buttons */
+.connections { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+.conn-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+.conn-btn:hover { border-color: var(--gold); background: var(--surface2); }
+.conn-btn .conn-id { font-weight: 700; color: var(--gold); }
+.conn-btn .conn-via { color: var(--text-dim); font-size: 11px; }
+.conn-note { font-size: 11px; color: var(--orange); margin-top: 2px; }
+
+/* Collapsible sections */
+details { margin-bottom: 16px; }
+summary {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  list-style: none;
+  user-select: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before {
+  content: '\25B6';
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+details[open] > summary::before { transform: rotate(90deg); }
+details[open] > summary { color: var(--text); border-bottom-color: var(--gold); }
+.section-body { padding: 12px 0; }
+
+/* Read-aloud boxes */
+.read-aloud {
+  background: linear-gradient(135deg, #1e2a40, #162040);
+  border-left: 3px solid var(--gold);
+  padding: 12px 16px;
+  margin: 8px 0;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #d4c9a8;
+}
+
+/* Secret/DM-only */
+.secret {
+  background: rgba(239, 83, 80, 0.08);
+  border-left: 3px solid var(--red);
+  padding: 8px 12px;
+  margin: 6px 0;
+  font-size: 13px;
+}
+.secret-label { color: var(--red); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+
+/* Encounter cards */
+.encounter-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 8px 0;
+}
+.encounter-card h4 { color: var(--red); font-size: 14px; margin-bottom: 6px; }
+.creature-list { list-style: none; padding: 0; }
+.creature-list li { font-size: 13px; padding: 2px 0; }
+.creature-list li::before { content: '\2694'; margin-right: 6px; color: var(--red); }
+.tactics { font-size: 13px; color: var(--text-dim); margin-top: 6px; font-style: italic; }
+
+/* POI cards */
+.poi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 8px 0;
+}
+.poi-card h4 { color: var(--teal); font-size: 14px; margin-bottom: 4px; }
+.poi-type { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+
+/* IF THEY ASK */
+.ita-item {
+  background: var(--surface);
+  border-left: 3px solid var(--purple);
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 0 6px 6px 0;
+}
+.ita-q { font-weight: 700; color: var(--purple); font-size: 13px; margin-bottom: 4px; }
+.ita-a { font-size: 13px; }
+.ita-thread { font-size: 11px; color: var(--teal); margin-top: 4px; }
+
+/* Special Resources */
+.sr-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+  margin: 8px 0;
+}
+.sr-pc { font-weight: 700; color: var(--teal); font-size: 14px; }
+.sr-cap { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.sr-moment { font-size: 13px; margin-bottom: 4px; }
+.sr-hook { font-size: 12px; color: var(--gold); font-style: italic; }
+.sr-dm-note { font-size: 12px; color: var(--orange); margin-top: 4px; border-top: 1px solid var(--border); padding-top: 4px; }
+
+/* Hazard cards */
+.hazard-card {
+  background: rgba(255, 167, 38, 0.06);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+  margin: 8px 0;
+}
+.hazard-card h4 { color: var(--orange); font-size: 14px; margin-bottom: 4px; }
+
+/* Treasure */
+.treasure-item {
+  background: rgba(245, 200, 66, 0.06);
+  border-left: 3px solid var(--gold);
+  padding: 8px 12px;
+  margin: 6px 0;
+  font-size: 13px;
+}
+
+/* Stat blocks */
+.stat-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--red);
+  border-radius: 0 0 6px 6px;
+  padding: 16px;
+  margin: 8px 0;
+}
+.stat-block h3 { color: var(--red); font-size: 16px; margin-bottom: 2px; }
+.stat-block .stat-sub { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+.stat-row { font-size: 13px; padding: 3px 0; }
+.stat-label { font-weight: 700; color: var(--gold); }
+.ability-scores { display: flex; gap: 12px; margin: 8px 0; text-align: center; }
+.ability-scores div { flex: 1; }
+.ability-scores .ab-name { font-size: 11px; font-weight: 700; color: var(--text-dim); }
+.ability-scores .ab-val { font-size: 16px; font-weight: 700; }
+.ability-scores .ab-mod { font-size: 12px; color: var(--text-dim); }
+.stat-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+
+/* Taunt cards */
+.taunt-card {
+  background: var(--surface);
+  border-left: 3px solid var(--purple);
+  padding: 10px 14px;
+  margin: 8px 0;
+  border-radius: 0 6px 6px 0;
+}
+.taunt-trigger { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.taunt-target { font-size: 12px; color: var(--teal); margin-bottom: 4px; }
+.taunt-msg { font-style: italic; font-size: 14px; color: #d4c9a8; margin: 6px 0; }
+.taunt-note { font-size: 12px; color: var(--orange); }
+
+/* Callback cards */
+.callback-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin: 10px 0;
+}
+.callback-card h4 { color: var(--gold); font-size: 15px; margin-bottom: 4px; }
+.callback-option {
+  background: var(--surface2);
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  font-size: 13px;
+}
+.callback-option strong { color: var(--teal); }
+.callback-dm-note { font-size: 12px; color: var(--orange); margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
+
+/* Tactical notes */
+.tactical-card {
+  background: rgba(239, 83, 80, 0.06);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+  margin: 8px 0;
+}
+.tactical-card h4 { color: var(--red); font-size: 13px; margin-bottom: 4px; }
+.tactical-card p { font-size: 13px; }
+
+/* Voice cards */
+.voice-card {
+  background: var(--surface);
+  border-left: 3px solid var(--blue);
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 0 6px 6px 0;
+}
+.voice-card .voice-name { font-weight: 700; color: var(--blue); font-size: 13px; }
+.voice-card .voice-desc { font-size: 13px; font-style: italic; }
+
+/* General helpers */
+.kv { font-size: 13px; padding: 2px 0; }
+.kv .k { font-weight: 700; color: var(--gold); }
+.muted { color: var(--text-dim); }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-combat { background: rgba(239,83,80,0.2); color: var(--red); }
+.badge-exploration { background: rgba(79,195,247,0.2); color: var(--blue); }
+.badge-puzzle { background: rgba(179,136,255,0.2); color: var(--purple); }
+.badge-social { background: rgba(102,187,106,0.2); color: var(--green); }
+.badge-safe { background: rgba(102,187,106,0.15); color: var(--green); font-size: 10px; margin-left: 6px; }
+ul.plain { list-style: none; padding: 0; }
+ul.plain li { padding: 3px 0; font-size: 13px; }
+ul.plain li::before { content: '\2022'; margin-right: 8px; color: var(--text-dim); }
+.dm-note {
+  font-size: 12px;
+  color: var(--orange);
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+/* Check entries */
+.check-entry {
+  background: var(--surface);
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.check-dc { font-weight: 700; color: var(--gold); }
+
+/* Location links in narrative text */
+.loc-link {
+  display: inline;
+  background: none;
+  border: none;
+  padding: 0 1px;
+  color: var(--blue);
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+.loc-link:hover { color: var(--gold); text-decoration-style: solid; }
+
+/* Adaptation badge */
+.adapt-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(38, 166, 154, 0.2);
+  color: var(--teal);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.sb-adapt { font-size: 10px; color: var(--teal); margin-left: 6px; vertical-align: middle; }
+
+/* Collapsed-section preview chip — small dim text after the summary label */
+.sum-preview {
+  display: inline;
+  margin-left: 10px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-dim);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: baseline;
+}
+details[open] > summary .sum-preview { display: none; }
+
+/* Right panel */
+#right-panel {
+  position: fixed;
+  top: 0; right: 0;
+  width: 280px;
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 10;
+  display: none;
+}
+#right-panel.visible { display: block; }
+.rp-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+.rp-stat { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.rp-stat h3 { color: var(--red); font-size: 14px; margin-bottom: 1px; }
+.rp-stat .stat-sub { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+.rp-stat .stat-row { font-size: 12px; padding: 2px 0; }
+.rp-stat .stat-label { font-weight: 700; color: var(--gold); }
+.rp-stat .ability-scores { display: flex; gap: 4px; margin: 6px 0; text-align: center; }
+.rp-stat .ability-scores div { flex: 1; }
+.rp-stat .ability-scores .ab-name { font-size: 9px; font-weight: 700; color: var(--text-dim); }
+.rp-stat .ability-scores .ab-val { font-size: 13px; font-weight: 700; }
+.rp-stat .ability-scores .ab-mod { font-size: 10px; color: var(--text-dim); }
+.rp-stat .stat-divider { border: none; border-top: 1px solid var(--border); margin: 5px 0; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #556; }
+
+/* --- Mark-as-Used --- */
+.markable {
+  position: relative;
+  cursor: pointer;
+  transition: opacity 0.15s, filter 0.15s;
+}
+.markable:hover::after {
+  content: '\2713';
+  position: absolute;
+  top: 6px; right: 8px;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.35;
+  pointer-events: none;
+}
+.markable.marked {
+  opacity: 0.42;
+  filter: grayscale(0.6);
+  text-decoration: line-through;
+  text-decoration-color: rgba(102,187,106,0.6);
+  text-decoration-thickness: 1px;
+}
+.markable.marked::after {
+  content: '\2713 used';
+  position: absolute;
+  top: 6px; right: 8px;
+  background: var(--green);
+  color: #0b1a0b;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 1;
+  pointer-events: none;
+}
+.markable.marked:hover::after {
+  content: '\2713 used \2022 click to unmark';
+  opacity: 1;
+}
+/* Prevent loc-link inside markable from eating the click inadvertently */
+.markable .loc-link { position: relative; z-index: 2; }
+
+/* Passive revelations + combat briefing cards */
+.pr-block { margin: 10px 0; }
+.pr-block-title { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.pr-item {
+  background: var(--surface);
+  border-left: 3px solid var(--blue);
+  padding: 8px 28px 8px 12px;
+  margin: 4px 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+}
+.pr-threshold { font-weight: 700; color: var(--blue); font-size: 12px; }
+.pr-reveals { margin-top: 2px; }
+.pr-pc-name { font-weight: 700; color: var(--teal); font-size: 12px; }
+
+.cb-hazard {
+  background: rgba(255, 167, 38, 0.06);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 28px 10px 14px;
+  margin: 6px 0;
+}
+.cb-hazard h4 { color: var(--orange); font-size: 13px; margin-bottom: 4px; }
+.cb-hazard .cb-detail { font-size: 13px; }
+.cb-hazard .cb-impact { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
+
+.cb-creature {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--red);
+  border-radius: 0 0 6px 6px;
+  padding: 10px 14px;
+  margin: 10px 0 6px;
+}
+.cb-creature h4 { color: var(--red); font-size: 14px; margin-bottom: 2px; }
+.cb-creature .cb-stats { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+.cb-creature .cb-sub-title { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
+.cb-creature ul.plain li { font-size: 12px; padding: 2px 0; }
+
+.cb-ambig {
+  background: rgba(179, 136, 255, 0.06);
+  border-left: 3px solid var(--purple);
+  padding: 6px 28px 6px 10px;
+  margin: 4px 0;
+  font-size: 12px;
+  border-radius: 0 4px 4px 0;
+}
+.cb-synergy {
+  background: rgba(38, 166, 154, 0.06);
+  border-left: 3px solid var(--teal);
+  padding: 8px 28px 8px 12px;
+  margin: 6px 0;
+  font-size: 13px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Clear marks button */
+#clear-marks-btn {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 8px 12px 4px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: border-color 0.15s, color 0.15s;
+  font-family: inherit;
+}
+#clear-marks-btn:hover { border-color: var(--red); color: var(--red); }
+#clear-marks-btn.empty { opacity: 0.4; cursor: default; }
+#clear-marks-btn.empty:hover { border-color: var(--border); color: var(--text-dim); }
+
+/* WBtW scene divider — separates linked scenes within a location */
+.scene-divider {
+  border-top: 2px solid var(--gold);
+  margin: 20px 0 10px;
+  padding-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Continuity briefing block (top of scene view) */
+.continuity-briefing {
+  background: linear-gradient(135deg, rgba(245,200,66,0.08), rgba(38,166,154,0.05));
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.continuity-briefing h3 { color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.continuity-briefing .cb-kv { margin: 4px 0; }
+.continuity-briefing .cb-kv .k { font-weight: 700; color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- ==================== LOAD SCREEN ==================== -->
+<div id="load-screen">
+  <h1>Adaptive Adventures</h1>
+  <div class="load-card">
+    <div class="load-row">
+      <label for="adventureSelect">Adventure</label>
+      <select id="adventureSelect" onchange="onAdventureChange()">
+        <option value="">— Select adventure —</option>
+      </select>
+    </div>
+    <div class="load-row">
+      <label for="adaptationSelect">Party Adaptation</label>
+      <select id="adaptationSelect">
+        <option value="">— None (generic) —</option>
+      </select>
+    </div>
+    <button id="launch-btn" disabled onclick="launchSelected()">Launch</button>
+  </div>
+  <div id="load-error"></div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard">
+  <nav id="sidebar"></nav>
+  <div id="main"></div>
+  <div id="right-panel"></div>
+</div>
+
+<script>
+// ===================== STATE =====================
+let source = null;
+let adaptation = null;
+let currentView = null;
+let currentAdventureId = null;
+let currentAdaptationId = null;
+let marks = {}; // { markKey: true }
+
+// ===================== MARK-AS-USED =====================
+function marksStorageKey() {
+  const advId = currentAdventureId || 'unknown';
+  const adaptId = currentAdaptationId || 'none';
+  return `aa-marks:${advId}:${adaptId}`;
+}
+function loadMarks() {
+  try {
+    const raw = localStorage.getItem(marksStorageKey());
+    marks = raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    marks = {};
+  }
+}
+function saveMarks() {
+  try { localStorage.setItem(marksStorageKey(), JSON.stringify(marks)); } catch (e) {}
+}
+function isMarked(key) { return !!marks[key]; }
+function toggleMark(key) {
+  if (marks[key]) delete marks[key];
+  else marks[key] = true;
+  saveMarks();
+  updateClearMarksButton();
+}
+function applyMarks(root) {
+  root = root || document.getElementById('main');
+  if (!root) return;
+  root.querySelectorAll('[data-mark-key]').forEach(el => {
+    el.classList.toggle('marked', isMarked(el.dataset.markKey));
+  });
+}
+function clearAllMarks() {
+  if (!Object.keys(marks).length) return;
+  if (!confirm('Clear all marks for this adaptation?')) return;
+  marks = {};
+  saveMarks();
+  applyMarks();
+  updateClearMarksButton();
+}
+function updateClearMarksButton() {
+  const btn = document.getElementById('clear-marks-btn');
+  if (!btn) return;
+  const n = Object.keys(marks).length;
+  if (n === 0) {
+    btn.textContent = 'No marks';
+    btn.classList.add('empty');
+  } else {
+    btn.textContent = `Clear ${n} Mark${n === 1 ? '' : 's'}`;
+    btn.classList.remove('empty');
+  }
+}
+// Delegated click handler for markable items
+document.addEventListener('click', (e) => {
+  // Don't trigger if click was on a loc-link or button inside a markable
+  if (e.target.closest('.loc-link') || e.target.closest('.conn-btn') || e.target.closest('.sb-item')) return;
+  if (e.target.closest('#clear-marks-btn')) return;
+  const markable = e.target.closest('.markable[data-mark-key]');
+  if (!markable) return;
+  // Also ignore clicks on summary/details toggles inside a markable (none expected, but safe)
+  if (e.target.tagName === 'SUMMARY') return;
+  const key = markable.dataset.markKey;
+  toggleMark(key);
+  markable.classList.toggle('marked', isMarked(key));
+});
+
+// ===================== MANIFEST / DROPDOWN =====================
+function populateDropdowns() {
+  const advSel = document.getElementById('adventureSelect');
+  const manifest = window.ADVENTURES_MANIFEST || [];
+  for (const adv of manifest) {
+    const opt = document.createElement('option');
+    opt.value = adv.id;
+    opt.textContent = adv.title + (adv.subtitle ? ' — ' + adv.subtitle : '');
+    advSel.appendChild(opt);
+  }
+  if (manifest.length === 1) {
+    advSel.value = manifest[0].id;
+    onAdventureChange();
+  }
+}
+
+function onAdventureChange() {
+  const advId = document.getElementById('adventureSelect').value;
+  const adaptSel = document.getElementById('adaptationSelect');
+  adaptSel.innerHTML = '<option value="">— None (generic) —</option>';
+  const launchBtn = document.getElementById('launch-btn');
+  if (!advId) { launchBtn.disabled = true; return; }
+  const manifest = window.ADVENTURES_MANIFEST || [];
+  const adv = manifest.find(a => a.id === advId);
+  if (adv && adv.adaptations) {
+    for (const a of adv.adaptations) {
+      const opt = document.createElement('option');
+      opt.value = a.id;
+      opt.textContent = a.label;
+      adaptSel.appendChild(opt);
+    }
+    if (adv.adaptations.length === 1) adaptSel.value = adv.adaptations[0].id;
+  }
+  launchBtn.disabled = false;
+}
+
+function launchSelected() {
+  const advId = document.getElementById('adventureSelect').value;
+  const adaptId = document.getElementById('adaptationSelect').value;
+  const loadError = document.getElementById('load-error');
+  loadError.textContent = '';
+  const manifest = window.ADVENTURES_MANIFEST || [];
+  const adv = manifest.find(a => a.id === advId);
+  if (!adv) { loadError.textContent = 'Adventure not found.'; return; }
+  currentAdventureId = advId;
+  currentAdaptationId = adaptId || null;
+  loadMarks();
+
+  function loadAdaptation() {
+    if (!adaptId) { launchDashboard(); return; }
+    const adaptMeta = adv.adaptations.find(a => a.id === adaptId);
+    if (!adaptMeta) { launchDashboard(); return; }
+    const old = document.getElementById('adaptationScript');
+    if (old) old.remove();
+    window.ADVENTURE_ADAPTATION = null;
+    const s = document.createElement('script');
+    s.id = 'adaptationScript';
+    s.src = adaptMeta.file + '?v=' + Date.now();
+    s.onload = () => { adaptation = window.ADVENTURE_ADAPTATION; launchDashboard(); };
+    s.onerror = () => { loadError.textContent = 'Failed to load adaptation file.'; };
+    document.head.appendChild(s);
+  }
+
+  const old = document.getElementById('sourceScript');
+  if (old) old.remove();
+  window.ADVENTURE_SOURCE = null;
+  const s = document.createElement('script');
+  s.id = 'sourceScript';
+  s.src = adv.source + '?v=' + Date.now();
+  s.onload = () => { source = window.ADVENTURE_SOURCE; loadAdaptation(); };
+  s.onerror = () => { loadError.textContent = 'Failed to load adventure source file.'; };
+  document.head.appendChild(s);
+}
+
+// ===================== LAUNCH =====================
+function launchDashboard() {
+  document.getElementById('load-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  buildSidebar();
+  const defaultView = (adaptation && adaptation.continuityBriefing)
+    ? 'ref-pickup'
+    : Object.keys(source.locations)[0];
+  navigate(defaultView);
+}
+
+function returnToMenu() {
+  source = null;
+  adaptation = null;
+  currentView = null;
+  const panel = document.getElementById('right-panel');
+  panel.classList.remove('visible');
+  document.getElementById('main').style.marginRight = '';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('load-screen').style.display = 'flex';
+  document.getElementById('load-error').textContent = '';
+}
+
+// Init dropdowns on load
+populateDropdowns();
+
+// ===================== SIDEBAR =====================
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = `<div class="sb-title">${esc(source.meta.title)}</div>`;
+  if (adaptation) {
+    html += `<div style="font-size:11px;color:var(--teal);padding:2px 16px 6px">${esc(adaptation.campaign)} adaptation</div>`;
+  } else {
+    html += `<div style="font-size:11px;color:var(--text-dim);padding:2px 16px 6px">Generic (no adaptation)</div>`;
+  }
+  html += `<button class="sb-item" style="color:var(--text-dim);font-size:11px;padding:4px 16px 8px" onclick="returnToMenu()">← Change Adventure</button>`;
+  html += `<div class="sb-section">Locations</div>`;
+  for (const [id, loc] of Object.entries(source.locations)) {
+    html += `<button class="sb-item" data-view="${id}"><span class="sb-id">${id}</span><span class="sb-name">${esc(loc.name)}</span></button>`;
+  }
+  if (source.triggerScenes && source.triggerScenes.length) {
+    html += `<hr class="sb-divider">`;
+    html += `<div class="sb-section">Events</div>`;
+    for (const ts of source.triggerScenes) {
+      html += `<button class="sb-item" data-view="${ts.id}"><span class="sb-id">&varr;</span><span class="sb-name">${esc(ts.name)}</span></button>`;
+    }
+  }
+  html += `<hr class="sb-divider">`;
+  html += `<div class="sb-section">Reference</div>`;
+  const refs = [
+    source.lore                  && ['ref-lore',      'Lore & Hooks',       false],
+    source.commonFeatures        && ['ref-features',  'Common Features',    false],
+    source.undeadBehavior        && ['ref-undead',    'Undead Behavior',    false],
+    source.rhodarTelepathy       && ['ref-telepathy', "Rhodar's Telepathy", false],
+    source.hoard                 && ['ref-hoard',     'Treasure Hoard',     false],
+    source.bestiary              && ['ref-bestiary',  'Bestiary',           false],
+  ].filter(Boolean);
+  if (adaptation) {
+    if (adaptation.continuityBriefing) refs.unshift(['ref-pickup', 'Session Pickup', true]);
+    refs.push(['ref-dc', 'DC Adjustments', true]);
+    refs.push(['ref-callbacks', 'Campaign Integration', true]);
+    refs.push(['ref-voice', 'Narration Voice', true]);
+  }
+  for (const [id, label, isAdapted] of refs) {
+    html += `<button class="sb-item" data-view="${id}"><span class="sb-name">${esc(label)}${isAdapted ? '<span class="sb-adapt">✦</span>' : ''}</span></button>`;
+  }
+  if (adaptation) {
+    html += `<hr class="sb-divider">`;
+    html += `<div class="sb-section">Session</div>`;
+    html += `<button id="clear-marks-btn" onclick="clearAllMarks()">No marks</button>`;
+  }
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sb-item').forEach(btn => {
+    btn.addEventListener('click', () => navigate(btn.dataset.view));
+  });
+  updateClearMarksButton();
+}
+
+function navigate(view) {
+  currentView = view;
+  // Update sidebar active
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  // Render
+  const main = document.getElementById('main');
+  if (source.locations[view]) {
+    main.innerHTML = renderLocation(view);
+  } else if (source.triggerScenes && source.triggerScenes.find(t => t.id === view)) {
+    main.innerHTML = renderTriggerScene(view);
+  } else if (view.startsWith('ref-')) {
+    main.innerHTML = renderReference(view);
+  }
+  main.scrollTop = 0;
+  window.scrollTo(0, 0);
+  updateRightPanel(view);
+  // Wire up connection buttons
+  main.querySelectorAll('.conn-btn').forEach(btn => {
+    btn.addEventListener('click', () => navigate(btn.dataset.target));
+  });
+  applyMarks(main);
+}
+
+// ===================== RENDER: LOCATION =====================
+function renderLocation(id) {
+  const loc = source.locations[id];
+  const adpt = adaptation && adaptation.scenes && adaptation.scenes[id];
+  let h = '';
+
+  // Header
+  h += `<div class="room-header">`;
+  h += `<h1>${id}: ${esc(loc.name)}</h1>`;
+  h += `<div class="room-meta">${typeBadge(loc.type)} ${esc(loc.summary)}`;
+  if (loc.safeRest) h += `<span class="badge badge-safe">Safe Rest</span>`;
+  h += `</div></div>`;
+
+  // Session State (adaptation — per-scene pickup status)
+  if (adpt && adpt.sessionState) {
+    const ss = adpt.sessionState;
+    const ssPreview = ss.status ? snip(ss.status, 90) : '';
+    h += `<details>${summaryWithPreview('Session State', { adapted: true, preview: ssPreview })}<div class="section-body">`;
+    if (ss.status) h += `<div class="kv"><span class="k">Status:</span> ${linkText(ss.status)}</div>`;
+    if (ss.enteredVia) h += `<div class="kv"><span class="k">Entered via:</span> ${linkText(ss.enteredVia)}</div>`;
+    if (ss.resolvedElements && ss.resolvedElements.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Resolved</div>`;
+      h += `<ul class="plain">`;
+      for (const r of ss.resolvedElements) h += `<li>${linkText(r)}</li>`;
+      h += `</ul>`;
+    }
+    if (ss.unresolvedElements && ss.unresolvedElements.length) {
+      h += `<div style="font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Unresolved</div>`;
+      h += `<ul class="plain">`;
+      for (const u of ss.unresolvedElements) h += `<li>${linkText(u)}</li>`;
+      h += `</ul>`;
+    }
+    if (ss.pendingElements && ss.pendingElements.length) {
+      h += `<div style="font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Pending</div>`;
+      h += `<ul class="plain">`;
+      for (const p of ss.pendingElements) h += `<li>${linkText(p)}</li>`;
+      h += `</ul>`;
+    }
+    if (ss.npcStatus) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">NPC Status</div>`;
+      for (const [npcKey, npcStatus] of Object.entries(ss.npcStatus)) {
+        h += `<div class="kv"><span class="k">${esc(npcKey)}:</span> ${linkText(npcStatus)}</div>`;
+      }
+    }
+    if (ss.cliffhangerResolution) h += `<div class="dm-note" style="margin-top:8px"><strong>Cliffhanger:</strong> ${linkText(ss.cliffhangerResolution)}</div>`;
+    h += `</div></details>`;
+  }
+
+  // Connections (top)
+  h += renderConnections(loc.connections, 'From here');
+
+  // Read Aloud
+  if (loc.readAloud && loc.readAloud.length) {
+    h += `<details>${summaryWithPreview('Read Aloud', { preview: snip(loc.readAloud[0], 90) })}<div class="section-body">`;
+    if (loc.readAloudCondition) h += `<div class="dm-note" style="margin-bottom:8px;border-top:none;padding-top:0">${esc(loc.readAloudCondition)}</div>`;
+    for (const ra of loc.readAloud) h += `<div class="read-aloud">${esc(ra)}</div>`;
+    h += `</div></details>`;
+  }
+
+  // Secrets
+  if (loc.secrets && loc.secrets.length) {
+    h += `<details>${summaryWithPreview('DM Secrets', { preview: `${loc.secrets.length} secret${loc.secrets.length===1?'':'s'}` })}<div class="section-body">`;
+    for (const s of loc.secrets) h += `<div class="secret"><div class="secret-label">Secret</div>${linkText(s)}</div>`;
+    h += `</div></details>`;
+  }
+
+  // Encounters
+  if (loc.encounters && loc.encounters.length) {
+    const encPreview = loc.encounters.map(e => e.name || e.title || '').filter(Boolean).slice(0,3).join(', ');
+    h += `<details>${summaryWithPreview('Encounters', { preview: encPreview || `${loc.encounters.length} encounter${loc.encounters.length===1?'':'s'}` })}<div class="section-body">`;
+    for (const enc of loc.encounters) h += renderEncounter(enc);
+    h += `</div></details>`;
+  }
+
+  // Hazards
+  if (loc.hazards && loc.hazards.length) {
+    const hazPreview = loc.hazards.map(h => h.name || '').filter(Boolean).slice(0,3).join(', ');
+    h += `<details>${summaryWithPreview('Hazards', { preview: hazPreview || `${loc.hazards.length} hazard${loc.hazards.length===1?'':'s'}` })}<div class="section-body">`;
+    for (const haz of loc.hazards) h += renderHazard(haz);
+    h += `</div></details>`;
+  }
+
+  // Points of Interest
+  const pois = loc.pointsOfInterest ? Object.values(loc.pointsOfInterest) : [];
+  if (pois.length) {
+    const poiPreview = pois.map(p => p.name || '').filter(Boolean).slice(0,3).join(', ');
+    h += `<details>${summaryWithPreview('Points of Interest', { preview: poiPreview || `${pois.length} item${pois.length===1?'':'s'}` })}<div class="section-body">`;
+    for (const poi of pois) h += renderPOI(poi);
+    h += `</div></details>`;
+  }
+
+  // Entry (special for V5)
+  if (loc.entry) {
+    h += `<details><summary>Entry Requirements</summary><div class="section-body">`;
+    const e = loc.entry.ironDoor || loc.entry;
+    if (e.lockedFrom) h += `<div class="kv"><span class="k">Locked from:</span> ${esc(e.lockedFrom)} side</div>`;
+    if (e.bypass) {
+      for (const b of e.bypass) {
+        h += `<div class="check-entry"><span class="check-dc">${esc(b.method)}</span>`;
+        if (b.dc) h += ` — DC ${b.dc} ${esc(b.skill || '')}`;
+        h += `</div>`;
+      }
+    }
+    if (e.durability) h += `<div class="kv"><span class="k">Durability:</span> AC ${e.durability.ac}, ${e.durability.hp} HP (immune: ${e.durability.immunities.join(', ')})</div>`;
+    h += `</div></details>`;
+  }
+
+  // Treasure
+  const treasure = loc.treasure;
+  if (treasure && ((Array.isArray(treasure) && treasure.length) || typeof treasure === 'string')) {
+    const tPreview = typeof treasure === 'string'
+      ? snip(treasure, 90)
+      : treasure.map(t => t.name).filter(Boolean).slice(0,3).join(', ');
+    h += `<details>${summaryWithPreview('Treasure', { preview: tPreview })}<div class="section-body">`;
+    if (typeof treasure === 'string') {
+      h += `<div class="treasure-item">${esc(treasure)}</div>`;
+    } else {
+      for (const t of treasure) {
+        h += `<div class="treasure-item"><strong>${esc(t.name)}</strong>`;
+        if (t.location) h += ` — ${esc(t.location)}`;
+        if (t.description) h += `<br>${esc(t.description)}`;
+        if (t.findDC) h += `<br><span class="check-dc">DC ${t.findDC} ${esc(t.findSkill || '')}</span>: ${esc(t.findDescription || '')}`;
+        h += `</div>`;
+      }
+    }
+    h += `</div></details>`;
+  }
+
+  // Coffins (V3)
+  if (loc.coffins) {
+    h += `<div class="kv" style="margin:8px 0"><span class="k">Coffins:</span> ${esc(loc.coffins.note)}</div>`;
+  }
+
+  // WBtW Scenes — linked via scenesHere
+  if (source.scenes && loc.scenesHere && loc.scenesHere.length) {
+    for (const sceneId of loc.scenesHere) {
+      const scene = source.scenes[sceneId];
+      if (scene) h += renderWBtWScene(sceneId, scene);
+    }
+  }
+
+  // Passive Revelations (adaptation) — inline thresholds + PC shortcuts
+  if (adpt && adpt.passiveRevelations && Object.keys(adpt.passiveRevelations).length) {
+    h += `<details><summary>Passive Revelations <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    for (const [topic, block] of Object.entries(adpt.passiveRevelations)) {
+      const label = topic.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/\b\w/g, c => c.toUpperCase()).trim();
+      h += `<div class="pr-block"><div class="pr-block-title">${esc(label)}</div>`;
+      if (block.partyAgnostic && block.partyAgnostic.length) {
+        block.partyAgnostic.forEach((pa, i) => {
+          const key = `pr-pa:${id}:${topic}:${i}`;
+          h += `<div class="pr-item markable" data-mark-key="${esc(key)}"><span class="pr-threshold">${esc(pa.threshold)}</span><div class="pr-reveals">${linkText(pa.reveals)}</div></div>`;
+        });
+      }
+      if (block.namedPcAccess && block.namedPcAccess.length) {
+        block.namedPcAccess.forEach((pc, i) => {
+          const key = `pr-pc:${id}:${topic}:${i}`;
+          h += `<div class="pr-item markable" data-mark-key="${esc(key)}" style="border-left-color:var(--teal)"><span class="pr-pc-name">${esc(pc.pc)}</span><div class="pr-reveals">${linkText(pc.access)}</div></div>`;
+        });
+      }
+      h += `</div>`;
+    }
+    h += `</div></details>`;
+  }
+
+  // Combat Briefing (adaptation) — hazards + creatures + synergies + rulesAmbiguities
+  if (adpt && adpt.combatBriefing) {
+    const cb = adpt.combatBriefing;
+    h += `<details><summary>Combat Briefing <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    if (cb.sceneSummary) h += `<p style="font-size:13px;margin-bottom:10px">${linkText(cb.sceneSummary)}</p>`;
+    if (cb.sceneLevelHazards && cb.sceneLevelHazards.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Hazards</div>`;
+      cb.sceneLevelHazards.forEach((hz, i) => {
+        const key = `hazard:${id}:${i}`;
+        h += `<div class="cb-hazard markable" data-mark-key="${esc(key)}">`;
+        h += `<h4>${esc(hz.name)}</h4>`;
+        if (hz.detail) h += `<div class="cb-detail">${linkText(hz.detail)}</div>`;
+        if (hz.pcImpact) h += `<div class="cb-impact">${linkText(hz.pcImpact)}</div>`;
+        if (hz.ruling) h += `<div class="dm-note" style="margin-top:6px"><strong>Ruling:</strong> ${linkText(hz.ruling)}</div>`;
+        if (hz.recommendedRuling) h += `<div class="dm-note" style="margin-top:6px"><strong>Recommended ruling:</strong> ${linkText(hz.recommendedRuling)}</div>`;
+        if (hz.holyWaterSourcing) h += `<div class="cb-impact">${linkText(hz.holyWaterSourcing)}</div>`;
+        h += `</div>`;
+      });
+    }
+    if (cb.creatures && Object.keys(cb.creatures).length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Creatures</div>`;
+      for (const [creatureKey, cr] of Object.entries(cb.creatures)) {
+        h += `<div class="cb-creature">`;
+        h += `<h4>${esc(creatureKey)}${cr.count ? ` <span style="font-weight:400;color:var(--text-dim);font-size:12px">× ${esc(String(cr.count))}</span>` : ''}</h4>`;
+        if (cr.stats) h += `<div class="cb-stats">${esc(cr.stats)}</div>`;
+        if (cr.notes) h += `<div class="cb-stats" style="color:var(--text)">${linkText(cr.notes)}</div>`;
+        if (cr.signatureMechanics) {
+          h += `<div class="cb-sub-title">Signature Mechanics</div>`;
+          if (Array.isArray(cr.signatureMechanics)) {
+            h += `<ul class="plain">`;
+            for (const m of cr.signatureMechanics) h += `<li>${linkText(m)}</li>`;
+            h += `</ul>`;
+          } else {
+            h += `<p style="font-size:12px">${linkText(cr.signatureMechanics)}</p>`;
+          }
+        }
+        if (cr.damageProfile) {
+          h += `<div class="cb-sub-title">Damage Profile</div>`;
+          if (cr.damageProfile.immunities) h += `<div class="kv" style="font-size:12px"><span class="k">Immune:</span> ${cr.damageProfile.immunities.join(', ')}</div>`;
+          if (cr.damageProfile.resistances) h += `<div class="kv" style="font-size:12px"><span class="k">Resist:</span> ${cr.damageProfile.resistances.join(', ')}</div>`;
+          if (cr.damageProfile.vulnerabilities && cr.damageProfile.vulnerabilities.length) h += `<div class="kv" style="font-size:12px"><span class="k">Vulnerable:</span> ${cr.damageProfile.vulnerabilities.join(', ')}</div>`;
+          if (cr.damageProfile.notes) h += `<div class="cb-impact">${linkText(cr.damageProfile.notes)}</div>`;
+          if (cr.damageProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.damageProfile.notesFromSession)}</div>`;
+        }
+        if (cr.conditionProfile) {
+          h += `<div class="cb-sub-title">Condition Profile</div>`;
+          if (cr.conditionProfile.immunities) h += `<div class="kv" style="font-size:12px"><span class="k">Immune:</span> ${cr.conditionProfile.immunities.join(', ')}</div>`;
+          if (cr.conditionProfile.vulnerable) h += `<div class="kv" style="font-size:12px"><span class="k">Vulnerable:</span> ${cr.conditionProfile.vulnerable.join(', ')}</div>`;
+          if (cr.conditionProfile.notes) h += `<div class="cb-impact">${linkText(cr.conditionProfile.notes)}</div>`;
+          if (cr.conditionProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.conditionProfile.notesFromSession)}</div>`;
+        }
+        if (cr.rulesAmbiguitiesToPreEmpt && cr.rulesAmbiguitiesToPreEmpt.length) {
+          h += `<div class="cb-sub-title">Pre-Empt Rulings</div>`;
+          cr.rulesAmbiguitiesToPreEmpt.forEach((amb, i) => {
+            const key = `ambig:${id}:${creatureKey}:${i}`;
+            h += `<div class="cb-ambig markable" data-mark-key="${esc(key)}">${linkText(amb)}</div>`;
+          });
+        }
+        if (cr.killPriority) h += `<div class="kv" style="margin-top:6px;font-size:12px"><span class="k">Kill priority:</span> ${linkText(cr.killPriority)}</div>`;
+        if (cr.tacticalNotes) {
+          h += `<div class="cb-sub-title">Tactical Notes</div>`;
+          if (Array.isArray(cr.tacticalNotes)) {
+            h += `<ul class="plain">`;
+            for (const t of cr.tacticalNotes) h += `<li>${linkText(t)}</li>`;
+            h += `</ul>`;
+          } else {
+            h += `<p style="font-size:12px">${linkText(cr.tacticalNotes)}</p>`;
+          }
+        }
+        if (cr.tacticalNote) h += `<div class="cb-impact">${linkText(cr.tacticalNote)}</div>`;
+        if (cr.combatRole) h += `<div class="cb-impact"><strong>Combat role:</strong> ${linkText(cr.combatRole)}</div>`;
+        if (cr.recognition) h += `<div class="cb-impact"><strong>Recognition:</strong> ${linkText(cr.recognition)}</div>`;
+        h += `</div>`;
+      }
+    }
+    if (cb.creatureSynergies && cb.creatureSynergies.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Creature Synergies</div>`;
+      cb.creatureSynergies.forEach((syn, i) => {
+        const key = `synergy:${id}:${i}`;
+        h += `<div class="cb-synergy markable" data-mark-key="${esc(key)}">${linkText(syn)}</div>`;
+      });
+    }
+    h += `</div></details>`;
+  }
+
+  // IF THEY ASK (merged: source POI questions + adaptation additions)
+  const itaSource = [];
+  if (pois.length) {
+    for (const poi of pois) {
+      if (poi.ifTheyAsk) {
+        for (const q of poi.ifTheyAsk) {
+          itaSource.push({ ...q, source: poi.name });
+        }
+      }
+    }
+  }
+  const itaAdapt = adpt && adpt.ifTheyAsk_additions ? adpt.ifTheyAsk_additions : [];
+  if (itaSource.length || itaAdapt.length) {
+    const totalQ = itaSource.length + itaAdapt.length;
+    const firstQ = (itaSource[0] || itaAdapt[0] || {}).question || '';
+    const itaPreview = totalQ === 1 ? snip(firstQ, 70) : `${totalQ} questions · ${snip(firstQ, 50)}`;
+    h += `<details>${summaryWithPreview('If They Ask', { adapted: itaAdapt.length > 0, preview: itaPreview })}<div class="section-body">`;
+    itaSource.forEach((q, i) => {
+      const key = `ita-src:${id}:${i}`;
+      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
+      if (q.source) h += `<div class="ita-thread">Source: ${esc(q.source)}</div>`;
+      h += `</div>`;
+    });
+    if (itaAdapt.length && itaSource.length) h += `<div style="font-size:11px;color:var(--teal);margin:10px 0 4px;text-transform:uppercase;letter-spacing:1px">Party-Specific <span class="adapt-badge">Adapted</span></div>`;
+    itaAdapt.forEach((q, i) => {
+      const key = `ita-adpt:${id}:${i}`;
+      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
+      if (q.campaignThread) h += `<div class="ita-thread">Thread: ${esc(q.campaignThread)}</div>`;
+      h += `</div>`;
+    });
+    h += `</div></details>`;
+  }
+
+  // Special Resources (adaptation)
+  if (adpt && adpt.specialResources && adpt.specialResources.length) {
+    const srPreview = adpt.specialResources.map(sr => sr.pc).filter(Boolean).join(', ');
+    h += `<details>${summaryWithPreview('Special Resources', { adapted: true, preview: srPreview })}<div class="section-body">`;
+    adpt.specialResources.forEach((sr, i) => {
+      const key = `sr:${id}:${i}`;
+      h += `<div class="sr-card markable" data-mark-key="${esc(key)}">`;
+      h += `<div class="sr-pc">${esc(sr.pc)}</div>`;
+      h += `<div class="sr-cap">${esc(sr.capability)}</div>`;
+      h += `<div class="sr-moment">${linkText(sr.moment)}</div>`;
+      if (sr.narrativeHook) h += `<div class="sr-hook">${linkText(sr.narrativeHook)}</div>`;
+      if (sr.dmNote) h += `<div class="sr-dm-note">${linkText(sr.dmNote)}</div>`;
+      h += `</div>`;
+    });
+    h += `</div></details>`;
+  }
+
+  // Common Features (reference, collapsed)
+  if (source.commonFeatures && source.commonFeatures.length) {
+    const cfPreview = source.commonFeatures.map(f => f.name).filter(Boolean).slice(0,3).join(', ');
+    h += `<details>${summaryWithPreview('Common Features', { preview: cfPreview })}<div class="section-body">`;
+    for (const f of source.commonFeatures) {
+      h += `<div class="poi-card"><h4>${esc(f.name)}</h4>`;
+      h += `<div class="poi-type">${esc(f.summary)}</div>`;
+      h += `<p style="font-size:13px">${esc(f.detail)}</p></div>`;
+    }
+    h += `</div></details>`;
+  }
+
+  // Connections (bottom)
+  h += renderConnections(loc.connections, 'Exits');
+
+  return h;
+}
+
+// ===================== RENDER: WBtW SCENE (linked via scenesHere) =====================
+function renderWBtWScene(sceneId, scene) {
+  if (!scene) return '';
+  const sceneAdpt = (adaptation && adaptation.scenes && adaptation.scenes[sceneId]) || null;
+  let h = '';
+
+  h += `<div class="scene-divider">${typeBadge(scene.type)} ${esc(scene.title || sceneId)}</div>`;
+
+  if (scene.summary) h += `<div class="dm-note" style="margin:8px 0">${esc(scene.summary)}</div>`;
+
+  // Read Aloud (source)
+  const raArr = Array.isArray(scene.readAloud) ? scene.readAloud : (scene.readAloud ? [scene.readAloud] : []);
+  if (raArr.length) {
+    h += `<details>${summaryWithPreview('Read Aloud', { preview: snip(raArr[0], 90) })}<div class="section-body">`;
+    for (const ra of raArr) h += `<div class="read-aloud">${esc(ra)}</div>`;
+    h += `</div></details>`;
+  }
+
+  // Event outcomes (adaptation) — success / failure narration. The "begin" beat lives in
+  // source readAloud above; we only add adapted occurring if it reflects session state.
+  if (sceneAdpt && sceneAdpt.eventReadAloud) {
+    const ev = sceneAdpt.eventReadAloud;
+    const hasAny = ev.occurring || ev.happyResolution || ev.sadResolution;
+    if (hasAny) {
+      const label = ev.occurring ? 'Event Narration' : 'Outcomes';
+      const evPreview = snip(ev.occurring || ev.happyResolution || ev.sadResolution || '', 90);
+      h += `<details>${summaryWithPreview(label, { adapted: true, preview: evPreview })}<div class="section-body">`;
+      if (ev.occurring) h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:6px">When it begins</div><div class="read-aloud">${esc(ev.occurring)}</div>`;
+      if (ev.happyResolution) h += `<div style="font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-top:8px">If it goes well</div><div class="read-aloud">${esc(ev.happyResolution)}</div>`;
+      if (ev.sadResolution) h += `<div style="font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:8px">If it goes badly</div><div class="read-aloud">${esc(ev.sadResolution)}</div>`;
+      h += `</div></details>`;
+    }
+  }
+
+  // If They Ask — adapted (in-character) takes precedence; source as fallback
+  const itaSource = (scene.ifTheyAsk && scene.ifTheyAsk.length) ? scene.ifTheyAsk : [];
+  const itaAdapt = (sceneAdpt && sceneAdpt.ifTheyAsk_additions && sceneAdpt.ifTheyAsk_additions.length) ? sceneAdpt.ifTheyAsk_additions : [];
+  const itaSuppress = sceneAdpt && sceneAdpt.ifTheyAsk_suppress === true;
+  const renderList = itaSuppress ? [] : (itaAdapt.length ? itaAdapt : itaSource);
+  const itaIsAdapted = renderList === itaAdapt && itaAdapt.length > 0;
+  if (renderList.length) {
+    const itaPreview = renderList.length === 1
+      ? snip(renderList[0].question, 70)
+      : `${renderList.length} questions · ${snip(renderList[0].question, 50)}`;
+    h += `<details>${summaryWithPreview('If They Ask', { adapted: itaIsAdapted, preview: itaPreview })}<div class="section-body">`;
+    renderList.forEach((q, i) => {
+      const key = `ita-scene:${sceneId}:${itaIsAdapted ? 'a' : 's'}:${i}`;
+      h += `<div class="ita-item markable" data-mark-key="${esc(key)}">`;
+      h += `<div class="ita-q">"${esc(q.question)}"</div>`;
+      const ans = q.answer;
+      if (typeof ans === 'string') {
+        h += `<div class="ita-a">${linkText(ans)}</div>`;
+      } else if (ans && typeof ans === 'object') {
+        if (ans.public) h += `<div class="ita-a">${linkText(ans.public)}</div>`;
+        if (ans.dm) h += `<div class="dm-note" style="margin-top:4px;border-top:none;padding-top:0">${esc(ans.dm)}</div>`;
+      }
+      h += `</div>`;
+    });
+    h += `</div></details>`;
+  }
+
+  // Trial block
+  if (scene.trial) {
+    const t = scene.trial;
+    const tBits = [t.dc ? `DC ${t.dc}` : '', t.difficulty || '', t.goal ? snip(t.goal, 50) : ''].filter(Boolean);
+    h += `<details>${summaryWithPreview('Trial Mechanics', { preview: tBits.join(' · ') })}<div class="section-body">`;
+    if (t.goal) h += `<div class="kv"><span class="k">Goal:</span> ${esc(t.goal)}</div>`;
+    if (t.dc) h += `<div class="kv"><span class="k">DC:</span> ${t.dc}</div>`;
+    if (t.difficulty) h += `<div class="kv"><span class="k">Difficulty:</span> ${esc(t.difficulty)}</div>`;
+    if (t.pace) h += `<div class="kv"><span class="k">Pace:</span> ${esc(t.pace)}</div>`;
+    if (t.tasks && t.tasks.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Tasks</div>`;
+      for (const task of t.tasks) {
+        h += `<div class="poi-card" style="margin-top:6px"><h4>${esc(task.name)}</h4>`;
+        if (task.skills && task.skills.length) h += `<div class="poi-type">${task.skills.join(' / ')}</div>`;
+        h += `<p style="font-size:13px">${esc(task.description)}</p>`;
+        if (task.requirements) h += `<div class="kv" style="font-size:12px"><span class="k">Requires:</span> ${Array.isArray(task.requirements) ? task.requirements.join(', ') : esc(task.requirements)}</div>`;
+        h += `</div>`;
+      }
+    }
+    if (t.outcomes && t.outcomes.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Outcomes</div>`;
+      for (const out of t.outcomes) h += `<div class="kv"><span class="k">${esc(out.tier || String(out.failures || '?'))}:</span> ${esc(out.description)}</div>`;
+    }
+    if (t.challenges && t.challenges.length) {
+      h += `<div style="font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Complications</div>`;
+      for (const ch of t.challenges) h += `<div class="dm-note" style="margin-top:6px"><strong>${esc(ch.name)}:</strong> ${esc(ch.description)}</div>`;
+    }
+    if (t.specialResourceSlots && t.specialResourceSlots.length) {
+      h += `<div style="font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Special Resource Slots</div>`;
+      for (const sr of t.specialResourceSlots) h += `<div class="kv" style="font-size:12px"><span class="k">${esc(sr.criterion)}:</span> ${esc(sr.effect)}</div>`;
+    }
+    h += `</div></details>`;
+  }
+
+  // Social block
+  if (scene.social) {
+    const s = scene.social;
+    const npcs = (s.npcs || []).slice(0,3).join(', ');
+    h += `<details>${summaryWithPreview('Social Mechanics', { preview: npcs || (s.talent || '') })}<div class="section-body">`;
+    if (s.mechanics && typeof s.mechanics === 'object') {
+      for (const [k, v] of Object.entries(s.mechanics)) {
+        const label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
+        h += `<div class="kv"><span class="k">${esc(label)}:</span> ${esc(v)}</div>`;
+      }
+    }
+    if (s.talent) h += `<div class="kv"><span class="k">Talent:</span> ${esc(s.talent)}</div>`;
+    if (s.triggers && s.triggers.length) h += `<div class="kv"><span class="k">Triggers:</span> ${s.triggers.map(t => esc(t)).join(', ')}</div>`;
+    if (s.moodShifts && Object.keys(s.moodShifts).length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Mood Shifts</div>`;
+      for (const [event, delta] of Object.entries(s.moodShifts)) {
+        const color = delta > 0 ? 'var(--green)' : delta < 0 ? 'var(--red)' : 'var(--text-dim)';
+        const label = event.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+        h += `<div class="kv"><span class="k">${esc(label)}:</span> <span style="color:${color}">${delta > 0 ? '+' : ''}${delta}</span></div>`;
+      }
+    }
+    if (s.outcomes && s.outcomes.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Outcomes</div>`;
+      for (const out of s.outcomes) h += `<div class="kv"><span class="k">${esc(out.tier)}:</span> ${esc(out.description)}</div>`;
+    }
+    h += `</div></details>`;
+  }
+
+  // Negotiation block
+  if (scene.negotiation) {
+    const n = scene.negotiation;
+    const nBits = [n.npc || '', n.attitude || ''].filter(Boolean);
+    h += `<details>${summaryWithPreview('Negotiation', { preview: nBits.join(' · ') })}<div class="section-body">`;
+    if (n.npc) h += `<div class="kv"><span class="k">NPC:</span> ${esc(n.npc)}</div>`;
+    if (n.attitude) h += `<div class="kv"><span class="k">Attitude:</span> ${esc(n.attitude)}</div>`;
+    if (n.request) h += `<p style="font-size:13px;margin:6px 0">${esc(n.request)}</p>`;
+    if (n.motivations && n.motivations.length) h += `<div class="kv"><span class="k">Motivations:</span> ${n.motivations.map(m => esc(m)).join(' · ')}</div>`;
+    if (n.pitfalls && n.pitfalls.length) h += `<div class="kv"><span class="k" style="color:var(--red)">Pitfalls:</span> ${n.pitfalls.map(p => esc(p)).join(' · ')}</div>`;
+    if (n.outcomes && n.outcomes.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Outcomes by Interest</div>`;
+      n.outcomes.forEach((out, i) => {
+        const narration = n.outcomeNarrations && n.outcomeNarrations[i]
+          ? `<div class="read-aloud" style="margin-top:4px;font-size:12px">"${esc(n.outcomeNarrations[i])}"</div>` : '';
+        h += `<div class="poi-card" style="margin-top:6px"><h4>${esc(out.tier)}</h4><p style="font-size:13px">${esc(out.description)}</p>${narration}</div>`;
+      });
+    }
+    if (n.subTrial) {
+      const st = n.subTrial;
+      h += `<div style="font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Sub-Trial: ${esc(st.name)}</div>`;
+      h += `<p style="font-size:13px;margin:4px 0">${esc(st.description)}</p>`;
+      if (st.outcomes && st.outcomes.length) {
+        for (const out of st.outcomes) h += `<div class="kv" style="font-size:12px"><span class="k">${esc(out.tier)}:</span> ${esc(out.description)}</div>`;
+      }
+    }
+    h += `</div></details>`;
+  }
+
+  return h;
+}
+
+// ===================== RENDER: TRIGGER SCENE =====================
+function renderTriggerScene(id) {
+  const scene = source.triggerScenes.find(t => t.id === id);
+  if (!scene) return '<p>Scene not found.</p>';
+  const adpt = adaptation && adaptation.scenes && adaptation.scenes[id];
+  let h = '';
+
+  h += `<div class="room-header">`;
+  h += `<h1>${esc(scene.name)}</h1>`;
+  h += `<div class="room-meta">${typeBadge(scene.type)} Trigger Event</div>`;
+  h += `</div>`;
+
+  // Trigger conditions
+  h += `<details><summary>Trigger Conditions</summary><div class="section-body">`;
+  if (scene.trigger) {
+    h += `<div class="kv"><span class="k">Operator:</span> ${esc(scene.trigger.operator || 'AND')}</div>`;
+    if (scene.trigger.conditions) {
+      h += `<ul class="plain">`;
+      for (const c of scene.trigger.conditions) h += `<li>${esc(c.replace(/_/g, ' '))}</li>`;
+      h += `</ul>`;
+    }
+    if (scene.trigger.dmNote) h += `<div class="dm-note" style="border-top:none">${esc(scene.trigger.dmNote)}</div>`;
+  }
+  h += `</div></details>`;
+
+  // Preamble
+  if (scene.preamble && scene.preamble.length) {
+    h += `<details><summary>Preamble (Read Aloud)</summary><div class="section-body">`;
+    for (const p of scene.preamble) h += `<div class="read-aloud">${esc(p)}</div>`;
+    if (scene.suggestedLocations) h += `<div class="kv"><span class="k">Suggested locations:</span> ${scene.suggestedLocations.join(', ')}</div>`;
+    h += `</div></details>`;
+  }
+
+  // Creatures
+  if (scene.creatures && scene.creatures.length) {
+    h += `<details><summary>Creatures</summary><div class="section-body">`;
+    h += `<ul class="creature-list">`;
+    for (const c of scene.creatures) {
+      const name = source.bestiary[c.id] ? source.bestiary[c.id].name : c.id;
+      h += `<li>${c.count}x ${esc(name)}</li>`;
+    }
+    h += `</ul>`;
+    if (scene.notes) h += `<div class="tactics">${esc(scene.notes)}</div>`;
+    h += `</div></details>`;
+  }
+
+  // Passive Revelations (adaptation) — same render path as locations
+  if (adpt && adpt.passiveRevelations && Object.keys(adpt.passiveRevelations).length) {
+    h += `<details><summary>Passive Revelations <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    for (const [topic, block] of Object.entries(adpt.passiveRevelations)) {
+      const label = topic.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/\b\w/g, c => c.toUpperCase()).trim();
+      h += `<div class="pr-block"><div class="pr-block-title">${esc(label)}</div>`;
+      if (block.partyAgnostic && block.partyAgnostic.length) {
+        block.partyAgnostic.forEach((pa, i) => {
+          const key = `pr-pa:${id}:${topic}:${i}`;
+          h += `<div class="pr-item markable" data-mark-key="${esc(key)}"><span class="pr-threshold">${esc(pa.threshold)}</span><div class="pr-reveals">${linkText(pa.reveals)}</div></div>`;
+        });
+      }
+      if (block.namedPcAccess && block.namedPcAccess.length) {
+        block.namedPcAccess.forEach((pc, i) => {
+          const key = `pr-pc:${id}:${topic}:${i}`;
+          h += `<div class="pr-item markable" data-mark-key="${esc(key)}" style="border-left-color:var(--teal)"><span class="pr-pc-name">${esc(pc.pc)}</span><div class="pr-reveals">${linkText(pc.access)}</div></div>`;
+        });
+      }
+      h += `</div>`;
+    }
+    h += `</div></details>`;
+  }
+
+  // Combat Briefing (adaptation)
+  if (adpt && adpt.combatBriefing) {
+    const cb = adpt.combatBriefing;
+    h += `<details><summary>Combat Briefing <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    if (cb.sceneSummary) h += `<p style="font-size:13px;margin-bottom:10px">${linkText(cb.sceneSummary)}</p>`;
+    if (cb.sceneLevelHazards && cb.sceneLevelHazards.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Hazards</div>`;
+      cb.sceneLevelHazards.forEach((hz, i) => {
+        const key = `hazard:${id}:${i}`;
+        h += `<div class="cb-hazard markable" data-mark-key="${esc(key)}">`;
+        h += `<h4>${esc(hz.name)}</h4>`;
+        if (hz.detail) h += `<div class="cb-detail">${linkText(hz.detail)}</div>`;
+        if (hz.pcImpact) h += `<div class="cb-impact">${linkText(hz.pcImpact)}</div>`;
+        if (hz.ruling) h += `<div class="dm-note" style="margin-top:6px"><strong>Ruling:</strong> ${linkText(hz.ruling)}</div>`;
+        if (hz.recommendedRuling) h += `<div class="dm-note" style="margin-top:6px"><strong>Recommended ruling:</strong> ${linkText(hz.recommendedRuling)}</div>`;
+        if (hz.holyWaterSourcing) h += `<div class="cb-impact">${linkText(hz.holyWaterSourcing)}</div>`;
+        h += `</div>`;
+      });
+    }
+    if (cb.creatures && Object.keys(cb.creatures).length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Creatures</div>`;
+      for (const [creatureKey, cr] of Object.entries(cb.creatures)) {
+        h += `<div class="cb-creature">`;
+        h += `<h4>${esc(creatureKey)}${cr.count ? ` <span style="font-weight:400;color:var(--text-dim);font-size:12px">× ${esc(String(cr.count))}</span>` : ''}</h4>`;
+        if (cr.stats) h += `<div class="cb-stats">${esc(cr.stats)}</div>`;
+        if (cr.notes) h += `<div class="cb-stats" style="color:var(--text)">${linkText(cr.notes)}</div>`;
+        if (cr.signatureMechanics) {
+          h += `<div class="cb-sub-title">Signature Mechanics</div>`;
+          if (Array.isArray(cr.signatureMechanics)) {
+            h += `<ul class="plain">`;
+            for (const m of cr.signatureMechanics) h += `<li>${linkText(m)}</li>`;
+            h += `</ul>`;
+          } else {
+            h += `<p style="font-size:12px">${linkText(cr.signatureMechanics)}</p>`;
+          }
+        }
+        if (cr.damageProfile) {
+          h += `<div class="cb-sub-title">Damage Profile</div>`;
+          if (cr.damageProfile.immunities) h += `<div class="kv" style="font-size:12px"><span class="k">Immune:</span> ${cr.damageProfile.immunities.join(', ')}</div>`;
+          if (cr.damageProfile.resistances) h += `<div class="kv" style="font-size:12px"><span class="k">Resist:</span> ${cr.damageProfile.resistances.join(', ')}</div>`;
+          if (cr.damageProfile.vulnerabilities && cr.damageProfile.vulnerabilities.length) h += `<div class="kv" style="font-size:12px"><span class="k">Vulnerable:</span> ${cr.damageProfile.vulnerabilities.join(', ')}</div>`;
+          if (cr.damageProfile.notes) h += `<div class="cb-impact">${linkText(cr.damageProfile.notes)}</div>`;
+          if (cr.damageProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.damageProfile.notesFromSession)}</div>`;
+        }
+        if (cr.conditionProfile) {
+          h += `<div class="cb-sub-title">Condition Profile</div>`;
+          if (cr.conditionProfile.immunities) h += `<div class="kv" style="font-size:12px"><span class="k">Immune:</span> ${cr.conditionProfile.immunities.join(', ')}</div>`;
+          if (cr.conditionProfile.vulnerable) h += `<div class="kv" style="font-size:12px"><span class="k">Vulnerable:</span> ${cr.conditionProfile.vulnerable.join(', ')}</div>`;
+          if (cr.conditionProfile.notes) h += `<div class="cb-impact">${linkText(cr.conditionProfile.notes)}</div>`;
+          if (cr.conditionProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.conditionProfile.notesFromSession)}</div>`;
+        }
+        if (cr.rulesAmbiguitiesToPreEmpt && cr.rulesAmbiguitiesToPreEmpt.length) {
+          h += `<div class="cb-sub-title">Pre-Empt Rulings</div>`;
+          cr.rulesAmbiguitiesToPreEmpt.forEach((amb, i) => {
+            const key = `ambig:${id}:${creatureKey}:${i}`;
+            h += `<div class="cb-ambig markable" data-mark-key="${esc(key)}">${linkText(amb)}</div>`;
+          });
+        }
+        if (cr.killPriority) h += `<div class="kv" style="margin-top:6px;font-size:12px"><span class="k">Kill priority:</span> ${linkText(cr.killPriority)}</div>`;
+        if (cr.tacticalNotes) {
+          h += `<div class="cb-sub-title">Tactical Notes</div>`;
+          if (Array.isArray(cr.tacticalNotes)) {
+            h += `<ul class="plain">`;
+            for (const t of cr.tacticalNotes) h += `<li>${linkText(t)}</li>`;
+            h += `</ul>`;
+          } else {
+            h += `<p style="font-size:12px">${linkText(cr.tacticalNotes)}</p>`;
+          }
+        }
+        if (cr.tacticalNote) h += `<div class="cb-impact">${linkText(cr.tacticalNote)}</div>`;
+        h += `</div>`;
+      }
+    }
+    if (cb.creatureSynergies && cb.creatureSynergies.length) {
+      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Creature Synergies</div>`;
+      cb.creatureSynergies.forEach((syn, i) => {
+        const key = `synergy:${id}:${i}`;
+        h += `<div class="cb-synergy markable" data-mark-key="${esc(key)}">${linkText(syn)}</div>`;
+      });
+    }
+    h += `</div></details>`;
+  }
+
+  // Tactical Notes (adaptation) — key:value pairs, also markable
+  if (adpt && adpt.tacticalNotes) {
+    h += `<details><summary>Tactical Breakdown <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    for (const [tKey, val] of Object.entries(adpt.tacticalNotes)) {
+      const label = tKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const mkey = `tac:${id}:${tKey}`;
+      h += `<div class="tactical-card markable" data-mark-key="${esc(mkey)}"><h4>${esc(label)}</h4><p>${linkText(val)}</p></div>`;
+    }
+    h += `</div></details>`;
+  }
+
+  // IF THEY ASK
+  const itaAdapt = adpt && adpt.ifTheyAsk_additions ? adpt.ifTheyAsk_additions : [];
+  if (itaAdapt.length) {
+    h += `<details><summary>If They Ask <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    itaAdapt.forEach((q, i) => {
+      const key = `ita-adpt:${id}:${i}`;
+      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
+      if (q.campaignThread) h += `<div class="ita-thread">Thread: ${esc(q.campaignThread)}</div>`;
+      h += `</div>`;
+    });
+    h += `</div></details>`;
+  }
+
+  // Special Resources
+  if (adpt && adpt.specialResources && adpt.specialResources.length) {
+    h += `<details><summary>Special Resources <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    adpt.specialResources.forEach((sr, i) => {
+      const key = `sr:${id}:${i}`;
+      h += `<div class="sr-card markable" data-mark-key="${esc(key)}">`;
+      h += `<div class="sr-pc">${esc(sr.pc)}</div>`;
+      h += `<div class="sr-cap">${esc(sr.capability)}</div>`;
+      h += `<div class="sr-moment">${linkText(sr.moment)}</div>`;
+      if (sr.narrativeHook) h += `<div class="sr-hook">${linkText(sr.narrativeHook)}</div>`;
+      if (sr.dmNote) h += `<div class="sr-dm-note">${linkText(sr.dmNote)}</div>`;
+      h += `</div>`;
+    });
+    h += `</div></details>`;
+  }
+
+  return h;
+}
+
+// ===================== RENDER: REFERENCE PAGES =====================
+function renderReference(view) {
+  switch (view) {
+    case 'ref-pickup': return renderSessionPickup();
+    case 'ref-lore': return renderLore();
+    case 'ref-features': return renderFeatures();
+    case 'ref-undead': return renderUndead();
+    case 'ref-telepathy': return renderTelepathy();
+    case 'ref-hoard': return renderHoard();
+    case 'ref-bestiary': return renderBestiary();
+    case 'ref-dc': return renderDC();
+    case 'ref-callbacks': return renderCallbacks();
+    case 'ref-voice': return renderVoice();
+    default: return '<p>Unknown reference section.</p>';
+  }
+}
+
+function renderSessionPickup() {
+  let h = `<div class="room-header"><h1>Session Pickup</h1><div class="room-meta">Resume state after last session</div></div>`;
+  if (!adaptation || !adaptation.continuityBriefing) return h + '<p>No continuity briefing on this adaptation.</p>';
+  const cb = adaptation.continuityBriefing;
+  h += `<div class="continuity-briefing">`;
+  if (cb.lastSessionDate) h += `<div class="cb-kv"><span class="k">Last session:</span> ${esc(cb.lastSessionDate)}</div>`;
+  if (cb.lastSessionSummary) h += `<p style="margin-top:8px">${linkText(cb.lastSessionSummary)}</p>`;
+  h += `</div>`;
+  if (cb.whereTheyAre) {
+    h += `<details><summary>Where They Are</summary><div class="section-body"><p>${linkText(cb.whereTheyAre)}</p></div></details>`;
+  }
+  if (cb.whatTheyAreDoing) {
+    h += `<details><summary>What They're Doing</summary><div class="section-body"><p>${linkText(cb.whatTheyAreDoing)}</p></div></details>`;
+  }
+  if (cb.currentCombatState) {
+    const ccs = cb.currentCombatState;
+    h += `<details><summary>Current Combat State</summary><div class="section-body">`;
+    if (ccs.note) h += `<div class="dm-note" style="border-top:none;padding-top:0;margin-bottom:6px">${esc(ccs.note)}</div>`;
+    if (ccs.status) h += `<div class="kv"><span class="k">Status:</span> ${linkText(ccs.status)}</div>`;
+    if (ccs.wraith3_stunned) h += `<div class="kv"><span class="k">Wraith #3 (stunned):</span> ${linkText(ccs.wraith3_stunned)}</div>`;
+    if (ccs.wraith4_outOfLOS) h += `<div class="kv"><span class="k">Wraith #4 (offscreen):</span> ${linkText(ccs.wraith4_outOfLOS)}</div>`;
+    if (ccs.partyNarrativeState) h += `<div class="kv"><span class="k">Party:</span> ${linkText(ccs.partyNarrativeState)}</div>`;
+    h += `</div></details>`;
+  }
+  if (cb.whatTheyKnowNow && cb.whatTheyKnowNow.length) {
+    h += `<details><summary>What They Know Now</summary><div class="section-body"><ul class="plain">`;
+    for (const item of cb.whatTheyKnowNow) h += `<li>${linkText(item)}</li>`;
+    h += `</ul></div></details>`;
+  }
+  if (cb.mostLikelyNextActions && cb.mostLikelyNextActions.length) {
+    h += `<details><summary>Most Likely Next Actions</summary><div class="section-body"><ul class="plain">`;
+    for (const item of cb.mostLikelyNextActions) h += `<li>${linkText(item)}</li>`;
+    h += `</ul></div></details>`;
+  }
+  if (cb.prepFocus) {
+    h += `<details><summary>Prep Focus</summary><div class="section-body"><p>${linkText(cb.prepFocus)}</p></div></details>`;
+  }
+  if (cb.openThreadsForDM && cb.openThreadsForDM.length) {
+    h += `<details><summary>Open Threads (DM-only)</summary><div class="section-body">`;
+    for (const t of cb.openThreadsForDM) h += `<div class="secret"><div class="secret-label">Open Thread</div>${linkText(t)}</div>`;
+    h += `</div></details>`;
+  }
+  return h;
+}
+
+function renderLore() {
+  let h = `<div class="room-header"><h1>Lore & Hooks</h1></div>`;
+  if (source.lore) {
+    h += `<details><summary>Background</summary><div class="section-body"><p>${linkText(source.lore.background)}</p>`;
+    if (source.lore.prophecy) h += `<div class="read-aloud" style="margin-top:10px">"${esc(source.lore.prophecy)}"</div>`;
+    h += `</div></details>`;
+  }
+  if (source.entering) {
+    h += `<details><summary>Entering Shadowkeep</summary><div class="section-body"><p>${esc(source.entering.description)}</p></div></details>`;
+  }
+  if (adaptation && adaptation.campaignIntegration) {
+    const ci = adaptation.campaignIntegration;
+    h += `<details><summary>Campaign Integration <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    h += `<div class="kv"><span class="k">Arrival:</span> ${linkText(ci.arrivalMethod)}</div>`;
+    h += `<div class="kv"><span class="k">Primary Objective:</span> ${linkText(ci.primaryObjective)}</div>`;
+    h += `<div class="kv"><span class="k">Secondary Objective:</span> ${linkText(ci.secondaryObjective)}</div>`;
+    if (ci.lullabySinger) h += `<div class="kv"><span class="k">Lullaby Singer:</span> ${linkText(ci.lullabySinger)}</div>`;
+    if (ci.toneDirective) h += `<div class="kv"><span class="k">Tone:</span> ${linkText(ci.toneDirective)}</div>`;
+    if (ci.hookStatus) {
+      h += `<div style="margin-top:10px"><strong>Hook Status:</strong></div>`;
+      for (const [hk, status] of Object.entries(ci.hookStatus)) {
+        h += `<div class="kv" style="padding-left:12px"><span class="k">${esc(hk)}:</span> ${linkText(status)}</div>`;
+      }
+    }
+    h += `</div></details>`;
+  }
+  if (source.hooks && source.hooks.length) {
+    h += `<details><summary>Adventure Hooks (Generic)</summary><div class="section-body">`;
+    for (const hook of source.hooks) {
+      h += `<div class="poi-card"><h4>${esc(hook.name)}</h4><p>${linkText(hook.description)}</p>`;
+      if (hook.reward) h += `<div class="kv"><span class="k">Reward:</span> ${esc(hook.reward)}</div>`;
+      h += `</div>`;
+    }
+    h += `</div></details>`;
+  }
+  if (source.resting) {
+    h += `<details><summary>Resting Rules</summary><div class="section-body">`;
+    h += `<div class="kv"><span class="k">Safe areas:</span> ${source.resting.safeAreas.join(', ')}</div>`;
+    h += `<div class="kv"><span class="k">Condition:</span> ${esc(source.resting.condition)}</div>`;
+    h += `<div class="kv"><span class="k">Interruption:</span> ${esc(source.resting.interruption)}</div>`;
+    h += `</div></details>`;
+  }
+  return h;
+}
+
+function renderFeatures() {
+  let h = `<div class="room-header"><h1>Common Features</h1></div>`;
+  if (source.commonFeatures) {
+    for (const f of source.commonFeatures) {
+      h += `<div class="poi-card"><h4>${esc(f.name)}</h4>`;
+      h += `<div class="poi-type">${esc(f.summary)}</div>`;
+      h += `<p style="font-size:13px">${esc(f.detail)}</p></div>`;
+    }
+  }
+  return h;
+}
+
+function renderUndead() {
+  let h = `<div class="room-header"><h1>Undead Behavior</h1></div>`;
+  const ub = source.undeadBehavior;
+  if (ub) {
+    h += `<div class="kv"><span class="k">Corporeal:</span> ${esc(ub.corporeal)}</div>`;
+    h += `<div class="kv"><span class="k">Spectral:</span> ${esc(ub.spectral)}</div>`;
+    h += `<div class="kv" style="margin-top:6px"><span class="k">Unconscious creatures:</span> ${esc(ub.unconsciousCreatures)}</div>`;
+    if (ub.capturedInfo) {
+      h += `<details style="margin-top:12px"><summary>Captured Undead Interrogation</summary><div class="section-body">`;
+      h += `<div class="check-entry"><span class="check-dc">DC ${ub.capturedInfo.dc}</span> ${ub.capturedInfo.skills.join(' or ')}</div>`;
+      h += `<ul class="plain">`;
+      for (const s of ub.capturedInfo.secrets) h += `<li>${esc(s)}</li>`;
+      h += `</ul></div></details>`;
+    }
+  }
+  return h;
+}
+
+function renderTelepathy() {
+  let h = `<div class="room-header"><h1>Rhodar's Telepathy</h1></div>`;
+  const rt = source.rhodarTelepathy;
+  if (rt) {
+    h += `<div class="kv"><span class="k">Range:</span> ${esc(rt.range)}</div>`;
+    h += `<div class="kv"><span class="k">Awareness:</span> ${esc(rt.awareness)}</div>`;
+    h += `<div class="kv"><span class="k">Behavior:</span> ${esc(rt.behavior)}</div>`;
+    if (rt.tauntTemplates && rt.tauntTemplates.length) {
+      h += `<details><summary>Generic Taunt Templates</summary><div class="section-body">`;
+      for (const t of rt.tauntTemplates) {
+        h += `<div class="taunt-card">`;
+        h += `<div class="taunt-trigger">${esc(t.trigger.replace(/_/g, ' '))}</div>`;
+        h += `<div class="taunt-target">Tone: ${esc(t.tone.replace(/_/g, ' '))}</div>`;
+        h += `<div class="taunt-note">${esc(t.note)}</div>`;
+        h += `</div>`;
+      }
+      h += `</div></details>`;
+    }
+  }
+  if (adaptation && adaptation.rhodarTelepathy_personalized) {
+    const rtp = adaptation.rhodarTelepathy_personalized;
+    h += `<details><summary>Personalized Taunts (${esc(adaptation.campaign)}) <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    if (rtp.awareness) h += `<div class="kv" style="margin-bottom:8px"><span class="k">Awareness:</span> ${esc(rtp.awareness)}</div>`;
+    if (rtp.taunts) {
+      rtp.taunts.forEach((t, i) => {
+        const key = `taunt:${i}`;
+        h += `<div class="taunt-card markable" data-mark-key="${esc(key)}">`;
+        h += `<div class="taunt-trigger">${esc(t.trigger.replace(/_/g, ' '))}</div>`;
+        h += `<div class="taunt-target">Target: ${esc(t.target)} | Tone: ${esc(t.tone)}</div>`;
+        h += `<div class="taunt-msg">"${esc(t.message)}"</div>`;
+        if (t.campaignCallback) h += `<div class="taunt-note">${esc(t.campaignCallback)}</div>`;
+        h += `</div>`;
+      });
+    }
+    h += `</div></details>`;
+  }
+  return h;
+}
+
+function renderHoard() {
+  let h = `<div class="room-header"><h1>Count Rhodar's Treasure Hoard</h1></div>`;
+  const hd = source.hoard;
+  if (!hd) return h + '<p>No hoard data.</p>';
+  h += `<div class="kv"><span class="k">Location:</span> ${esc(hd.location)}</div>`;
+  h += `<p style="font-size:13px;margin:6px 0">${esc(hd.description)}</p>`;
+
+  if (hd.magicItems && hd.magicItems.length) {
+    h += `<details><summary>Magic Items</summary><div class="section-body">`;
+    for (const item of hd.magicItems) {
+      h += `<div class="poi-card"><h4>${esc(item.name)}</h4>`;
+      h += `<div class="poi-type">${esc(item.rarity || '')}${item.attunement ? ' | ' + esc(item.attunement) : ''}${item.location ? ' | Found: ' + esc(item.location) : ''}</div>`;
+      if (item.description) h += `<p style="font-size:13px">${esc(item.description)}</p>`;
+      if (item.benefits) {
+        h += `<ul class="plain">`;
+        for (const b of item.benefits) h += `<li>${esc(b)}</li>`;
+        h += `</ul>`;
+      }
+      if (item.sentience) {
+        h += `<div class="dm-note" style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px"><strong>Sentience:</strong> ${esc(item.sentience.alignment)}, INT ${item.sentience.scores.INT} WIS ${item.sentience.scores.WIS} CHA ${item.sentience.scores.CHA}. ${esc(item.sentience.communication)}. ${esc(item.sentience.personality)}</div>`;
+      }
+      if (item.shadowFormDetails) h += `<div style="font-size:12px;color:var(--text-dim);margin-top:4px">${esc(item.shadowFormDetails)}</div>`;
+      if (item.note) h += `<div style="font-size:12px;color:var(--text-dim);margin-top:4px">${esc(item.note)}</div>`;
+      h += `</div>`;
+    }
+    h += `</div></details>`;
+  }
+
+  if (hd.consumables && hd.consumables.length) {
+    h += `<details><summary>Consumables</summary><div class="section-body">`;
+    for (const c of hd.consumables) h += `<div class="treasure-item">${c.count}x ${esc(c.name)}</div>`;
+    h += `</div></details>`;
+  }
+
+  if (hd.specialItems && hd.specialItems.length) {
+    h += `<details><summary>Special Items</summary><div class="section-body">`;
+    for (const item of hd.specialItems) {
+      h += `<div class="poi-card"><h4>${esc(item.name)}</h4>`;
+      if (item.description) h += `<p style="font-size:13px">${esc(item.description)}</p>`;
+      if (item.effect) h += `<div style="font-size:13px;color:var(--orange);margin-top:4px">${esc(item.effect)}</div>`;
+      h += `</div>`;
+    }
+    h += `</div></details>`;
+  }
+
+  if (hd.mundaneWealth && hd.mundaneWealth.length) {
+    h += `<details><summary>Mundane Wealth</summary><div class="section-body">`;
+    for (const m of hd.mundaneWealth) h += `<div class="treasure-item">${m.count}x ${esc(m.name)} (${esc(m.value)})</div>`;
+    h += `</div></details>`;
+  }
+
+  if (hd.coins) {
+    h += `<details><summary>Coins</summary><div class="section-body">`;
+    h += `<div class="treasure-item">`;
+    const parts = [];
+    if (hd.coins.pp) parts.push(hd.coins.pp.toLocaleString() + ' pp');
+    if (hd.coins.gp) parts.push(hd.coins.gp.toLocaleString() + ' gp');
+    if (hd.coins.sp) parts.push(hd.coins.sp.toLocaleString() + ' sp');
+    if (hd.coins.cp) parts.push(hd.coins.cp.toLocaleString() + ' cp');
+    h += parts.join(' | ');
+    h += `</div></div></details>`;
+  }
+  return h;
+}
+
+function renderBestiary() {
+  let h = `<div class="room-header"><h1>Bestiary</h1></div>`;
+  if (!source.bestiary) return h + '<p>No bestiary data.</p>';
+  for (const [id, cr] of Object.entries(source.bestiary)) {
+    h += renderStatBlock(cr);
+  }
+  return h;
+}
+
+function renderStatBlock(cr) {
+  let h = `<details><summary style="font-size:14px;text-transform:none;letter-spacing:0">${esc(cr.name)} <span style="color:var(--text-dim);font-weight:400;font-size:12px">${esc(cr.cr ? 'CR ' + cr.cr : '')}</span></summary>`;
+  h += `<div class="stat-block">`;
+  h += `<h3>${esc(cr.name)}</h3>`;
+  h += `<div class="stat-sub">${esc(cr.size || '')} ${esc(cr.type || '')}${cr.alignment ? ', ' + esc(cr.alignment) : ''}</div>`;
+  h += `<hr class="stat-divider">`;
+
+  if (cr.ac) h += `<div class="stat-row"><span class="stat-label">AC</span> ${cr.ac}${cr.acType ? ' (' + esc(cr.acType) + ')' : ''}</div>`;
+  if (cr.hp) h += `<div class="stat-row"><span class="stat-label">HP</span> ${typeof cr.hp === 'string' ? esc(cr.hp) : cr.hp}${cr.hpFormula ? ' (' + esc(cr.hpFormula) + ')' : ''}</div>`;
+  if (cr.speed) {
+    const spd = Object.entries(cr.speed).filter(([k,v]) => v && k !== 'hover').map(([k,v]) => k === 'walk' ? v + ' ft.' : k + ' ' + v + ' ft.').join(', ');
+    h += `<div class="stat-row"><span class="stat-label">Speed</span> ${esc(spd)}${cr.speed.hover ? ' (hover)' : ''}</div>`;
+  }
+
+  if (cr.abilities) {
+    h += `<hr class="stat-divider">`;
+    h += `<div class="ability-scores">`;
+    for (const [ab, val] of Object.entries(cr.abilities)) {
+      const mod = Math.floor((val - 10) / 2);
+      h += `<div><div class="ab-name">${ab}</div><div class="ab-val">${val}</div><div class="ab-mod">(${mod >= 0 ? '+' : ''}${mod})</div></div>`;
+    }
+    h += `</div>`;
+  }
+
+  h += `<hr class="stat-divider">`;
+  if (cr.savingThrows) h += `<div class="stat-row"><span class="stat-label">Saves</span> ${Object.entries(cr.savingThrows).map(([k,v]) => k + ' +' + v).join(', ')}</div>`;
+  if (cr.skills) h += `<div class="stat-row"><span class="stat-label">Skills</span> ${Object.entries(cr.skills).map(([k,v]) => k + ' +' + v).join(', ')}</div>`;
+  if (cr.damageResistances) h += `<div class="stat-row"><span class="stat-label">Resist</span> ${cr.damageResistances.join(', ')}</div>`;
+  if (cr.damageImmunities) h += `<div class="stat-row"><span class="stat-label">Immune</span> ${cr.damageImmunities.join(', ')}</div>`;
+  if (cr.conditionImmunities) h += `<div class="stat-row"><span class="stat-label">Cond. Immune</span> ${cr.conditionImmunities.join(', ')}</div>`;
+  if (cr.senses) h += `<div class="stat-row"><span class="stat-label">Senses</span> ${Object.entries(cr.senses).map(([k,v]) => k.replace(/([A-Z])/g, ' $1').trim() + ' ' + v + (typeof v === 'number' ? ' ft.' : '')).join(', ')}</div>`;
+  if (cr.languages) h += `<div class="stat-row"><span class="stat-label">Languages</span> ${cr.languages.join(', ')}</div>`;
+
+  // Traits
+  if (cr.traits && cr.traits.length) {
+    h += `<hr class="stat-divider">`;
+    for (const t of cr.traits) h += `<div class="stat-row"><span class="stat-label">${esc(t.name)}.</span> ${esc(t.description)}</div>`;
+  }
+
+  // Actions
+  if (cr.actions && cr.actions.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--red);font-weight:700;font-size:14px;margin:4px 0">Actions</div>`;
+    for (const a of cr.actions) {
+      h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> `;
+      if (a.type) h += `<em>${esc(a.type)}:</em> `;
+      if (a.toHit) h += `+${a.toHit} to hit, `;
+      if (a.reach) h += `reach ${a.reach} ft., `;
+      if (a.range) h += `range ${a.range} ft., `;
+      if (a.damage) h += `${esc(a.damage)}. `;
+      if (a.effect) h += esc(a.effect);
+      if (a.description) h += esc(a.description);
+      if (a.prerequisite) h += ` <em>(${esc(a.prerequisite)})</em>`;
+      if (a.note) h += ` <span class="muted">${esc(a.note)}</span>`;
+      h += `</div>`;
+    }
+  }
+
+  // Bonus Actions
+  if (cr.bonusActions && cr.bonusActions.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--orange);font-weight:700;font-size:14px;margin:4px 0">Bonus Actions</div>`;
+    for (const a of cr.bonusActions) {
+      h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
+    }
+  }
+
+  // Reactions
+  if (cr.reactions && cr.reactions.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--blue);font-weight:700;font-size:14px;margin:4px 0">Reactions</div>`;
+    for (const r of cr.reactions) {
+      h += `<div class="stat-row"><span class="stat-label">${esc(r.name)}.</span> `;
+      if (r.trigger) h += `<em>Trigger: ${esc(r.trigger)}.</em> `;
+      h += esc(r.description);
+      h += `</div>`;
+    }
+  }
+
+  // Villain Actions
+  if (cr.villainActions && cr.villainActions.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--purple);font-weight:700;font-size:14px;margin:4px 0">Villain Actions</div>`;
+    for (const a of cr.villainActions) {
+      h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
+    }
+  }
+
+  // Spells
+  if (cr.spells) {
+    h += `<hr class="stat-divider"><div style="color:var(--purple);font-weight:700;font-size:14px;margin:4px 0">Spellcasting</div>`;
+    if (cr.spells.saveDC) h += `<div class="stat-row">Spell save DC ${cr.spells.saveDC} (${esc(cr.spells.ability || '')})</div>`;
+    if (cr.spells.atWill) h += `<div class="stat-row"><span class="stat-label">At will:</span> ${cr.spells.atWill.join(', ')}</div>`;
+    if (cr.spells.perDay3) h += `<div class="stat-row"><span class="stat-label">3/day:</span> ${cr.spells.perDay3.join(', ')}</div>`;
+    if (cr.spells.perDay1) h += `<div class="stat-row"><span class="stat-label">1/day:</span> ${cr.spells.perDay1.join(', ')}</div>`;
+  }
+
+  // Features (retainer)
+  if (cr.features && cr.features.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--teal);font-weight:700;font-size:14px;margin:4px 0">Features</div>`;
+    for (const f of cr.features) {
+      h += `<div class="stat-row"><span class="stat-label">${esc(f.name)} (Lv${f.level}).</span> ${esc(f.description)}</div>`;
+    }
+  }
+
+  if (cr.note) h += `<div class="dm-note">${esc(cr.note)}</div>`;
+
+  h += `</div></details>`;
+  return h;
+}
+
+function renderDC() {
+  if (!adaptation || !adaptation.dcAdjustments) return '<p>No DC adjustment data.</p>';
+  const dc = adaptation.dcAdjustments;
+  let h = `<div class="room-header"><h1>DC Adjustments</h1></div>`;
+  h += `<div class="kv" style="margin-bottom:12px"><span class="k">Policy:</span> ${esc(dc.policy)}</div>`;
+  if (dc.notes) h += `<p style="font-size:13px;color:var(--text-dim);margin-bottom:12px">${esc(dc.notes)}</p>`;
+  if (dc.autoSuccesses) {
+    h += `<details><summary>Auto-Successes</summary><div class="section-body">`;
+    for (const [key, checks] of Object.entries(dc.autoSuccesses)) {
+      const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      h += `<div style="margin-bottom:8px"><strong style="color:var(--teal)">${esc(label)}</strong>`;
+      h += `<ul class="plain">`;
+      for (const c of checks) h += `<li>${esc(c)}</li>`;
+      h += `</ul></div>`;
+    }
+    h += `</div></details>`;
+  }
+  return h;
+}
+
+function renderCallbacks() {
+  if (!adaptation || !adaptation.campaignCallbacks) return '<p>No campaign callback data.</p>';
+  let h = `<div class="room-header"><h1>Campaign Integration & Callbacks</h1></div>`;
+  for (const [key, cb] of Object.entries(adaptation.campaignCallbacks)) {
+    h += `<div class="callback-card">`;
+    h += `<h4>${esc(key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()))}</h4>`;
+    h += `<p style="font-size:13px">${linkText(cb.description)}</p>`;
+    const optList = cb.options || cb.suggestions;
+    if (optList && optList.length) {
+      for (const opt of optList) {
+        if (typeof opt === 'string') {
+          h += `<div class="callback-option">${esc(opt)}</div>`;
+        } else {
+          h += `<div class="callback-option"><strong>${esc(opt.id || '')}</strong> ${esc(opt.description || '')}`;
+          if (opt.pros) h += `<br><span style="color:var(--green);font-size:12px">Pros: ${esc(opt.pros)}</span>`;
+          if (opt.cons) h += `<br><span style="color:var(--red);font-size:12px">Cons: ${esc(opt.cons)}</span>`;
+          h += `</div>`;
+        }
+      }
+    }
+    if (cb.dmNote) h += `<div class="callback-dm-note">${esc(cb.dmNote)}</div>`;
+    h += `</div>`;
+  }
+  return h;
+}
+
+function renderVoice() {
+  if (!adaptation || !adaptation.narrationVoice) return '<p>No narration voice data.</p>';
+  const nv = adaptation.narrationVoice;
+  let h = `<div class="room-header"><h1>Narration Voice</h1></div>`;
+  h += `<div class="kv"><span class="k">Tone:</span> ${esc(nv.tone)}</div>`;
+  h += `<p style="font-size:13px;margin:8px 0">${esc(nv.description)}</p>`;
+  if (nv.characterVoices) {
+    h += `<details><summary>Character Voices</summary><div class="section-body">`;
+    for (const [name, desc] of Object.entries(nv.characterVoices)) {
+      h += `<div class="voice-card"><div class="voice-name">${esc(name.charAt(0).toUpperCase() + name.slice(1))}</div><div class="voice-desc">${esc(desc)}</div></div>`;
+    }
+    h += `</div></details>`;
+  }
+  return h;
+}
+
+// ===================== COMPONENT RENDERERS =====================
+function renderConnections(connections, label) {
+  if (!connections || !Object.keys(connections).length) return '';
+  let h = `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${esc(label)}</div>`;
+  h += `<div class="connections">`;
+  for (const [targetId, info] of Object.entries(connections)) {
+    const targetName = getLocationName(targetId);
+    h += `<button class="conn-btn" data-target="${targetId}" style="flex-direction:column;align-items:flex-start;gap:2px">`;
+    h += `<div><span class="conn-id">${esc(targetId)}</span> ${esc(targetName)}${info.via ? `<span class="conn-via"> ${esc(info.via)}</span>` : ''}</div>`;
+    if (info.note) h += `<div class="conn-note" style="font-size:11px">${esc(info.note)}</div>`;
+    h += `</button>`;
+  }
+  h += `</div>`;
+  return h;
+}
+
+function renderEncounter(enc) {
+  let h = `<div class="encounter-card">`;
+  h += `<h4>${esc(enc.name)}</h4>`;
+  if (enc.creatures && enc.creatures.length) {
+    h += `<ul class="creature-list">`;
+    for (const c of enc.creatures) {
+      const name = c.name ? c.name : (source.bestiary[c.id] ? source.bestiary[c.id].name : c.id);
+      h += `<li>${c.count}x ${esc(name)}${c.position ? ' (' + esc(c.position) + ')' : ''}</li>`;
+    }
+    h += `</ul>`;
+  }
+  if (enc.detection) {
+    h += `<div class="check-entry"><span class="check-dc">DC ${enc.detection.dc} ${esc(enc.detection.skill)}</span>: ${esc(enc.detection.result)}</div>`;
+  }
+  if (enc.trigger) h += `<div class="kv"><span class="k">Trigger:</span> ${esc(enc.trigger)}</div>`;
+  if (enc.tactics) h += `<div class="tactics">${linkText(enc.tactics)}</div>`;
+  if (enc.ritualClock) {
+    const rc = enc.ritualClock;
+    h += `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">`;
+    h += `<div class="kv"><span class="k">Ritual:</span> ${esc(rc.description)}</div>`;
+    if (rc.identifyDC) h += `<div class="check-entry"><span class="check-dc">DC ${rc.identifyDC} ${esc(rc.identifySkill || '')}</span>: ${esc(rc.identifyResult || '')}</div>`;
+    if (rc.failureCondition) h += `<div class="kv" style="color:var(--red)"><span class="k">Failure:</span> ${esc(rc.failureCondition)}</div>`;
+    if (rc.failureResult) h += `<div class="kv" style="color:var(--red)"><span class="k">Result:</span> ${esc(rc.failureResult)}</div>`;
+    if (rc.disruptMethods) {
+      h += `<div class="kv"><span class="k">Disrupt:</span></div><ul class="plain">`;
+      for (const m of rc.disruptMethods) h += `<li>${esc(m)}</li>`;
+      h += `</ul>`;
+    }
+    h += `</div>`;
+  }
+  h += `</div>`;
+  return h;
+}
+
+function renderHazard(haz) {
+  let h = `<div class="hazard-card"><h4>${esc(haz.name)}</h4>`;
+  h += `<p style="font-size:13px">${esc(haz.description)}</p>`;
+  if (haz.identifyDC) h += `<div class="check-entry"><span class="check-dc">DC ${haz.identifyDC} ${esc(haz.identifySkill || '')}</span>${haz.identifyAlt ? ' or ' + esc(haz.identifyAlt) : ''}</div>`;
+  if (haz.damage) h += `<div class="kv"><span class="k">Damage:</span> ${esc(haz.damage)}</div>`;
+  if (haz.trigger) h += `<div class="kv"><span class="k">Trigger:</span> ${esc(haz.trigger)}</div>`;
+  if (haz.antiFlying) h += `<div class="kv"><span class="k">Anti-flying:</span> ${esc(haz.antiFlying)}</div>`;
+  if (haz.saveDC) h += `<div class="kv"><span class="k">Save DC:</span> ${haz.saveDC}${haz.saveAbility ? ' ' + esc(haz.saveAbility) : ''}</div>`;
+  if (haz.failEffect) h += `<div class="kv"><span class="k">Fail:</span> ${esc(haz.failEffect)}</div>`;
+  if (haz.successEffect) h += `<div class="kv"><span class="k">Success:</span> ${esc(haz.successEffect)}</div>`;
+  if (haz.language) h += `<div class="kv"><span class="k">Language:</span> ${esc(haz.language)}</div>`;
+  if (haz.counterLevel) h += `<div class="kv"><span class="k">Counter:</span> Light from spell level ${haz.counterLevel}+ persists</div>`;
+  if (haz.glyphs) {
+    h += `<div style="margin-top:6px"><strong style="color:var(--orange);font-size:12px">Glyphs:</strong></div>`;
+    for (const g of haz.glyphs) {
+      h += `<div class="check-entry">${esc(g.position)}: <strong>${esc(g.spell)}</strong> (level ${g.level})</div>`;
+    }
+  }
+  h += `</div>`;
+  return h;
+}
+
+function renderPOI(poi) {
+  let h = `<div class="poi-card"><h4>${esc(poi.name)}</h4>`;
+  if (poi.type) h += `<div class="poi-type">${esc(poi.type)}</div>`;
+  if (poi.description) h += `<p style="font-size:13px">${linkText(poi.description)}</p>`;
+  if (poi.leadsTo) h += `<div class="kv"><span class="k">Leads to:</span> <button class="loc-link" onclick="navigate('${poi.leadsTo}')">${esc(poi.leadsTo)}</button> ${esc(getLocationName(poi.leadsTo))}</div>`;
+  if (poi.interaction) h += `<div class="kv"><span class="k">Interaction:</span> ${linkText(poi.interaction)}</div>`;
+  if (poi.motivation) h += `<div class="kv"><span class="k">Motivation:</span> ${linkText(poi.motivation)}</div>`;
+  if (poi.offers && poi.offers.length) {
+    h += `<div class="kv"><span class="k">Offers:</span></div><ul class="plain">`;
+    for (const o of poi.offers) h += `<li>${esc(o)}</li>`;
+    h += `</ul>`;
+  }
+  if (poi.ifAttacked) h += `<div class="kv"><span class="k">If attacked:</span> ${esc(poi.ifAttacked)}</div>`;
+  if (poi.checks && poi.checks.length) {
+    for (const ck of poi.checks) {
+      h += `<div class="check-entry"><span class="check-dc">DC ${ck.dc} ${esc(ck.skill)}</span>: ${esc(ck.success)}`;
+      if (ck.successBy5) h += `<br><span class="check-dc">Beat by 5+:</span> ${esc(ck.successBy5)}`;
+      if (ck.synergy) h += `<br><span class="muted">${esc(ck.synergy)}</span>`;
+      h += `</div>`;
+    }
+  }
+  if (poi.consequence) {
+    if (poi.consequence.triggered) h += `<div class="kv" style="color:var(--red)"><span class="k">If triggered:</span> ${esc(poi.consequence.triggered)}</div>`;
+    if (poi.consequence.avoided) h += `<div class="kv" style="color:var(--green)"><span class="k">If avoided:</span> ${esc(poi.consequence.avoided)}</div>`;
+  }
+  if (poi.redTaxMechanic) {
+    const rt = poi.redTaxMechanic;
+    h += `<div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px">`;
+    h += `<div class="kv"><span class="k">Red Tax (if willing):</span> ${esc(rt.ifWilling)}</div>`;
+    if (rt.bypass) {
+      h += `<div class="kv"><span class="k">Bypass:</span></div>`;
+      for (const b of rt.bypass) {
+        h += `<div class="check-entry">${esc(b.method)}${b.dc ? ': DC ' + b.dc + ' ' + esc(b.skill || '') : ''}</div>`;
+      }
+    }
+    h += `</div>`;
+  }
+  if (poi.hookNote) h += `<div class="dm-note">${esc(poi.hookNote)}</div>`;
+  if (poi.item) h += `<div class="kv"><span class="k">Item:</span> ${esc(poi.item)}</div>`;
+  if (poi.durability) h += `<div class="kv"><span class="k">Durability:</span> AC ${poi.durability.ac}, ${poi.durability.hp} HP (immune: ${poi.durability.immunities.join(', ')})</div>`;
+  if (poi.destroyMethod) h += `<div class="kv"><span class="k">Destroy:</span> ${esc(poi.destroyMethod)}</div>`;
+  if (poi.rhodarPresent) h += `<div class="kv" style="color:var(--red)"><span class="k">If Rhodar was defeated:</span> ${esc(poi.rhodarPresent)}</div>`;
+  if (poi.unlocks) h += `<div class="kv"><span class="k">Unlocks:</span> ${poi.unlocks.join(', ')}</div>`;
+  h += `</div>`;
+  return h;
+}
+
+// ===================== RIGHT PANEL =====================
+function updateRightPanel(view) {
+  const panel = document.getElementById('right-panel');
+  const main = document.getElementById('main');
+  const loc = source && source.locations[view];
+  if (!loc || !source.bestiary) {
+    panel.classList.remove('visible');
+    main.style.marginRight = '';
+    return;
+  }
+
+  const creatureIds = new Set();
+  if (loc.encounters) {
+    for (const enc of loc.encounters) {
+      if (enc.creatures) for (const c of enc.creatures) {
+        if (c.id && source.bestiary[c.id]) creatureIds.add(c.id);
+      }
+    }
+  }
+  if (loc.pointsOfInterest) {
+    for (const poi of Object.values(loc.pointsOfInterest)) {
+      if (poi.creature && source.bestiary[poi.creature]) creatureIds.add(poi.creature);
+    }
+  }
+
+  if (!creatureIds.size) {
+    panel.classList.remove('visible');
+    main.style.marginRight = '';
+    return;
+  }
+
+  let h = `<div class="rp-title">Creatures Here</div>`;
+  for (const id of creatureIds) h += renderStatBlockInline(source.bestiary[id]);
+  panel.innerHTML = h;
+  panel.classList.add('visible');
+  main.style.marginRight = '280px';
+}
+
+function renderStatBlockInline(cr) {
+  let h = `<div class="rp-stat">`;
+  h += `<h3>${esc(cr.name)}</h3>`;
+  h += `<div class="stat-sub">${esc(cr.size || '')} ${esc(cr.type || '')}${cr.alignment ? ', ' + esc(cr.alignment) : ''}${cr.cr ? ' · CR ' + cr.cr : ''}</div>`;
+  h += `<hr class="stat-divider">`;
+  if (cr.ac) h += `<div class="stat-row"><span class="stat-label">AC</span> ${cr.ac}${cr.acType ? ' (' + esc(cr.acType) + ')' : ''}</div>`;
+  if (cr.hp) h += `<div class="stat-row"><span class="stat-label">HP</span> ${typeof cr.hp === 'string' ? esc(cr.hp) : cr.hp}${cr.hpFormula ? ' (' + esc(cr.hpFormula) + ')' : ''}</div>`;
+  if (cr.speed) {
+    const spd = Object.entries(cr.speed).filter(([k,v]) => v && k !== 'hover').map(([k,v]) => k === 'walk' ? v + ' ft.' : k + ' ' + v + ' ft.').join(', ');
+    h += `<div class="stat-row"><span class="stat-label">Speed</span> ${esc(spd)}</div>`;
+  }
+  if (cr.abilities) {
+    h += `<hr class="stat-divider"><div class="ability-scores">`;
+    for (const [ab, val] of Object.entries(cr.abilities)) {
+      const mod = Math.floor((val - 10) / 2);
+      h += `<div><div class="ab-name">${ab}</div><div class="ab-val">${val}</div><div class="ab-mod">(${mod >= 0 ? '+' : ''}${mod})</div></div>`;
+    }
+    h += `</div>`;
+  }
+  h += `<hr class="stat-divider">`;
+  if (cr.savingThrows) h += `<div class="stat-row"><span class="stat-label">Saves</span> ${Object.entries(cr.savingThrows).map(([k,v]) => k + ' +' + v).join(', ')}</div>`;
+  if (cr.damageResistances) h += `<div class="stat-row"><span class="stat-label">Resist</span> ${cr.damageResistances.join(', ')}</div>`;
+  if (cr.damageImmunities) h += `<div class="stat-row"><span class="stat-label">Immune</span> ${cr.damageImmunities.join(', ')}</div>`;
+  if (cr.conditionImmunities) h += `<div class="stat-row"><span class="stat-label">Cond. Immune</span> ${cr.conditionImmunities.join(', ')}</div>`;
+  if (cr.senses) h += `<div class="stat-row"><span class="stat-label">Senses</span> ${Object.entries(cr.senses).map(([k,v]) => k.replace(/([A-Z])/g, ' $1').trim() + ' ' + v + (typeof v === 'number' ? ' ft.' : '')).join(', ')}</div>`;
+  if (cr.traits && cr.traits.length) {
+    h += `<hr class="stat-divider">`;
+    for (const t of cr.traits) h += `<div class="stat-row"><span class="stat-label">${esc(t.name)}.</span> ${esc(t.description)}</div>`;
+  }
+  if (cr.actions && cr.actions.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--red);font-weight:700;font-size:12px;margin:3px 0">Actions</div>`;
+    for (const a of cr.actions) {
+      h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> `;
+      if (a.type) h += `<em>${esc(a.type)}:</em> `;
+      if (a.toHit) h += `+${a.toHit} to hit, `;
+      if (a.reach) h += `reach ${a.reach} ft., `;
+      if (a.damage) h += `${esc(a.damage)}. `;
+      if (a.effect) h += esc(a.effect);
+      if (a.description) h += esc(a.description);
+      h += `</div>`;
+    }
+  }
+  if (cr.bonusActions && cr.bonusActions.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--orange);font-weight:700;font-size:12px;margin:3px 0">Bonus Actions</div>`;
+    for (const a of cr.bonusActions) h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
+  }
+  if (cr.reactions && cr.reactions.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--blue);font-weight:700;font-size:12px;margin:3px 0">Reactions</div>`;
+    for (const r of cr.reactions) {
+      h += `<div class="stat-row"><span class="stat-label">${esc(r.name)}.</span> `;
+      if (r.trigger) h += `<em>Trigger: ${esc(r.trigger)}.</em> `;
+      h += esc(r.description) + `</div>`;
+    }
+  }
+  if (cr.villainActions && cr.villainActions.length) {
+    h += `<hr class="stat-divider"><div style="color:var(--purple);font-weight:700;font-size:12px;margin:3px 0">Villain Actions</div>`;
+    for (const a of cr.villainActions) h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
+  }
+  if (cr.spells) {
+    h += `<hr class="stat-divider"><div style="color:var(--purple);font-weight:700;font-size:12px;margin:3px 0">Spellcasting</div>`;
+    if (cr.spells.saveDC) h += `<div class="stat-row">Spell save DC ${cr.spells.saveDC}</div>`;
+    if (cr.spells.atWill) h += `<div class="stat-row"><span class="stat-label">At will:</span> ${cr.spells.atWill.join(', ')}</div>`;
+    if (cr.spells.perDay3) h += `<div class="stat-row"><span class="stat-label">3/day:</span> ${cr.spells.perDay3.join(', ')}</div>`;
+    if (cr.spells.perDay1) h += `<div class="stat-row"><span class="stat-label">1/day:</span> ${cr.spells.perDay1.join(', ')}</div>`;
+  }
+  if (cr.note) h += `<div class="stat-row" style="color:var(--orange);margin-top:4px">${esc(cr.note)}</div>`;
+  h += `</div>`;
+  return h;
+}
+
+// ===================== HELPERS =====================
+function linkText(str) {
+  if (str === null || str === undefined) return '';
+  const s = esc(str);
+  if (!source || !source.locations) return s;
+  const locIds = Object.keys(source.locations);
+  const triggerIds = source.triggerScenes ? source.triggerScenes.map(t => t.id) : [];
+  const allIds = [...locIds, ...triggerIds];
+  if (!allIds.length) return s;
+  const pattern = new RegExp(`\\b(${allIds.map(id => id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'g');
+  return s.replace(pattern, id => `<button class="loc-link" onclick="navigate('${id}')">${id}</button>`);
+}
+
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Truncate text for use as a preview snippet in a <summary> chip.
+function snip(str, n) {
+  if (!str) return '';
+  const t = String(str).replace(/\s+/g, ' ').trim();
+  return t.length <= n ? t : t.slice(0, n - 1).trimEnd() + '…';
+}
+
+// Build a <summary> with a label, optional adapt badge, and an optional preview chip.
+function summaryWithPreview(label, opts) {
+  opts = opts || {};
+  const badge = opts.adapted ? ' <span class="adapt-badge">Adapted</span>' : '';
+  const preview = opts.preview ? `<span class="sum-preview">${esc(opts.preview)}</span>` : '';
+  return `<summary>${label}${badge}${preview}</summary>`;
+}
+
+function getLocationName(id) {
+  if (source.locations[id]) return source.locations[id].name;
+  const ts = source.triggerScenes && source.triggerScenes.find(t => t.id === id);
+  if (ts) return ts.name;
+  return id;
+}
+
+function typeBadge(type) {
+  const cls = {
+    combat: 'badge-combat', exploration: 'badge-exploration',
+    puzzle: 'badge-puzzle', social: 'badge-social',
+  }[type] || 'badge-exploration';
+  return `<span class="badge ${cls}">${esc(type)}</span>`;
+}
+</script>
+</body>
+</html>

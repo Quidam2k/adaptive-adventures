@@ -1,0 +1,37 @@
+MIT License
+
+Copyright (c) 2026 Todd Walker
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+─────────────────────────────────────────────────────────────────────────────
+
+NOTE ON SCOPE
+
+This MIT license covers the *tooling* in this repository: the DM dashboard
+(dashboard.html), the scene schema (schema/), the adaptation protocol
+(runtime/), and the original example adventure under
+adventures/example_thornwell/, which is licensed content authored for this
+project.
+
+It does NOT grant any rights to third-party adventure material. Published,
+commercial adventures (e.g. those by Wizards of the Coast or MCDM) remain the
+property of their respective rights holders and are deliberately excluded from
+this repository. Use this tooling with adventures you own or have the right to
+adapt.

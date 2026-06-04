@@ -1,0 +1,37 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  PUBLISH BOUNDARY
+#
+#  This repo ships the *tooling* (dashboard, schema, runtime protocol) and ONE
+#  original, copyright-free example adventure. Everything else stays local:
+#    • Copyrighted adventure source material (MCDM / WotC PDFs + extracted text)
+#    • Real campaign adaptations (contain player names + session-by-session play)
+#
+#  When in doubt, it stays out. Run `git status` before every commit.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Copyrighted PDFs and anything derived from them, anywhere in the tree
+*.pdf
+
+# Default-deny every adventure folder, then re-allow ONLY the shippable example.
+/adventures/*/
+!/adventures/example_thornwell/
+
+# Your private manifest — lists the real, unpublished adventures for local use
+/adventures/manifest.local.js
+
+# Source books, research, prior-art extracts
+/reference/
+
+# Real-session artifacts (player data)
+/fact_check_reports/
+/screengrab/
+/NEXT_SESSION_PLAN_*.md
+/cascades/
+
+# Tooling scratch
+/.playwright-mcp/
+
+# OS / editor cruft
+Thumbs.db
+.DS_Store
+*.swp
