@@ -1210,6 +1210,8 @@ function referencePages() {
     source.hoard                 && ['ref-hoard',     'Treasure Hoard',     false],
     source.bestiary              && ['ref-bestiary',  'Bestiary',           false],
   ].filter(Boolean);
+  const up = unplacedScenes();
+  if (up.scenes.length || up.orphans.length) refs.push(['ref-unplaced', 'Unplaced Scenes', up.orphans.length > 0 || up.scenes.some(([sid]) => adaptation && adaptation.scenes && adaptation.scenes[sid])]);
   if (adaptation) {
     refs.push(['ref-dc', 'DC Adjustments', true]);
     refs.push(['ref-callbacks', 'Campaign Integration', true]);
@@ -1217,6 +1219,26 @@ function referencePages() {
     if (adaptation.rulings && adaptation.rulings.length) refs.push(['ref-rulings', 'Rulings Log', true]);
   }
   return refs;
+}
+
+// Scene ids a location links to. Sources use three conventions: scenesHere
+// (array), scenes (array), or scene (single id).
+function locSceneIds(loc) {
+  return (loc.scenesHere && loc.scenesHere.length) ? loc.scenesHere
+    : (loc.scenes && loc.scenes.length) ? loc.scenes
+    : (loc.scene ? [loc.scene] : []);
+}
+
+// Content no location view renders: source scenes no location links to, and
+// adaptation scene keys that match no location, event or source scene.
+// Feeds the "Unplaced Scenes" reference page.
+function unplacedScenes() {
+  const linked = new Set(Object.values(source.locations).flatMap(locSceneIds));
+  const scenes = Object.entries(source.scenes || {}).filter(([sid]) => !linked.has(sid));
+  const known = sid => source.locations[sid] || (source.scenes && source.scenes[sid])
+    || (source.triggerScenes && source.triggerScenes.some(t => t.id === sid));
+  const orphans = Object.keys((adaptation && adaptation.scenes) || {}).filter(sid => !known(sid));
+  return { scenes, orphans };
 }
 
 function navigate(view) {
@@ -1261,9 +1283,7 @@ function buildSearchIndex() {
       if (poi.name) searchIndex.push({ kind: 'POI', label: poi.name, parent: `${id}: ${loc.name}`, view: id, alt: poi.type || '' });
     }
     if (source.scenes) {
-      const sceneIds = (loc.scenesHere && loc.scenesHere.length) ? loc.scenesHere
-        : (loc.scenes && loc.scenes.length) ? loc.scenes
-        : (loc.scene ? [loc.scene] : []);
+      const sceneIds = locSceneIds(loc);
       for (const sid of sceneIds) {
         const sc = source.scenes[sid];
         if (sc) searchIndex.push({ kind: 'Scene', label: sc.title || sid, parent: `${id}: ${loc.name}`, view: id, alt: `${sid} ${sc.summary || ''}` });
@@ -1279,6 +1299,9 @@ function buildSearchIndex() {
     for (const cr of Object.values(source.bestiary)) {
       searchIndex.push({ kind: 'Bestiary', label: cr.name, parent: cr.cr ? `CR ${cr.cr}` : '', view: 'ref-bestiary', alt: `${cr.type || ''} ${cr.size || ''}` });
     }
+  }
+  for (const [sid, sc] of unplacedScenes().scenes) {
+    searchIndex.push({ kind: 'Scene', label: sc.title || sid, parent: 'Unplaced scenes', view: 'ref-unplaced', alt: `${sid} ${sc.summary || ''}` });
   }
   for (const [id, label] of referencePages()) {
     searchIndex.push({ kind: 'Reference', label, parent: '', view: id, alt: id });
@@ -1411,49 +1434,7 @@ function renderLocation(id) {
   h += `</div></div>`;
 
   // Session State (adaptation — per-scene pickup status)
-  if (adpt && adpt.sessionState) {
-    const ss = adpt.sessionState;
-    const ssPreview = ss.status ? snip(ss.status, 90) : '';
-    h += `<details${PLAY_KEEP}>${summaryWithPreview('Session State', { adapted: true, preview: ssPreview })}<div class="section-body">`;
-    if (ss.status) h += `<div class="kv"><span class="k">Status:</span> ${linkText(ss.status)}</div>`;
-    if (ss.enteredVia) h += `<div class="kv"><span class="k">Entered via:</span> ${linkText(ss.enteredVia)}</div>`;
-    if (ss.narrative) h += `<div style="margin-top:6px">${paraText(ss.narrative)}</div>`;
-    if (ss.keyPoints && ss.keyPoints.length) {
-      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Key Points</div><ul class="plain">`;
-      for (const kp of ss.keyPoints) h += `<li>${linkText(kp)}</li>`;
-      h += `</ul>`;
-    }
-    if (ss.notes && ss.notes.length) {
-      for (const n of ss.notes) h += `<div class="kv" style="margin-top:8px"><span class="k">${esc(n.label)}:</span> ${linkText(n.text)}</div>`;
-    }
-    if (ss.resolvedElements && ss.resolvedElements.length) {
-      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Resolved</div>`;
-      h += `<ul class="plain">`;
-      for (const r of ss.resolvedElements) h += `<li>${linkText(r)}</li>`;
-      h += `</ul>`;
-    }
-    if (ss.unresolvedElements && ss.unresolvedElements.length) {
-      h += `<div class="sub-label" style="color:var(--orange);margin-top:8px">Unresolved</div>`;
-      h += `<ul class="plain">`;
-      for (const u of ss.unresolvedElements) h += `<li>${linkText(u)}</li>`;
-      h += `</ul>`;
-    }
-    if (ss.pendingElements && ss.pendingElements.length) {
-      h += `<div class="sub-label" style="color:var(--orange);margin-top:8px">Pending</div>`;
-      h += `<ul class="plain">`;
-      for (const p of ss.pendingElements) h += `<li>${linkText(p)}</li>`;
-      h += `</ul>`;
-    }
-    if (ss.npcStatus) {
-      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">NPC Status</div>`;
-      for (const [npcKey, npcStatus] of Object.entries(ss.npcStatus)) {
-        h += `<div class="kv"><span class="k">${esc(npcKey)}:</span> ${linkText(npcStatus)}</div>`;
-      }
-    }
-    if (ss.cliffhangerResolution) h += `<div class="dm-note" style="margin-top:8px"><strong>Cliffhanger:</strong> ${linkText(ss.cliffhangerResolution)}</div>`;
-    if (ss.dmNote) h += `<div class="dm-note" style="margin-top:8px">${paraText(ss.dmNote)}</div>`;
-    h += `</div></details>`;
-  }
+  h += renderSessionState(adpt);
 
   // Connections (top)
   h += renderConnections(loc.connections, 'From here');
@@ -1541,12 +1522,9 @@ function renderLocation(id) {
     h += `<div class="kv" style="margin:8px 0"><span class="k">Coffins:</span> ${esc(loc.coffins.note)}</div>`;
   }
 
-  // WBtW Scenes — source uses three conventions: scenesHere (array), scenes (array), or scene (single id).
+  // WBtW Scenes linked to this location
   if (source.scenes) {
-    const sceneIds = (loc.scenesHere && loc.scenesHere.length) ? loc.scenesHere
-      : (loc.scenes && loc.scenes.length) ? loc.scenes
-      : (loc.scene ? [loc.scene] : []);
-    for (const sceneId of sceneIds) {
+    for (const sceneId of locSceneIds(loc)) {
       const scene = source.scenes[sceneId];
       if (scene) h += renderWBtWScene(sceneId, scene);
     }
@@ -1555,10 +1533,7 @@ function renderLocation(id) {
   h += renderPassiveRevelations(id, adpt);
   h += renderCombatBriefing(id, adpt);
   h += renderTacticalNotes(id, adpt);
-  h += renderTableRulings([id,
-    ...((loc.scenesHere && loc.scenesHere.length) ? loc.scenesHere
-      : (loc.scenes && loc.scenes.length) ? loc.scenes
-      : (loc.scene ? [loc.scene] : []))]);
+  h += renderTableRulings([id, ...locSceneIds(loc)]);
 
   // IF THEY ASK (merged: source POI questions + adaptation additions)
   const itaSource = [];
@@ -1623,6 +1598,7 @@ function renderWBtWScene(sceneId, scene) {
   h += `<div class="scene-divider">${typeBadge(scene.type)} ${esc(scene.title || sceneId)}</div>`;
 
   if (scene.summary) h += `<div class="dm-note" style="margin:8px 0">${esc(scene.summary)}</div>`;
+  h += renderSessionState(sceneAdpt);
 
   // Read Aloud (source)
   const raArr = Array.isArray(scene.readAloud) ? scene.readAloud : (scene.readAloud ? [scene.readAloud] : []);
@@ -1881,6 +1857,55 @@ function renderTacticalNotes(id, adpt) {
   h += `</div></details>`;
   return h;
 }
+
+// Session State — per-scene pickup status from the adaptation. Shared by
+// renderLocation and renderWBtWScene (location- or scene-keyed).
+function renderSessionState(adpt) {
+  if (!adpt || !adpt.sessionState) return '';
+  const ss = adpt.sessionState;
+  const ssPreview = ss.status ? snip(ss.status, 90) : '';
+  let h = `<details${PLAY_KEEP}>${summaryWithPreview('Session State', { adapted: true, preview: ssPreview })}<div class="section-body">`;
+  if (ss.status) h += `<div class="kv"><span class="k">Status:</span> ${linkText(ss.status)}</div>`;
+  if (ss.enteredVia) h += `<div class="kv"><span class="k">Entered via:</span> ${linkText(ss.enteredVia)}</div>`;
+  if (ss.narrative) h += `<div style="margin-top:6px">${paraText(ss.narrative)}</div>`;
+  if (ss.keyPoints && ss.keyPoints.length) {
+    h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Key Points</div><ul class="plain">`;
+    for (const kp of ss.keyPoints) h += `<li>${linkText(kp)}</li>`;
+    h += `</ul>`;
+  }
+  if (ss.notes && ss.notes.length) {
+    for (const n of ss.notes) h += `<div class="kv" style="margin-top:8px"><span class="k">${esc(n.label)}:</span> ${linkText(n.text)}</div>`;
+  }
+  if (ss.resolvedElements && ss.resolvedElements.length) {
+    h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Resolved</div>`;
+    h += `<ul class="plain">`;
+    for (const r of ss.resolvedElements) h += `<li>${linkText(r)}</li>`;
+    h += `</ul>`;
+  }
+  if (ss.unresolvedElements && ss.unresolvedElements.length) {
+    h += `<div class="sub-label" style="color:var(--orange);margin-top:8px">Unresolved</div>`;
+    h += `<ul class="plain">`;
+    for (const u of ss.unresolvedElements) h += `<li>${linkText(u)}</li>`;
+    h += `</ul>`;
+  }
+  if (ss.pendingElements && ss.pendingElements.length) {
+    h += `<div class="sub-label" style="color:var(--orange);margin-top:8px">Pending</div>`;
+    h += `<ul class="plain">`;
+    for (const p of ss.pendingElements) h += `<li>${linkText(p)}</li>`;
+    h += `</ul>`;
+  }
+  if (ss.npcStatus) {
+    h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">NPC Status</div>`;
+    for (const [npcKey, npcStatus] of Object.entries(ss.npcStatus)) {
+      h += `<div class="kv"><span class="k">${esc(npcKey)}:</span> ${linkText(npcStatus)}</div>`;
+    }
+  }
+  if (ss.cliffhangerResolution) h += `<div class="dm-note" style="margin-top:8px"><strong>Cliffhanger:</strong> ${linkText(ss.cliffhangerResolution)}</div>`;
+  if (ss.dmNote) h += `<div class="dm-note" style="margin-top:8px">${paraText(ss.dmNote)}</div>`;
+  h += `</div></details>`;
+  return h;
+}
+
 // Table Rulings — locked rulings from the append-only rulings log whose
 // sceneRefs include this view (or one of the scenes rendered on it). Shared by
 // renderLocation and renderTriggerScene. Rulings matter at the table, so the
@@ -2027,6 +2052,7 @@ function renderReference(view) {
     case 'ref-callbacks': return renderCallbacks();
     case 'ref-voice': return renderVoice();
     case 'ref-rulings': return renderRulingsLog();
+    case 'ref-unplaced': return renderUnplacedScenes();
     default: return '<p>Unknown reference section.</p>';
   }
 }
@@ -2425,6 +2451,26 @@ function renderRulingsLog() {
     }
     h += `</div>`;
   });
+  return h;
+}
+
+// Scenes with no location view, rendered in full so their source content and
+// adaptation blocks stay reachable, plus adaptation keys that match nothing.
+function renderUnplacedScenes() {
+  const { scenes, orphans } = unplacedScenes();
+  let h = '';
+  if (scenes.length) h += `<div class="room-header"><h1>Unplaced Scenes</h1><div class="room-meta">Scenes no location links to (travel, random encounters, transitions). Run them wherever they happen.</div></div>`;
+  for (const [sid, scene] of scenes) {
+    h += renderWBtWScene(sid, scene);
+    h += renderTableRulings([sid]);
+  }
+  if (orphans.length) {
+    h += `<div class="room-header"${scenes.length ? ' style="margin-top:28px"' : ''}><h1>Orphaned Adaptation Entries</h1><div class="room-meta">These adaptation keys match no location, event or source scene, so nothing else renders them. Check the key for a typo or a missing source scene.</div></div>`;
+    for (const sid of orphans) {
+      h += renderWBtWScene(sid, { type: 'orphan', title: sid, summary: `No source scene "${sid}" — adaptation data only.` });
+      h += renderTableRulings([sid]);
+    }
+  }
   return h;
 }
 
