@@ -8,34 +8,104 @@
 <!-- Optional: private, unpublished adventures. 404s harmlessly when absent (e.g. a fresh clone). -->
 <script src="adventures/manifest.local.js" onerror="this.remove()"></script>
 <style>
+/* ════════════════════════════════════════════════════════════════════
+   PHB / Homebrewery book styling.
+   Fonts are copied locally by setup-fonts.ps1 (fonts/ is gitignored);
+   every face has a graceful system fallback.
+   ════════════════════════════════════════════════════════════════════ */
+@font-face { font-family: 'Bookinsanity'; src: url('fonts/Bookinsanity.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Bookinsanity'; src: url('fonts/Bookinsanity Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Bookinsanity'; src: url('fonts/Bookinsanity Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Bookinsanity'; src: url('fonts/Bookinsanity Bold Italic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Mr Eaves Small Caps'; src: url('fonts/Mr Eaves Small Caps.woff2') format('woff2'); font-weight: 400 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Scaly Sans'; src: url('fonts/Scaly Sans.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Scaly Sans'; src: url('fonts/Scaly Sans Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Scaly Sans'; src: url('fonts/Scaly Sans Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Scaly Sans'; src: url('fonts/Scaly Sans Bold Italic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Scaly Sans Caps'; src: url('fonts/Scaly Sans Caps.woff2') format('woff2'); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Nodesto Caps Condensed'; src: url('fonts/Nodesto Caps Condensed Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
 :root {
-  --bg: #1a1a2e;
-  --surface: #16213e;
-  --surface2: #0f3460;
-  --border: #334;
-  --text: #e0e0e0;
-  --text-dim: #888;
-  --gold: #f5c842;
-  --green: #66bb6a;
-  --red: #ef5350;
-  --blue: #4fc3f7;
-  --purple: #b388ff;
-  --orange: #ffa726;
-  --teal: #26a69a;
-  --sidebar-w: 220px;
+  --font-body: 'Bookinsanity', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --font-heading: 'Mr Eaves Small Caps', 'Palatino Linotype', Georgia, serif;
+  --font-sans: 'Scaly Sans', 'Segoe UI', 'Trebuchet MS', sans-serif;
+  --font-caps: 'Scaly Sans Caps', 'Scaly Sans', 'Segoe UI', sans-serif;
+  --font-title: 'Nodesto Caps Condensed', 'Mr Eaves Small Caps', 'Palatino Linotype', serif;
+  --sidebar-w: 230px;
 }
+
+/* ── Parchment (default): a page from a published book ─────────────── */
+:root, :root[data-theme="parchment"] {
+  --bg: #EEE5CE;             /* page parchment */
+  --surface: #F6EEDC;        /* quiet card */
+  --surface2: #E9DDBE;       /* deeper panel / sidebar */
+  --statblock-bg: #FDF1DC;   /* classic tan stat block */
+  --readaloud-bg: #FAF7EA;   /* read-aloud cream */
+  --border: #D6C7A2;         /* tan hairline */
+  --rule: #C9AD6A;           /* gold rule */
+  --sb-bar: #E69A28;         /* stat-block orange bars */
+  --text: #231A10;           /* ink */
+  --text-dim: #7A6C51;       /* faded ink */
+  --header: #58180D;         /* red-brown headings */
+  --shadow: rgba(80, 60, 20, 0.18);
+  --page-hi: rgba(255, 252, 240, 0.55);
+  --page-lo: rgba(120, 90, 40, 0.10);
+
+  /* Legacy accent names (used throughout render JS) re-pointed to book ink */
+  --gold: #58180D;           /* key labels / emphasis — matches headings */
+  --red: #922610;            /* combat / danger / stat-block red */
+  --green: #4A6741;          /* success / used */
+  --blue: #1D4E89;           /* location links */
+  --purple: #5E3A66;         /* questions / villain */
+  --orange: #7C4A03;         /* umber — DM notes */
+  --teal: #2F5D50;           /* adapted-content marker */
+}
+
+/* ── Candlelight: the same book, read by candle. Dimmed parchment, warm
+     shadows, identical typography — NOT a generic dark theme. ───────── */
+:root[data-theme="candlelight"] {
+  --bg: #262019;
+  --surface: #2E2719;
+  --surface2: #211B12;
+  --statblock-bg: #332A18;
+  --readaloud-bg: #322B1D;
+  --border: #55452B;
+  --rule: #8A6D3B;
+  --sb-bar: #A9741F;
+  --text: #DCCFA8;
+  --text-dim: #9A8A64;
+  --header: #D07347;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --page-hi: rgba(255, 220, 150, 0.045);
+  --page-lo: rgba(0, 0, 0, 0.35);
+
+  --gold: #D07347;
+  --red: #D46A4C;
+  --green: #93B27A;
+  --blue: #86AFD3;
+  --purple: #B491C4;
+  --orange: #CF9D53;
+  --teal: #82B29A;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg);
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 15% 0%, var(--page-hi), transparent 60%),
+    radial-gradient(ellipse 100% 90% at 90% 100%, var(--page-lo), transparent 55%);
+  background-attachment: fixed;
   color: var(--text);
-  line-height: 1.55;
-  font-size: 14px;
+  line-height: 1.5;
+  font-size: 15px;
 }
 a { color: var(--blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
+p { margin: 0 0 0.6em; }
+p:last-child { margin-bottom: 0; }
 
-/* --- Loading Screen --- */
+/* ── Loading screen: book cover ────────────────────────────────────── */
 #load-screen {
   display: flex;
   flex-direction: column;
@@ -46,46 +116,54 @@ a:hover { text-decoration: underline; }
   padding: 40px;
 }
 #load-screen h1 {
-  font-size: 28px;
-  color: var(--gold);
+  font-family: var(--font-title);
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--header);
   letter-spacing: 2px;
-  text-transform: uppercase;
+  text-shadow: 0 2px 3px var(--shadow);
 }
 #load-screen p { color: var(--text-dim); max-width: 480px; text-align: center; }
 .load-card {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--rule);
+  outline: 1px solid var(--border);
+  outline-offset: 4px;
   padding: 32px 40px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-width: 380px;
+  min-width: 400px;
+  box-shadow: 0 6px 18px var(--shadow);
 }
 .load-row { display: flex; flex-direction: column; gap: 6px; }
-.load-row label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); }
+.load-row label {
+  font-family: var(--font-caps);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--header);
+}
 .load-row select {
-  background: var(--surface2);
+  background: var(--readaloud-bg);
   border: 1px solid var(--border);
   color: var(--text);
-  border-radius: 6px;
   padding: 8px 12px;
   font-size: 14px;
-  font-family: inherit;
+  font-family: var(--font-sans);
   cursor: pointer;
   width: 100%;
 }
-.load-row select:focus { outline: none; border-color: var(--gold); }
+.load-row select:focus { outline: none; border-color: var(--header); }
 #launch-btn {
-  background: var(--gold);
-  color: #1a1a2e;
+  background: var(--header);
+  color: var(--statblock-bg);
   border: none;
-  border-radius: 6px;
   padding: 10px 0;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
-  font-family: inherit;
-  letter-spacing: 1px;
+  font-family: var(--font-heading);
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition: opacity 0.15s;
@@ -93,39 +171,40 @@ a:hover { text-decoration: underline; }
 }
 #launch-btn:hover { opacity: 0.85; }
 #launch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-#load-error { color: var(--red); font-size: 13px; min-height: 20px; text-align: center; }
+#load-error { color: var(--red); font-size: 13px; min-height: 20px; text-align: center; font-family: var(--font-sans); }
 
-/* --- Dashboard Layout --- */
+/* ── Layout ────────────────────────────────────────────────────────── */
 #dashboard { display: none; }
 #sidebar {
   position: fixed;
   top: 0; left: 0;
   width: var(--sidebar-w);
   height: 100vh;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: var(--surface2);
+  border-right: 1px solid var(--rule);
   overflow-y: auto;
   padding: 12px 0;
   z-index: 10;
 }
 #main {
   margin-left: var(--sidebar-w);
-  padding: 24px 32px 60px;
-  max-width: 960px;
+  padding: 28px 36px 60px;
+  max-width: 900px;
 }
 
-/* --- Sidebar --- */
+/* ── Sidebar: table of contents ────────────────────────────────────── */
 .sb-title {
-  font-size: 13px;
+  font-family: var(--font-heading);
+  font-size: 19px;
   font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 8px 16px 4px;
+  color: var(--header);
+  letter-spacing: 1px;
+  padding: 8px 16px 2px;
+  line-height: 1.15;
 }
 .sb-divider {
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule);
   margin: 8px 12px;
 }
 .sb-item {
@@ -136,15 +215,16 @@ a:hover { text-decoration: underline; }
   border: none;
   color: var(--text);
   font-size: 13px;
-  padding: 5px 16px 5px 20px;
+  font-family: var(--font-sans);
+  padding: 4px 16px 4px 20px;
   cursor: pointer;
-  font-family: inherit;
   transition: background 0.15s;
 }
-.sb-item:hover { background: var(--surface2); }
-.sb-item.active { background: var(--surface2); color: var(--gold); border-left: 3px solid var(--gold); padding-left: 17px; }
+.sb-item:hover { background: var(--surface); }
+.sb-item.active { background: var(--surface); color: var(--header); border-left: 3px solid var(--header); padding-left: 17px; font-weight: 700; }
 .sb-item .sb-id {
   display: block;
+  font-family: var(--font-caps);
   font-weight: 700;
   color: var(--text-dim);
   font-size: 10px;
@@ -158,268 +238,362 @@ a:hover { text-decoration: underline; }
   white-space: nowrap;
   line-height: 1.3;
 }
-.sb-item.active .sb-id { color: var(--gold); }
-.sb-section { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); padding: 10px 16px 2px; }
+.sb-item.active .sb-id { color: var(--header); }
+.sb-section {
+  font-family: var(--font-caps);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--header);
+  padding: 10px 16px 2px;
+}
+#theme-toggle-btn, #play-toggle-btn {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 8px 12px;
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--text-dim);
+  font-family: var(--font-caps);
+  font-size: 11px;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: border-color 0.15s, color 0.15s;
+}
+#theme-toggle-btn:hover, #play-toggle-btn:hover { border-color: var(--header); color: var(--header); }
+#play-toggle-btn.on { border-color: var(--header); color: var(--header); font-weight: 700; }
 
-/* --- Main Content --- */
-.room-header { margin-bottom: 20px; }
-.room-header h1 { font-size: 24px; color: var(--gold); margin-bottom: 4px; }
-.room-header .room-meta { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+/* ── Page headers ──────────────────────────────────────────────────── */
+.room-header { margin-bottom: 18px; border-bottom: 2px solid var(--rule); padding-bottom: 8px; }
+.room-header h1 {
+  font-family: var(--font-heading);
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--header);
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+.room-header .room-meta {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
 
-/* Connection buttons */
-.connections { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+/* ── Connections ───────────────────────────────────────────────────── */
+.connections { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 18px; }
 .conn-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px;
   padding: 6px 12px;
   color: var(--text);
-  font-size: 12px;
+  font-size: 12.5px;
   cursor: pointer;
-  font-family: inherit;
-  transition: border-color 0.15s, background 0.15s;
+  font-family: var(--font-sans);
+  box-shadow: 0 1px 2px var(--shadow);
+  transition: border-color 0.15s;
 }
-.conn-btn:hover { border-color: var(--gold); background: var(--surface2); }
-.conn-btn .conn-id { font-weight: 700; color: var(--gold); }
+.conn-btn:hover { border-color: var(--header); }
+.conn-btn .conn-id { font-family: var(--font-caps); font-weight: 700; color: var(--header); }
 .conn-btn .conn-via { color: var(--text-dim); font-size: 11px; }
-.conn-note { font-size: 11px; color: var(--orange); margin-top: 2px; }
+.conn-note { font-size: 11px; color: var(--orange); margin-top: 2px; font-family: var(--font-sans); }
 
-/* Collapsible sections */
-details { margin-bottom: 16px; }
+/* ── Collapsible sections: book section heads ──────────────────────── */
+details { margin-bottom: 14px; }
 summary {
-  font-size: 13px;
+  font-family: var(--font-heading);
+  font-size: 21px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text-dim);
+  color: var(--header);
   cursor: pointer;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 4px 0 2px;
+  border-bottom: 1px solid var(--rule);
   list-style: none;
   user-select: none;
+  line-height: 1.2;
 }
 summary::-webkit-details-marker { display: none; }
 summary::before {
-  content: '\25B6';
+  content: '\25B8';
   display: inline-block;
-  margin-right: 8px;
-  font-size: 10px;
+  margin-right: 7px;
+  font-size: 13px;
+  color: var(--rule);
   transition: transform 0.2s;
+  vertical-align: 2px;
 }
 details[open] > summary::before { transform: rotate(90deg); }
-details[open] > summary { color: var(--text); border-bottom-color: var(--gold); }
-.section-body { padding: 12px 0; }
+details[open] > summary { border-bottom: 2px solid var(--rule); }
+.section-body { padding: 10px 0 4px; }
 
-/* Read-aloud boxes */
-.read-aloud {
-  background: linear-gradient(135deg, #1e2a40, #162040);
-  border-left: 3px solid var(--gold);
-  padding: 12px 16px;
-  margin: 8px 0;
+/* Collapsed-section preview chip */
+.sum-preview {
+  display: inline;
+  margin-left: 10px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--text-dim);
   font-style: italic;
-  font-size: 14px;
-  line-height: 1.65;
-  color: #d4c9a8;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: 2px;
 }
+details[open] > summary .sum-preview { display: none; }
 
-/* Secret/DM-only */
-.secret {
-  background: rgba(239, 83, 80, 0.08);
-  border-left: 3px solid var(--red);
-  padding: 8px 12px;
-  margin: 6px 0;
-  font-size: 13px;
-}
-.secret-label { color: var(--red); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
-
-/* Encounter cards */
-.encounter-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 12px 16px;
-  margin: 8px 0;
-}
-.encounter-card h4 { color: var(--red); font-size: 14px; margin-bottom: 6px; }
-.creature-list { list-style: none; padding: 0; }
-.creature-list li { font-size: 13px; padding: 2px 0; }
-.creature-list li::before { content: '\2694'; margin-right: 6px; color: var(--red); }
-.tactics { font-size: 13px; color: var(--text-dim); margin-top: 6px; font-style: italic; }
-
-/* POI cards */
-.poi-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 12px 16px;
-  margin: 8px 0;
-}
-.poi-card h4 { color: var(--teal); font-size: 14px; margin-bottom: 4px; }
-.poi-type { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-
-/* IF THEY ASK */
-.ita-item {
-  background: var(--surface);
-  border-left: 3px solid var(--purple);
-  padding: 8px 12px;
-  margin: 6px 0;
-  border-radius: 0 6px 6px 0;
-}
-.ita-q { font-weight: 700; color: var(--purple); font-size: 13px; margin-bottom: 4px; }
-.ita-a { font-size: 13px; }
-.ita-thread { font-size: 11px; color: var(--teal); margin-top: 4px; }
-
-/* Special Resources */
-.sr-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--teal);
-  border-radius: 0 6px 6px 0;
-  padding: 12px 16px;
-  margin: 8px 0;
-}
-.sr-pc { font-weight: 700; color: var(--teal); font-size: 14px; }
-.sr-cap { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
-.sr-moment { font-size: 13px; margin-bottom: 4px; }
-.sr-hook { font-size: 12px; color: var(--gold); font-style: italic; }
-.sr-dm-note { font-size: 12px; color: var(--orange); margin-top: 4px; border-top: 1px solid var(--border); padding-top: 4px; }
-
-/* Hazard cards */
-.hazard-card {
-  background: rgba(255, 167, 38, 0.06);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--orange);
-  border-radius: 0 6px 6px 0;
-  padding: 12px 16px;
-  margin: 8px 0;
-}
-.hazard-card h4 { color: var(--orange); font-size: 14px; margin-bottom: 4px; }
-
-/* Treasure */
-.treasure-item {
-  background: rgba(245, 200, 66, 0.06);
-  border-left: 3px solid var(--gold);
-  padding: 8px 12px;
-  margin: 6px 0;
-  font-size: 13px;
-}
-
-/* Stat blocks */
-.stat-block {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--red);
-  border-radius: 0 0 6px 6px;
-  padding: 16px;
-  margin: 8px 0;
-}
-.stat-block h3 { color: var(--red); font-size: 16px; margin-bottom: 2px; }
-.stat-block .stat-sub { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
-.stat-row { font-size: 13px; padding: 3px 0; }
-.stat-label { font-weight: 700; color: var(--gold); }
-.ability-scores { display: flex; gap: 12px; margin: 8px 0; text-align: center; }
-.ability-scores div { flex: 1; }
-.ability-scores .ab-name { font-size: 11px; font-weight: 700; color: var(--text-dim); }
-.ability-scores .ab-val { font-size: 16px; font-weight: 700; }
-.ability-scores .ab-mod { font-size: 12px; color: var(--text-dim); }
-.stat-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
-
-/* Taunt cards */
-.taunt-card {
-  background: var(--surface);
-  border-left: 3px solid var(--purple);
-  padding: 10px 14px;
-  margin: 8px 0;
-  border-radius: 0 6px 6px 0;
-}
-.taunt-trigger { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-.taunt-target { font-size: 12px; color: var(--teal); margin-bottom: 4px; }
-.taunt-msg { font-style: italic; font-size: 14px; color: #d4c9a8; margin: 6px 0; }
-.taunt-note { font-size: 12px; color: var(--orange); }
-
-/* Callback cards */
-.callback-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 14px 16px;
-  margin: 10px 0;
-}
-.callback-card h4 { color: var(--gold); font-size: 15px; margin-bottom: 4px; }
-.callback-option {
-  background: var(--surface2);
-  border-radius: 4px;
-  padding: 8px 10px;
-  margin: 6px 0;
-  font-size: 13px;
-}
-.callback-option strong { color: var(--teal); }
-.callback-dm-note { font-size: 12px; color: var(--orange); margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
-
-/* Tactical notes */
-.tactical-card {
-  background: rgba(239, 83, 80, 0.06);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--red);
-  border-radius: 0 6px 6px 0;
-  padding: 12px 16px;
-  margin: 8px 0;
-}
-.tactical-card h4 { color: var(--red); font-size: 13px; margin-bottom: 4px; }
-.tactical-card p { font-size: 13px; }
-
-/* Voice cards */
-.voice-card {
-  background: var(--surface);
-  border-left: 3px solid var(--blue);
-  padding: 8px 12px;
-  margin: 6px 0;
-  border-radius: 0 6px 6px 0;
-}
-.voice-card .voice-name { font-weight: 700; color: var(--blue); font-size: 13px; }
-.voice-card .voice-desc { font-size: 13px; font-style: italic; }
-
-/* General helpers */
-.kv { font-size: 13px; padding: 2px 0; }
-.kv .k { font-weight: 700; color: var(--gold); }
-.muted { color: var(--text-dim); }
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 10px;
+/* Small run-in labels inside sections (was inline-styled uppercase divs) */
+.sub-label {
+  font-family: var(--font-caps);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
 }
-.badge-combat { background: rgba(239,83,80,0.2); color: var(--red); }
-.badge-exploration { background: rgba(79,195,247,0.2); color: var(--blue); }
-.badge-puzzle { background: rgba(179,136,255,0.2); color: var(--purple); }
-.badge-social { background: rgba(102,187,106,0.2); color: var(--green); }
-.badge-safe { background: rgba(102,187,106,0.15); color: var(--green); font-size: 10px; margin-left: 6px; }
-ul.plain { list-style: none; padding: 0; }
-ul.plain li { padding: 3px 0; font-size: 13px; }
-ul.plain li::before { content: '\2022'; margin-right: 8px; color: var(--text-dim); }
+.pr-block-title, .cb-sub-title {
+  font-family: var(--font-caps);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.pr-block-title { margin-bottom: 4px; }
+.cb-sub-title { color: var(--header); margin-top: 8px; }
+
+/* ════════════════════════════════════════════════════════════════════
+   PATTERN 1 — READ-ALOUD: the boxed descriptive text of a printed page
+   ════════════════════════════════════════════════════════════════════ */
+.read-aloud {
+  background: var(--readaloud-bg);
+  border-top: 2px solid var(--text);
+  border-bottom: 2px solid var(--text);
+  padding: 12px 18px;
+  margin: 10px 0;
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.6;
+  box-shadow: 1px 3px 6px var(--shadow);
+}
+.taunt-msg { font-style: italic; font-size: 15px; margin: 6px 0; }
+
+/* ════════════════════════════════════════════════════════════════════
+   PATTERN 2 — DM-ONLY: red-brown frame + generated small-caps flag
+   ════════════════════════════════════════════════════════════════════ */
+.secret, .tactical-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--header);
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: 14px;
+  box-shadow: 0 1px 2px var(--shadow);
+}
+.secret::before, .tactical-card::before {
+  content: 'DM only';
+  display: block;
+  font-family: var(--font-caps);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--header);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 2px;
+}
+.secret-label {
+  font-family: var(--font-caps);
+  color: var(--header);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+.tactical-card h4 { font-family: var(--font-heading); color: var(--header); font-size: 17px; margin-bottom: 2px; }
+.tactical-card p { font-size: 14px; }
 .dm-note {
-  font-size: 12px;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
   color: var(--orange);
   margin-top: 4px;
   padding-top: 4px;
   border-top: 1px solid var(--border);
 }
+.sr-dm-note { font-family: var(--font-sans); font-size: 12.5px; color: var(--orange); margin-top: 4px; border-top: 1px solid var(--border); padding-top: 4px; }
+.callback-dm-note { font-family: var(--font-sans); font-size: 12.5px; color: var(--orange); margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
 
-/* Check entries */
+/* ════════════════════════════════════════════════════════════════════
+   PATTERN 3 — ROLLABLE / CHECK: Scaly Sans, DC prominent
+   ════════════════════════════════════════════════════════════════════ */
 .check-entry {
   background: var(--surface);
+  border: 1px solid var(--border);
   padding: 6px 10px;
   margin: 4px 0;
-  border-radius: 4px;
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
 }
-.check-dc { font-weight: 700; color: var(--gold); }
+.check-dc { font-family: var(--font-caps); font-weight: 700; color: var(--header); }
+
+/* ════════════════════════════════════════════════════════════════════
+   PATTERN 4 — REFERENCE: quiet parchment cards, small-caps name line.
+   Semantic meaning carried by the label color, not 20 card treatments.
+   ════════════════════════════════════════════════════════════════════ */
+.encounter-card, .poi-card, .hazard-card, .sr-card, .ita-item,
+.taunt-card, .callback-card, .voice-card, .pr-item,
+.cb-hazard, .cb-creature, .cb-synergy, .cb-ambig, .treasure-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  margin: 8px 0;
+  box-shadow: 0 1px 2px var(--shadow);
+}
+.encounter-card h4, .poi-card h4, .hazard-card h4, .callback-card h4,
+.cb-hazard h4, .cb-creature h4 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 3px;
+  line-height: 1.15;
+}
+.encounter-card h4, .cb-creature h4 { color: var(--red); }
+.hazard-card h4, .cb-hazard h4 { color: var(--orange); }
+.poi-card h4 { color: var(--header); }
+.callback-card h4 { color: var(--header); }
+
+.creature-list { list-style: none; padding: 0; font-family: var(--font-sans); }
+.creature-list li { font-size: 13.5px; padding: 2px 0; }
+.creature-list li::before { content: '\2694'; margin-right: 6px; color: var(--red); }
+.tactics { font-size: 14px; color: var(--text-dim); margin-top: 6px; font-style: italic; }
+.poi-type {
+  font-family: var(--font-caps);
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.ita-item { border-left: 3px solid var(--purple); }
+.ita-q { font-weight: 700; color: var(--purple); font-size: 14.5px; margin-bottom: 4px; font-style: italic; }
+.ita-a { font-size: 14px; }
+.ita-thread { font-family: var(--font-sans); font-size: 11.5px; color: var(--teal); margin-top: 4px; }
+
+.sr-card { border-left: 3px solid var(--teal); }
+.sr-pc { font-family: var(--font-heading); font-weight: 700; color: var(--teal); font-size: 17px; }
+.sr-cap { font-family: var(--font-caps); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 6px; }
+.sr-moment { font-size: 14px; margin-bottom: 4px; }
+.sr-hook { font-size: 13.5px; color: var(--header); font-style: italic; }
+
+.treasure-item { border-left: 3px solid var(--rule); font-size: 14px; }
+
+.taunt-card { border-left: 3px solid var(--purple); }
+.taunt-trigger { font-family: var(--font-caps); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.taunt-target { font-family: var(--font-sans); font-size: 12px; color: var(--teal); margin-bottom: 4px; }
+.taunt-note { font-family: var(--font-sans); font-size: 12.5px; color: var(--orange); }
+
+.callback-option {
+  background: var(--readaloud-bg);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  margin: 6px 0;
+  font-size: 13.5px;
+}
+.callback-option strong { color: var(--teal); }
+
+.voice-card { border-left: 3px solid var(--blue); padding: 8px 12px; margin: 6px 0; }
+.voice-card .voice-name { font-family: var(--font-heading); font-weight: 700; color: var(--header); font-size: 16px; }
+.voice-card .voice-desc { font-size: 14px; font-style: italic; }
+
+.pr-item { border-left: 3px solid var(--blue); padding: 8px 28px 8px 12px; margin: 4px 0; font-size: 14px; }
+.pr-threshold { font-family: var(--font-caps); font-weight: 700; color: var(--blue); font-size: 12px; }
+.pr-reveals { margin-top: 2px; }
+.pr-pc-name { font-family: var(--font-caps); font-weight: 700; color: var(--teal); font-size: 12px; }
+.pr-block { margin: 10px 0; }
+
+.cb-hazard { border-left: 3px solid var(--orange); padding-right: 28px; }
+.cb-hazard .cb-detail { font-size: 14px; }
+.cb-hazard .cb-impact { font-size: 13px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
+.cb-creature { border-top: 2px solid var(--red); margin: 10px 0 6px; }
+.cb-creature .cb-stats { font-family: var(--font-sans); font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.cb-creature .cb-impact { font-size: 13px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
+.cb-creature ul.plain li { font-size: 13px; padding: 2px 0; }
+.cb-ambig { border-left: 3px solid var(--purple); padding: 6px 28px 6px 10px; margin: 4px 0; font-size: 13px; }
+.cb-synergy { border-left: 3px solid var(--teal); padding: 8px 28px 8px 12px; margin: 6px 0; font-size: 13.5px; }
+
+/* ── Stat blocks: the classic tan PHB monster block ────────────────── */
+.stat-block {
+  background: var(--statblock-bg);
+  border-top: 4px solid var(--sb-bar);
+  border-bottom: 4px solid var(--sb-bar);
+  outline: 1px solid var(--text);
+  outline-offset: -5px;
+  padding: 14px 18px;
+  margin: 10px 0;
+  font-family: var(--font-sans);
+  box-shadow: 1px 3px 8px var(--shadow);
+}
+.stat-block h3 {
+  font-family: var(--font-heading);
+  color: var(--header);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 0;
+  line-height: 1.1;
+}
+.stat-block .stat-sub, .rp-stat .stat-sub { font-size: 12px; color: var(--text-dim); font-style: italic; margin-bottom: 6px; }
+.stat-row { font-size: 13.5px; padding: 2px 0; }
+.stat-label { font-weight: 700; color: var(--header); }
+.stat-sec {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--header);
+  border-bottom: 1px solid var(--header);
+  margin: 6px 0 4px;
+}
+.ability-scores { display: flex; gap: 12px; margin: 8px 0; text-align: center; }
+.ability-scores div { flex: 1; }
+.ability-scores .ab-name { font-family: var(--font-caps); font-size: 11px; font-weight: 700; color: var(--header); }
+.ability-scores .ab-val { font-size: 15px; font-weight: 700; }
+.ability-scores .ab-mod { font-size: 12px; color: var(--text-dim); }
+.stat-divider {
+  border: none;
+  height: 3px;
+  margin: 7px 0;
+  background: linear-gradient(to right, var(--red) 0%, var(--red) 60%, transparent 100%);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.stat-summary { font-size: 17px; }
+.stat-cr { font-family: var(--font-sans); color: var(--text-dim); font-weight: 400; font-size: 12.5px; }
+
+/* ── General helpers ───────────────────────────────────────────────── */
+.kv { font-size: 14px; padding: 2px 0; }
+.kv .k { font-weight: 700; color: var(--header); }
+.muted { color: var(--text-dim); }
+.badge {
+  display: inline-block;
+  font-family: var(--font-caps);
+  padding: 1px 7px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  vertical-align: 1px;
+}
+.badge-combat { color: var(--red); }
+.badge-exploration { color: var(--blue); }
+.badge-puzzle { color: var(--purple); }
+.badge-social { color: var(--green); }
+.badge-safe { color: var(--green); font-size: 9px; margin-left: 6px; }
+ul.plain { list-style: none; padding: 0; }
+ul.plain li { padding: 3px 0; font-size: 14px; }
+ul.plain li::before { content: '\2022'; margin-right: 8px; color: var(--rule); }
 
 /* Location links in narrative text */
 .loc-link {
@@ -436,83 +610,70 @@ ul.plain li::before { content: '\2022'; margin-right: 8px; color: var(--text-dim
   text-decoration-style: dotted;
   text-underline-offset: 2px;
 }
-.loc-link:hover { color: var(--gold); text-decoration-style: solid; }
+.loc-link:hover { color: var(--header); text-decoration-style: solid; }
 
 /* Adaptation badge */
 .adapt-badge {
   display: inline-block;
-  padding: 1px 6px;
+  font-family: var(--font-caps);
+  padding: 1px 7px;
+  border: 1px solid var(--teal);
   border-radius: 8px;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: rgba(38, 166, 154, 0.2);
   color: var(--teal);
   margin-left: 8px;
-  vertical-align: middle;
+  vertical-align: 3px;
 }
 .sb-adapt { font-size: 10px; color: var(--teal); margin-left: 6px; vertical-align: middle; }
 
-/* Collapsed-section preview chip — small dim text after the summary label */
-.sum-preview {
-  display: inline;
-  margin-left: 10px;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--text-dim);
-  font-style: italic;
-  text-transform: none;
-  letter-spacing: 0;
-  vertical-align: baseline;
-}
-details[open] > summary .sum-preview { display: none; }
-
-/* Right panel */
+/* ── Right panel ───────────────────────────────────────────────────── */
 #right-panel {
   position: fixed;
   top: 0; right: 0;
   width: 280px;
   height: 100vh;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
+  background: var(--statblock-bg);
+  border-left: 1px solid var(--rule);
   overflow-y: auto;
   z-index: 10;
   display: none;
 }
 #right-panel.visible { display: block; }
 .rp-title {
+  font-family: var(--font-caps);
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-dim);
+  color: var(--header);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   padding: 12px 16px 8px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--sb-bar);
   position: sticky;
   top: 0;
-  background: var(--surface);
+  background: var(--statblock-bg);
   z-index: 1;
 }
-.rp-stat { padding: 12px 14px; border-bottom: 1px solid var(--border); }
-.rp-stat h3 { color: var(--red); font-size: 14px; margin-bottom: 1px; }
-.rp-stat .stat-sub { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+.rp-stat { padding: 12px 14px; border-bottom: 2px solid var(--sb-bar); font-family: var(--font-sans); }
+.rp-stat h3 { font-family: var(--font-heading); color: var(--header); font-size: 18px; font-weight: 700; margin-bottom: 1px; line-height: 1.1; }
 .rp-stat .stat-row { font-size: 12px; padding: 2px 0; }
-.rp-stat .stat-label { font-weight: 700; color: var(--gold); }
+.rp-stat .stat-sec { font-size: 15px; margin: 4px 0 3px; }
 .rp-stat .ability-scores { display: flex; gap: 4px; margin: 6px 0; text-align: center; }
 .rp-stat .ability-scores div { flex: 1; }
-.rp-stat .ability-scores .ab-name { font-size: 9px; font-weight: 700; color: var(--text-dim); }
+.rp-stat .ability-scores .ab-name { font-size: 9px; }
 .rp-stat .ability-scores .ab-val { font-size: 13px; font-weight: 700; }
-.rp-stat .ability-scores .ab-mod { font-size: 10px; color: var(--text-dim); }
-.rp-stat .stat-divider { border: none; border-top: 1px solid var(--border); margin: 5px 0; }
+.rp-stat .ability-scores .ab-mod { font-size: 10px; }
+.rp-stat .stat-divider { height: 2px; margin: 5px 0; }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
+/* ── Scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 9px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #556; }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
-/* --- Mark-as-Used --- */
+/* ── Mark-as-used (tuned for parchment: fade to pencil-check) ──────── */
 .markable {
   position: relative;
   cursor: pointer;
@@ -525,14 +686,14 @@ details[open] > summary .sum-preview { display: none; }
   color: var(--text-dim);
   font-size: 14px;
   font-weight: 700;
-  opacity: 0.35;
+  opacity: 0.45;
   pointer-events: none;
 }
 .markable.marked {
-  opacity: 0.42;
-  filter: grayscale(0.6);
+  opacity: 0.55;
+  filter: grayscale(0.5) sepia(0.15);
   text-decoration: line-through;
-  text-decoration-color: rgba(102,187,106,0.6);
+  text-decoration-color: var(--green);
   text-decoration-thickness: 1px;
 }
 .markable.marked::after {
@@ -540,11 +701,12 @@ details[open] > summary .sum-preview { display: none; }
   position: absolute;
   top: 6px; right: 8px;
   background: var(--green);
-  color: #0b1a0b;
+  color: var(--statblock-bg);
+  font-family: var(--font-caps);
   font-size: 10px;
   font-weight: 700;
   padding: 1px 6px;
-  border-radius: 10px;
+  border-radius: 8px;
   text-decoration: none;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -555,67 +717,37 @@ details[open] > summary .sum-preview { display: none; }
   content: '\2713 used \2022 click to unmark';
   opacity: 1;
 }
-/* Prevent loc-link inside markable from eating the click inadvertently */
 .markable .loc-link { position: relative; z-index: 2; }
 
-/* Passive revelations + combat briefing cards */
-.pr-block { margin: 10px 0; }
-.pr-block-title { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
-.pr-item {
-  background: var(--surface);
-  border-left: 3px solid var(--blue);
-  padding: 8px 28px 8px 12px;
-  margin: 4px 0;
-  border-radius: 0 4px 4px 0;
-  font-size: 13px;
-}
-.pr-threshold { font-weight: 700; color: var(--blue); font-size: 12px; }
-.pr-reveals { margin-top: 2px; }
-.pr-pc-name { font-weight: 700; color: var(--teal); font-size: 12px; }
-
-.cb-hazard {
-  background: rgba(255, 167, 38, 0.06);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--orange);
-  border-radius: 0 6px 6px 0;
-  padding: 10px 28px 10px 14px;
-  margin: 6px 0;
-}
-.cb-hazard h4 { color: var(--orange); font-size: 13px; margin-bottom: 4px; }
-.cb-hazard .cb-detail { font-size: 13px; }
-.cb-hazard .cb-impact { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
-
-.cb-creature {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 2px solid var(--red);
-  border-radius: 0 0 6px 6px;
-  padding: 10px 14px;
-  margin: 10px 0 6px;
-}
-.cb-creature h4 { color: var(--red); font-size: 14px; margin-bottom: 2px; }
-.cb-creature .cb-stats { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
-.cb-creature .cb-sub-title { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
-.cb-creature ul.plain li { font-size: 12px; padding: 2px 0; }
-
-.cb-ambig {
-  background: rgba(179, 136, 255, 0.06);
-  border-left: 3px solid var(--purple);
-  padding: 6px 28px 6px 10px;
-  margin: 4px 0;
-  font-size: 12px;
-  border-radius: 0 4px 4px 0;
-}
-.cb-synergy {
-  background: rgba(38, 166, 154, 0.06);
-  border-left: 3px solid var(--teal);
-  padding: 8px 28px 8px 12px;
-  margin: 6px 0;
-  font-size: 13px;
-  border-radius: 0 4px 4px 0;
+/* ── Scene divider (WBtW linked scenes) ────────────────────────────── */
+.scene-divider {
+  border-top: 2px solid var(--rule);
+  margin: 22px 0 10px;
+  padding-top: 10px;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--header);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* Clear marks button */
+/* ── Continuity briefing (top of scene view) ───────────────────────── */
+.continuity-briefing {
+  background: var(--readaloud-bg);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--header);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+.continuity-briefing h3 { font-family: var(--font-heading); color: var(--header); font-size: 17px; margin-bottom: 6px; }
+.continuity-briefing .cb-kv { margin: 4px 0; }
+.continuity-briefing .cb-kv .k { font-weight: 700; color: var(--header); }
+
+/* ── Clear-marks button ────────────────────────────────────────────── */
 #clear-marks-btn {
   display: block;
   width: calc(100% - 24px);
@@ -623,45 +755,92 @@ details[open] > summary .sum-preview { display: none; }
   background: none;
   border: 1px solid var(--border);
   color: var(--text-dim);
+  font-family: var(--font-caps);
   font-size: 11px;
   padding: 6px 10px;
-  border-radius: 4px;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: border-color 0.15s, color 0.15s;
-  font-family: inherit;
 }
 #clear-marks-btn:hover { border-color: var(--red); color: var(--red); }
 #clear-marks-btn.empty { opacity: 0.4; cursor: default; }
 #clear-marks-btn.empty:hover { border-color: var(--border); color: var(--text-dim); }
 
-/* WBtW scene divider — separates linked scenes within a location */
-.scene-divider {
-  border-top: 2px solid var(--gold);
-  margin: 20px 0 10px;
-  padding-top: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--gold);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+/* ── Play mode: declutter location/scene views at the table ────────────
+   Renderers stamp data-play="keep" on sections that matter mid-session
+   (read-aloud, encounters, briefings, …). Everything unstamped hides.
+   Reference pages (#main[data-view-kind="ref"]) are never filtered.  ── */
+body[data-play-mode="on"] #main[data-view-kind="location"] details:not([data-play="keep"]),
+body[data-play-mode="on"] #main[data-view-kind="scene"] details:not([data-play="keep"]) { display: none; }
+body[data-play-mode="on"] #main[data-view-kind="location"] .read-aloud,
+body[data-play-mode="on"] #main[data-view-kind="scene"] .read-aloud { font-size: 18px; line-height: 1.65; }
 
-/* Continuity briefing block (top of scene view) */
-.continuity-briefing {
-  background: linear-gradient(135deg, rgba(245,200,66,0.08), rgba(38,166,154,0.05));
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
-  border-radius: 0 6px 6px 0;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  font-size: 13px;
+/* ── Command palette (Ctrl+K) ──────────────────────────────────────── */
+#palette-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(25, 15, 5, 0.45);
+  z-index: 100;
+  display: none;
 }
-.continuity-briefing h3 { color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-.continuity-briefing .cb-kv { margin: 4px 0; }
-.continuity-briefing .cb-kv .k { font-weight: 700; color: var(--gold); }
+#palette-backdrop.open { display: block; }
+#palette {
+  position: fixed;
+  top: 12vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 90vw);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  outline: 1px solid var(--border);
+  outline-offset: 3px;
+  box-shadow: 0 10px 30px var(--shadow);
+}
+#palette-input {
+  width: 100%;
+  background: var(--readaloud-bg);
+  border: none;
+  border-bottom: 2px solid var(--rule);
+  padding: 12px 16px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--text);
+}
+#palette-input:focus { outline: none; }
+#palette-results {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+#palette-results li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+#palette-results li.sel { background: var(--surface2); box-shadow: inset 3px 0 0 var(--header); }
+#palette-results li:hover { background: var(--surface2); }
+.pal-kind {
+  font-family: var(--font-caps);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--header);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+.pal-label { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pal-parent { color: var(--text-dim); font-size: 12px; margin-left: auto; flex-shrink: 0; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pal-empty { padding: 10px 16px; color: var(--text-dim); font-style: italic; font-size: 13px; font-family: var(--font-sans); }
 </style>
 </head>
 <body>
@@ -702,6 +881,57 @@ let currentView = null;
 let currentAdventureId = null;
 let currentAdaptationId = null;
 let marks = {}; // { markKey: true }
+
+// ===================== THEME =====================
+const THEME_KEY = 'aa-theme';
+function currentTheme() {
+  return document.documentElement.dataset.theme === 'candlelight' ? 'candlelight' : 'parchment';
+}
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+  updateThemeButton();
+}
+function toggleTheme() { applyTheme(currentTheme() === 'candlelight' ? 'parchment' : 'candlelight'); }
+function updateThemeButton() {
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = currentTheme() === 'candlelight' ? 'Parchment' : 'Candlelight';
+}
+(function () {
+  let t = 'parchment';
+  try { t = localStorage.getItem(THEME_KEY) || 'parchment'; } catch (e) {}
+  document.documentElement.dataset.theme = t;
+})();
+
+// ===================== PLAY / PREP MODE =====================
+// Play mode declutters location/scene views to what matters at the table.
+// Hiding is pure CSS keyed off body[data-play-mode] + data-play="keep" stamps
+// applied at render time (see PLAY_KEEP uses in the renderers).
+let playMode = false;
+const PLAY_KEEP = ' data-play="keep"';
+function playModeKey() {
+  return `aa-playmode:${currentAdventureId || 'unknown'}:${currentAdaptationId || 'none'}`;
+}
+function loadPlayMode() {
+  try { playMode = localStorage.getItem(playModeKey()) === 'on'; } catch (e) { playMode = false; }
+  applyPlayMode();
+}
+function applyPlayMode() {
+  document.body.dataset.playMode = playMode ? 'on' : 'off';
+  updatePlayModeButton();
+}
+function togglePlayMode() {
+  playMode = !playMode;
+  try { localStorage.setItem(playModeKey(), playMode ? 'on' : 'off'); } catch (e) {}
+  applyPlayMode();
+  if (currentView) navigate(currentView);
+}
+function updatePlayModeButton() {
+  const btn = document.getElementById('play-toggle-btn');
+  if (!btn) return;
+  btn.textContent = playMode ? 'Prep Mode' : 'Play Mode';
+  btn.classList.toggle('on', playMode);
+}
 
 // ===================== MARK-AS-USED =====================
 function marksStorageKey() {
@@ -822,9 +1052,35 @@ function launchSelected() {
     if (!adaptMeta) { launchDashboard(); return; }
     const old = document.getElementById('adaptationScript');
     if (old) old.remove();
+    document.querySelectorAll('.adaptation-script').forEach(el => el.remove());
+    if (adaptMeta.files && adaptMeta.files.length) {
+      // Split adaptation: party / state / rulings layers, loaded in order and
+      // merged. Each file assigns its own global; merge happens after the last.
+      window.ADVENTURE_ADAPTATION_PARTY = null;
+      window.ADVENTURE_ADAPTATION_STATE = null;
+      window.ADVENTURE_ADAPTATION_RULINGS = null;
+      const queue = adaptMeta.files.slice();
+      const next = () => {
+        if (!queue.length) {
+          adaptation = mergeAdaptationParts(window.ADVENTURE_ADAPTATION_PARTY,
+            window.ADVENTURE_ADAPTATION_STATE, window.ADVENTURE_ADAPTATION_RULINGS);
+          launchDashboard();
+          return;
+        }
+        const file = queue.shift();
+        const s = document.createElement('script');
+        s.className = 'adaptation-script';
+        s.src = file + '?v=' + Date.now();
+        s.onload = next;
+        s.onerror = () => { loadError.textContent = 'Failed to load adaptation file: ' + file; };
+        document.head.appendChild(s);
+      };
+      next();
+      return;
+    }
     window.ADVENTURE_ADAPTATION = null;
     const s = document.createElement('script');
-    s.id = 'adaptationScript';
+    s.className = 'adaptation-script';
     s.src = adaptMeta.file + '?v=' + Date.now();
     s.onload = () => { adaptation = window.ADVENTURE_ADAPTATION; launchDashboard(); };
     s.onerror = () => { loadError.textContent = 'Failed to load adaptation file.'; };
@@ -842,11 +1098,38 @@ function launchSelected() {
   document.head.appendChild(s);
 }
 
+// Deep-merge the split adaptation layers (party / state / rulings) into the
+// single adaptation object the renderers expect. Top level is a shallow merge
+// (state wins); scenes merge per-scene with state's keys spread over party's;
+// the rulings log attaches as adaptation.rulings.
+function mergeAdaptationParts(party, state, rulings) {
+  const merged = {};
+  for (const part of [party, state]) {
+    if (!part) continue;
+    for (const [k, v] of Object.entries(part)) {
+      if (k === 'scenes') continue;
+      merged[k] = v;
+    }
+  }
+  const scenes = {};
+  for (const part of [party, state]) {
+    if (!part || !part.scenes) continue;
+    for (const [id, sc] of Object.entries(part.scenes)) {
+      scenes[id] = Object.assign(scenes[id] || {}, sc);
+    }
+  }
+  if (Object.keys(scenes).length) merged.scenes = scenes;
+  if (rulings && rulings.rulings && rulings.rulings.length) merged.rulings = rulings.rulings;
+  return merged;
+}
+
 // ===================== LAUNCH =====================
 function launchDashboard() {
   document.getElementById('load-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
+  loadPlayMode();
   buildSidebar();
+  buildSearchIndex();
   const defaultView = (adaptation && adaptation.continuityBriefing)
     ? 'ref-pickup'
     : Object.keys(source.locations)[0];
@@ -854,6 +1137,7 @@ function launchDashboard() {
 }
 
 function returnToMenu() {
+  closePalette();
   source = null;
   adaptation = null;
   currentView = null;
@@ -878,6 +1162,10 @@ function buildSidebar() {
     html += `<div style="font-size:11px;color:var(--text-dim);padding:2px 16px 6px">Generic (no adaptation)</div>`;
   }
   html += `<button class="sb-item" style="color:var(--text-dim);font-size:11px;padding:4px 16px 8px" onclick="returnToMenu()">← Change Adventure</button>`;
+  if (adaptation && adaptation.continuityBriefing) {
+    html += `<div class="sb-section">Tonight</div>`;
+    html += `<button class="sb-item" data-view="ref-pickup"><span class="sb-name">Tonight <span class="sb-adapt">✦</span></span></button>`;
+  }
   html += `<div class="sb-section">Locations</div>`;
   for (const [id, loc] of Object.entries(source.locations)) {
     html += `<button class="sb-item" data-view="${id}"><span class="sb-id">${id}</span><span class="sb-name">${esc(loc.name)}</span></button>`;
@@ -891,6 +1179,29 @@ function buildSidebar() {
   }
   html += `<hr class="sb-divider">`;
   html += `<div class="sb-section">Reference</div>`;
+  for (const [id, label, isAdapted] of referencePages()) {
+    html += `<button class="sb-item" data-view="${id}"><span class="sb-name">${esc(label)}${isAdapted ? '<span class="sb-adapt">✦</span>' : ''}</span></button>`;
+  }
+  if (adaptation) {
+    html += `<hr class="sb-divider">`;
+    html += `<div class="sb-section">Session</div>`;
+    html += `<button id="clear-marks-btn" onclick="clearAllMarks()">No marks</button>`;
+  }
+  html += `<hr class="sb-divider">`;
+  html += `<button id="play-toggle-btn" onclick="togglePlayMode()"></button>`;
+  html += `<button id="theme-toggle-btn" onclick="toggleTheme()"></button>`;
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sb-item').forEach(btn => {
+    btn.addEventListener('click', () => navigate(btn.dataset.view));
+  });
+  updateClearMarksButton();
+  updateThemeButton();
+  updatePlayModeButton();
+}
+
+// Reference pages available for the current source/adaptation, as
+// [viewId, label, isAdapted]. Shared by the sidebar and the search index.
+function referencePages() {
   const refs = [
     source.lore                  && ['ref-lore',      'Lore & Hooks',       false],
     source.commonFeatures        && ['ref-features',  'Common Features',    false],
@@ -900,37 +1211,28 @@ function buildSidebar() {
     source.bestiary              && ['ref-bestiary',  'Bestiary',           false],
   ].filter(Boolean);
   if (adaptation) {
-    if (adaptation.continuityBriefing) refs.unshift(['ref-pickup', 'Session Pickup', true]);
     refs.push(['ref-dc', 'DC Adjustments', true]);
     refs.push(['ref-callbacks', 'Campaign Integration', true]);
     refs.push(['ref-voice', 'Narration Voice', true]);
+    if (adaptation.rulings && adaptation.rulings.length) refs.push(['ref-rulings', 'Rulings Log', true]);
   }
-  for (const [id, label, isAdapted] of refs) {
-    html += `<button class="sb-item" data-view="${id}"><span class="sb-name">${esc(label)}${isAdapted ? '<span class="sb-adapt">✦</span>' : ''}</span></button>`;
-  }
-  if (adaptation) {
-    html += `<hr class="sb-divider">`;
-    html += `<div class="sb-section">Session</div>`;
-    html += `<button id="clear-marks-btn" onclick="clearAllMarks()">No marks</button>`;
-  }
-  sb.innerHTML = html;
-  sb.querySelectorAll('.sb-item').forEach(btn => {
-    btn.addEventListener('click', () => navigate(btn.dataset.view));
-  });
-  updateClearMarksButton();
+  return refs;
 }
 
 function navigate(view) {
   currentView = view;
   // Update sidebar active
   document.querySelectorAll('.sb-item').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-  // Render
+  // Render (+ stamp the view kind so play-mode CSS only filters location/scene views)
   const main = document.getElementById('main');
   if (source.locations[view]) {
+    main.dataset.viewKind = 'location';
     main.innerHTML = renderLocation(view);
   } else if (source.triggerScenes && source.triggerScenes.find(t => t.id === view)) {
+    main.dataset.viewKind = 'scene';
     main.innerHTML = renderTriggerScene(view);
   } else if (view.startsWith('ref-')) {
+    main.dataset.viewKind = 'ref';
     main.innerHTML = renderReference(view);
   }
   main.scrollTop = 0;
@@ -942,6 +1244,158 @@ function navigate(view) {
   });
   applyMarks(main);
 }
+
+// ===================== COMMAND PALETTE (Ctrl+K) =====================
+// Search index over locations, trigger scenes, WBtW scenes, POIs, bestiary
+// creatures, and reference pages. Rebuilt once per launch.
+let searchIndex = [];
+function buildSearchIndex() {
+  searchIndex = [];
+  if (adaptation && adaptation.continuityBriefing) {
+    searchIndex.push({ kind: 'Tonight', label: 'Tonight', parent: 'Session pickup', view: 'ref-pickup', alt: 'session pickup resume tonight briefing' });
+  }
+  for (const [id, loc] of Object.entries(source.locations)) {
+    searchIndex.push({ kind: 'Location', label: `${id}: ${loc.name}`, parent: loc.summary || '', view: id, alt: `${id} ${loc.name} ${loc.summary || ''}` });
+    const pois = loc.pointsOfInterest ? Object.values(loc.pointsOfInterest) : [];
+    for (const poi of pois) {
+      if (poi.name) searchIndex.push({ kind: 'POI', label: poi.name, parent: `${id}: ${loc.name}`, view: id, alt: poi.type || '' });
+    }
+    if (source.scenes) {
+      const sceneIds = (loc.scenesHere && loc.scenesHere.length) ? loc.scenesHere
+        : (loc.scenes && loc.scenes.length) ? loc.scenes
+        : (loc.scene ? [loc.scene] : []);
+      for (const sid of sceneIds) {
+        const sc = source.scenes[sid];
+        if (sc) searchIndex.push({ kind: 'Scene', label: sc.title || sid, parent: `${id}: ${loc.name}`, view: id, alt: `${sid} ${sc.summary || ''}` });
+      }
+    }
+  }
+  if (source.triggerScenes) {
+    for (const ts of source.triggerScenes) {
+      searchIndex.push({ kind: 'Event', label: ts.name, parent: 'Trigger event', view: ts.id, alt: ts.id });
+    }
+  }
+  if (source.bestiary) {
+    for (const cr of Object.values(source.bestiary)) {
+      searchIndex.push({ kind: 'Bestiary', label: cr.name, parent: cr.cr ? `CR ${cr.cr}` : '', view: 'ref-bestiary', alt: `${cr.type || ''} ${cr.size || ''}` });
+    }
+  }
+  for (const [id, label] of referencePages()) {
+    searchIndex.push({ kind: 'Reference', label, parent: '', view: id, alt: id });
+  }
+}
+
+// Match scoring: prefix > word-start > substring > subsequence. -1 = no match.
+// Subsequence only applies to short labels — over long alt/summary text it
+// matches nearly everything and floods the results with noise.
+function scoreMatch(q, text, allowSubseq) {
+  if (!text) return -1;
+  text = String(text).toLowerCase();
+  if (text.startsWith(q)) return 100;
+  const idx = text.indexOf(q);
+  if (idx > 0 && /[^a-z0-9]/.test(text[idx - 1])) return 80;
+  if (idx >= 0) return 60;
+  if (!allowSubseq) return -1;
+  let i = 0;
+  for (const ch of text) {
+    if (ch === q[i]) i++;
+    if (i === q.length) return 30;
+  }
+  return -1;
+}
+
+let paletteEl = null, paletteInput = null, paletteResultsEl = null;
+let paletteOpen = false, paletteSel = 0, paletteResults = [];
+
+function ensurePalette() {
+  if (paletteEl) return;
+  const bd = document.createElement('div');
+  bd.id = 'palette-backdrop';
+  bd.innerHTML = `<div id="palette"><input type="text" id="palette-input" placeholder="Search rooms, scenes, creatures, reference…" autocomplete="off" spellcheck="false"><ul id="palette-results"></ul></div>`;
+  document.body.appendChild(bd);
+  paletteEl = bd;
+  paletteInput = bd.querySelector('#palette-input');
+  paletteResultsEl = bd.querySelector('#palette-results');
+  paletteInput.addEventListener('input', () => renderPaletteResults());
+  bd.addEventListener('mousedown', (e) => { if (e.target === bd) closePalette(); });
+  paletteResultsEl.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-idx]');
+    if (li && paletteResults[+li.dataset.idx]) activatePaletteResult(paletteResults[+li.dataset.idx]);
+  });
+}
+function openPalette() {
+  ensurePalette();
+  paletteEl.classList.add('open');
+  paletteOpen = true;
+  paletteInput.value = '';
+  renderPaletteResults();
+  paletteInput.focus();
+}
+function closePalette() {
+  if (paletteEl) paletteEl.classList.remove('open');
+  paletteOpen = false;
+}
+function renderPaletteResults() {
+  const q = paletteInput.value.trim().toLowerCase();
+  if (!q) {
+    paletteResults = searchIndex.slice(0, 10);
+  } else {
+    paletteResults = searchIndex
+      .map(item => {
+        const s = Math.max(scoreMatch(q, item.label, true), item.alt ? scoreMatch(q, item.alt, false) - 15 : -1);
+        return { item, s };
+      })
+      .filter(r => r.s >= 0)
+      .sort((a, b) => b.s - a.s || a.item.label.length - b.item.label.length)
+      .slice(0, 10)
+      .map(r => r.item);
+  }
+  paletteSel = 0;
+  if (!paletteResults.length) {
+    paletteResultsEl.innerHTML = `<li class="pal-empty">No matches.</li>`;
+    return;
+  }
+  paletteResultsEl.innerHTML = paletteResults.map((r, i) =>
+    `<li data-idx="${i}" class="${i === paletteSel ? 'sel' : ''}"><span class="pal-kind">${esc(r.kind)}</span><span class="pal-label">${esc(r.label)}</span>${r.parent ? `<span class="pal-parent">${esc(r.parent)}</span>` : ''}</li>`
+  ).join('');
+}
+function movePaletteSel(delta) {
+  if (!paletteResults.length) return;
+  paletteSel = (paletteSel + delta + paletteResults.length) % paletteResults.length;
+  paletteResultsEl.querySelectorAll('li[data-idx]').forEach((li, i) => li.classList.toggle('sel', i === paletteSel));
+  const sel = paletteResultsEl.querySelector('li.sel');
+  if (sel) sel.scrollIntoView({ block: 'nearest' });
+}
+function activatePaletteResult(item) {
+  closePalette();
+  navigate(item.view);
+}
+function isTypingTarget(el) {
+  return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable);
+}
+document.addEventListener('keydown', (e) => {
+  const dashboardVisible = source && document.getElementById('dashboard').style.display === 'block';
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 'k') {
+    if (!dashboardVisible) return;
+    e.preventDefault();
+    if (paletteOpen) closePalette(); else openPalette();
+    return;
+  }
+  if (!paletteOpen) {
+    if (e.key === '/' && dashboardVisible && !isTypingTarget(e.target) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      openPalette();
+    }
+    return;
+  }
+  if (e.key === 'Escape') { e.preventDefault(); closePalette(); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); movePaletteSel(1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); movePaletteSel(-1); }
+  else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (paletteResults[paletteSel]) activatePaletteResult(paletteResults[paletteSel]);
+  }
+});
 
 // ===================== RENDER: LOCATION =====================
 function renderLocation(id) {
@@ -960,34 +1414,44 @@ function renderLocation(id) {
   if (adpt && adpt.sessionState) {
     const ss = adpt.sessionState;
     const ssPreview = ss.status ? snip(ss.status, 90) : '';
-    h += `<details>${summaryWithPreview('Session State', { adapted: true, preview: ssPreview })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Session State', { adapted: true, preview: ssPreview })}<div class="section-body">`;
     if (ss.status) h += `<div class="kv"><span class="k">Status:</span> ${linkText(ss.status)}</div>`;
     if (ss.enteredVia) h += `<div class="kv"><span class="k">Entered via:</span> ${linkText(ss.enteredVia)}</div>`;
+    if (ss.narrative) h += `<div style="margin-top:6px">${paraText(ss.narrative)}</div>`;
+    if (ss.keyPoints && ss.keyPoints.length) {
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Key Points</div><ul class="plain">`;
+      for (const kp of ss.keyPoints) h += `<li>${linkText(kp)}</li>`;
+      h += `</ul>`;
+    }
+    if (ss.notes && ss.notes.length) {
+      for (const n of ss.notes) h += `<div class="kv" style="margin-top:8px"><span class="k">${esc(n.label)}:</span> ${linkText(n.text)}</div>`;
+    }
     if (ss.resolvedElements && ss.resolvedElements.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Resolved</div>`;
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Resolved</div>`;
       h += `<ul class="plain">`;
       for (const r of ss.resolvedElements) h += `<li>${linkText(r)}</li>`;
       h += `</ul>`;
     }
     if (ss.unresolvedElements && ss.unresolvedElements.length) {
-      h += `<div style="font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Unresolved</div>`;
+      h += `<div class="sub-label" style="color:var(--orange);margin-top:8px">Unresolved</div>`;
       h += `<ul class="plain">`;
       for (const u of ss.unresolvedElements) h += `<li>${linkText(u)}</li>`;
       h += `</ul>`;
     }
     if (ss.pendingElements && ss.pendingElements.length) {
-      h += `<div style="font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Pending</div>`;
+      h += `<div class="sub-label" style="color:var(--orange);margin-top:8px">Pending</div>`;
       h += `<ul class="plain">`;
       for (const p of ss.pendingElements) h += `<li>${linkText(p)}</li>`;
       h += `</ul>`;
     }
     if (ss.npcStatus) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">NPC Status</div>`;
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">NPC Status</div>`;
       for (const [npcKey, npcStatus] of Object.entries(ss.npcStatus)) {
         h += `<div class="kv"><span class="k">${esc(npcKey)}:</span> ${linkText(npcStatus)}</div>`;
       }
     }
     if (ss.cliffhangerResolution) h += `<div class="dm-note" style="margin-top:8px"><strong>Cliffhanger:</strong> ${linkText(ss.cliffhangerResolution)}</div>`;
+    if (ss.dmNote) h += `<div class="dm-note" style="margin-top:8px">${paraText(ss.dmNote)}</div>`;
     h += `</div></details>`;
   }
 
@@ -995,10 +1459,11 @@ function renderLocation(id) {
   h += renderConnections(loc.connections, 'From here');
 
   // Read Aloud
-  if (loc.readAloud && loc.readAloud.length) {
-    h += `<details>${summaryWithPreview('Read Aloud', { preview: snip(loc.readAloud[0], 90) })}<div class="section-body">`;
+  const locRaArr = Array.isArray(loc.readAloud) ? loc.readAloud : (loc.readAloud ? [loc.readAloud] : []);
+  if (locRaArr.length) {
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Read Aloud', { preview: snip(locRaArr[0], 90) })}<div class="section-body">`;
     if (loc.readAloudCondition) h += `<div class="dm-note" style="margin-bottom:8px;border-top:none;padding-top:0">${esc(loc.readAloudCondition)}</div>`;
-    for (const ra of loc.readAloud) h += `<div class="read-aloud">${esc(ra)}</div>`;
+    for (const ra of locRaArr) h += `<div class="read-aloud">${esc(ra)}</div>`;
     h += `</div></details>`;
   }
 
@@ -1012,7 +1477,7 @@ function renderLocation(id) {
   // Encounters
   if (loc.encounters && loc.encounters.length) {
     const encPreview = loc.encounters.map(e => e.name || e.title || '').filter(Boolean).slice(0,3).join(', ');
-    h += `<details>${summaryWithPreview('Encounters', { preview: encPreview || `${loc.encounters.length} encounter${loc.encounters.length===1?'':'s'}` })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Encounters', { preview: encPreview || `${loc.encounters.length} encounter${loc.encounters.length===1?'':'s'}` })}<div class="section-body">`;
     for (const enc of loc.encounters) h += renderEncounter(enc);
     h += `</div></details>`;
   }
@@ -1020,7 +1485,7 @@ function renderLocation(id) {
   // Hazards
   if (loc.hazards && loc.hazards.length) {
     const hazPreview = loc.hazards.map(h => h.name || '').filter(Boolean).slice(0,3).join(', ');
-    h += `<details>${summaryWithPreview('Hazards', { preview: hazPreview || `${loc.hazards.length} hazard${loc.hazards.length===1?'':'s'}` })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Hazards', { preview: hazPreview || `${loc.hazards.length} hazard${loc.hazards.length===1?'':'s'}` })}<div class="section-body">`;
     for (const haz of loc.hazards) h += renderHazard(haz);
     h += `</div></details>`;
   }
@@ -1076,121 +1541,23 @@ function renderLocation(id) {
     h += `<div class="kv" style="margin:8px 0"><span class="k">Coffins:</span> ${esc(loc.coffins.note)}</div>`;
   }
 
-  // WBtW Scenes — linked via scenesHere
-  if (source.scenes && loc.scenesHere && loc.scenesHere.length) {
-    for (const sceneId of loc.scenesHere) {
+  // WBtW Scenes — source uses three conventions: scenesHere (array), scenes (array), or scene (single id).
+  if (source.scenes) {
+    const sceneIds = (loc.scenesHere && loc.scenesHere.length) ? loc.scenesHere
+      : (loc.scenes && loc.scenes.length) ? loc.scenes
+      : (loc.scene ? [loc.scene] : []);
+    for (const sceneId of sceneIds) {
       const scene = source.scenes[sceneId];
       if (scene) h += renderWBtWScene(sceneId, scene);
     }
   }
 
-  // Passive Revelations (adaptation) — inline thresholds + PC shortcuts
-  if (adpt && adpt.passiveRevelations && Object.keys(adpt.passiveRevelations).length) {
-    h += `<details><summary>Passive Revelations <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
-    for (const [topic, block] of Object.entries(adpt.passiveRevelations)) {
-      const label = topic.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/\b\w/g, c => c.toUpperCase()).trim();
-      h += `<div class="pr-block"><div class="pr-block-title">${esc(label)}</div>`;
-      if (block.partyAgnostic && block.partyAgnostic.length) {
-        block.partyAgnostic.forEach((pa, i) => {
-          const key = `pr-pa:${id}:${topic}:${i}`;
-          h += `<div class="pr-item markable" data-mark-key="${esc(key)}"><span class="pr-threshold">${esc(pa.threshold)}</span><div class="pr-reveals">${linkText(pa.reveals)}</div></div>`;
-        });
-      }
-      if (block.namedPcAccess && block.namedPcAccess.length) {
-        block.namedPcAccess.forEach((pc, i) => {
-          const key = `pr-pc:${id}:${topic}:${i}`;
-          h += `<div class="pr-item markable" data-mark-key="${esc(key)}" style="border-left-color:var(--teal)"><span class="pr-pc-name">${esc(pc.pc)}</span><div class="pr-reveals">${linkText(pc.access)}</div></div>`;
-        });
-      }
-      h += `</div>`;
-    }
-    h += `</div></details>`;
-  }
-
-  // Combat Briefing (adaptation) — hazards + creatures + synergies + rulesAmbiguities
-  if (adpt && adpt.combatBriefing) {
-    const cb = adpt.combatBriefing;
-    h += `<details><summary>Combat Briefing <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
-    if (cb.sceneSummary) h += `<p style="font-size:13px;margin-bottom:10px">${linkText(cb.sceneSummary)}</p>`;
-    if (cb.sceneLevelHazards && cb.sceneLevelHazards.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Hazards</div>`;
-      cb.sceneLevelHazards.forEach((hz, i) => {
-        const key = `hazard:${id}:${i}`;
-        h += `<div class="cb-hazard markable" data-mark-key="${esc(key)}">`;
-        h += `<h4>${esc(hz.name)}</h4>`;
-        if (hz.detail) h += `<div class="cb-detail">${linkText(hz.detail)}</div>`;
-        if (hz.pcImpact) h += `<div class="cb-impact">${linkText(hz.pcImpact)}</div>`;
-        if (hz.ruling) h += `<div class="dm-note" style="margin-top:6px"><strong>Ruling:</strong> ${linkText(hz.ruling)}</div>`;
-        if (hz.recommendedRuling) h += `<div class="dm-note" style="margin-top:6px"><strong>Recommended ruling:</strong> ${linkText(hz.recommendedRuling)}</div>`;
-        if (hz.holyWaterSourcing) h += `<div class="cb-impact">${linkText(hz.holyWaterSourcing)}</div>`;
-        h += `</div>`;
-      });
-    }
-    if (cb.creatures && Object.keys(cb.creatures).length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Creatures</div>`;
-      for (const [creatureKey, cr] of Object.entries(cb.creatures)) {
-        h += `<div class="cb-creature">`;
-        h += `<h4>${esc(creatureKey)}${cr.count ? ` <span style="font-weight:400;color:var(--text-dim);font-size:12px">× ${esc(String(cr.count))}</span>` : ''}</h4>`;
-        if (cr.stats) h += `<div class="cb-stats">${esc(cr.stats)}</div>`;
-        if (cr.notes) h += `<div class="cb-stats" style="color:var(--text)">${linkText(cr.notes)}</div>`;
-        if (cr.signatureMechanics) {
-          h += `<div class="cb-sub-title">Signature Mechanics</div>`;
-          if (Array.isArray(cr.signatureMechanics)) {
-            h += `<ul class="plain">`;
-            for (const m of cr.signatureMechanics) h += `<li>${linkText(m)}</li>`;
-            h += `</ul>`;
-          } else {
-            h += `<p style="font-size:12px">${linkText(cr.signatureMechanics)}</p>`;
-          }
-        }
-        if (cr.damageProfile) {
-          h += `<div class="cb-sub-title">Damage Profile</div>`;
-          if (cr.damageProfile.immunities) h += `<div class="kv" style="font-size:12px"><span class="k">Immune:</span> ${cr.damageProfile.immunities.join(', ')}</div>`;
-          if (cr.damageProfile.resistances) h += `<div class="kv" style="font-size:12px"><span class="k">Resist:</span> ${cr.damageProfile.resistances.join(', ')}</div>`;
-          if (cr.damageProfile.vulnerabilities && cr.damageProfile.vulnerabilities.length) h += `<div class="kv" style="font-size:12px"><span class="k">Vulnerable:</span> ${cr.damageProfile.vulnerabilities.join(', ')}</div>`;
-          if (cr.damageProfile.notes) h += `<div class="cb-impact">${linkText(cr.damageProfile.notes)}</div>`;
-          if (cr.damageProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.damageProfile.notesFromSession)}</div>`;
-        }
-        if (cr.conditionProfile) {
-          h += `<div class="cb-sub-title">Condition Profile</div>`;
-          if (cr.conditionProfile.immunities) h += `<div class="kv" style="font-size:12px"><span class="k">Immune:</span> ${cr.conditionProfile.immunities.join(', ')}</div>`;
-          if (cr.conditionProfile.vulnerable) h += `<div class="kv" style="font-size:12px"><span class="k">Vulnerable:</span> ${cr.conditionProfile.vulnerable.join(', ')}</div>`;
-          if (cr.conditionProfile.notes) h += `<div class="cb-impact">${linkText(cr.conditionProfile.notes)}</div>`;
-          if (cr.conditionProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.conditionProfile.notesFromSession)}</div>`;
-        }
-        if (cr.rulesAmbiguitiesToPreEmpt && cr.rulesAmbiguitiesToPreEmpt.length) {
-          h += `<div class="cb-sub-title">Pre-Empt Rulings</div>`;
-          cr.rulesAmbiguitiesToPreEmpt.forEach((amb, i) => {
-            const key = `ambig:${id}:${creatureKey}:${i}`;
-            h += `<div class="cb-ambig markable" data-mark-key="${esc(key)}">${linkText(amb)}</div>`;
-          });
-        }
-        if (cr.killPriority) h += `<div class="kv" style="margin-top:6px;font-size:12px"><span class="k">Kill priority:</span> ${linkText(cr.killPriority)}</div>`;
-        if (cr.tacticalNotes) {
-          h += `<div class="cb-sub-title">Tactical Notes</div>`;
-          if (Array.isArray(cr.tacticalNotes)) {
-            h += `<ul class="plain">`;
-            for (const t of cr.tacticalNotes) h += `<li>${linkText(t)}</li>`;
-            h += `</ul>`;
-          } else {
-            h += `<p style="font-size:12px">${linkText(cr.tacticalNotes)}</p>`;
-          }
-        }
-        if (cr.tacticalNote) h += `<div class="cb-impact">${linkText(cr.tacticalNote)}</div>`;
-        if (cr.combatRole) h += `<div class="cb-impact"><strong>Combat role:</strong> ${linkText(cr.combatRole)}</div>`;
-        if (cr.recognition) h += `<div class="cb-impact"><strong>Recognition:</strong> ${linkText(cr.recognition)}</div>`;
-        h += `</div>`;
-      }
-    }
-    if (cb.creatureSynergies && cb.creatureSynergies.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Creature Synergies</div>`;
-      cb.creatureSynergies.forEach((syn, i) => {
-        const key = `synergy:${id}:${i}`;
-        h += `<div class="cb-synergy markable" data-mark-key="${esc(key)}">${linkText(syn)}</div>`;
-      });
-    }
-    h += `</div></details>`;
-  }
+  h += renderPassiveRevelations(id, adpt);
+  h += renderCombatBriefing(id, adpt);
+  h += renderTableRulings([id,
+    ...((loc.scenesHere && loc.scenesHere.length) ? loc.scenesHere
+      : (loc.scenes && loc.scenes.length) ? loc.scenes
+      : (loc.scene ? [loc.scene] : []))]);
 
   // IF THEY ASK (merged: source POI questions + adaptation additions)
   const itaSource = [];
@@ -1208,14 +1575,14 @@ function renderLocation(id) {
     const totalQ = itaSource.length + itaAdapt.length;
     const firstQ = (itaSource[0] || itaAdapt[0] || {}).question || '';
     const itaPreview = totalQ === 1 ? snip(firstQ, 70) : `${totalQ} questions · ${snip(firstQ, 50)}`;
-    h += `<details>${summaryWithPreview('If They Ask', { adapted: itaAdapt.length > 0, preview: itaPreview })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('If They Ask', { adapted: itaAdapt.length > 0, preview: itaPreview })}<div class="section-body">`;
     itaSource.forEach((q, i) => {
       const key = `ita-src:${id}:${i}`;
       h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
       if (q.source) h += `<div class="ita-thread">Source: ${esc(q.source)}</div>`;
       h += `</div>`;
     });
-    if (itaAdapt.length && itaSource.length) h += `<div style="font-size:11px;color:var(--teal);margin:10px 0 4px;text-transform:uppercase;letter-spacing:1px">Party-Specific <span class="adapt-badge">Adapted</span></div>`;
+    if (itaAdapt.length && itaSource.length) h += `<div class="sub-label" style="color:var(--teal);margin:10px 0 4px">Party-Specific <span class="adapt-badge">Adapted</span></div>`;
     itaAdapt.forEach((q, i) => {
       const key = `ita-adpt:${id}:${i}`;
       h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
@@ -1228,7 +1595,7 @@ function renderLocation(id) {
   // Special Resources (adaptation)
   if (adpt && adpt.specialResources && adpt.specialResources.length) {
     const srPreview = adpt.specialResources.map(sr => sr.pc).filter(Boolean).join(', ');
-    h += `<details>${summaryWithPreview('Special Resources', { adapted: true, preview: srPreview })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Special Resources', { adapted: true, preview: srPreview })}<div class="section-body">`;
     adpt.specialResources.forEach((sr, i) => {
       const key = `sr:${id}:${i}`;
       h += `<div class="sr-card markable" data-mark-key="${esc(key)}">`;
@@ -1273,7 +1640,7 @@ function renderWBtWScene(sceneId, scene) {
   // Read Aloud (source)
   const raArr = Array.isArray(scene.readAloud) ? scene.readAloud : (scene.readAloud ? [scene.readAloud] : []);
   if (raArr.length) {
-    h += `<details>${summaryWithPreview('Read Aloud', { preview: snip(raArr[0], 90) })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Read Aloud', { preview: snip(raArr[0], 90) })}<div class="section-body">`;
     for (const ra of raArr) h += `<div class="read-aloud">${esc(ra)}</div>`;
     h += `</div></details>`;
   }
@@ -1286,10 +1653,10 @@ function renderWBtWScene(sceneId, scene) {
     if (hasAny) {
       const label = ev.occurring ? 'Event Narration' : 'Outcomes';
       const evPreview = snip(ev.occurring || ev.happyResolution || ev.sadResolution || '', 90);
-      h += `<details>${summaryWithPreview(label, { adapted: true, preview: evPreview })}<div class="section-body">`;
-      if (ev.occurring) h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:6px">When it begins</div><div class="read-aloud">${esc(ev.occurring)}</div>`;
-      if (ev.happyResolution) h += `<div style="font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-top:8px">If it goes well</div><div class="read-aloud">${esc(ev.happyResolution)}</div>`;
-      if (ev.sadResolution) h += `<div style="font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:8px">If it goes badly</div><div class="read-aloud">${esc(ev.sadResolution)}</div>`;
+      h += `<details${PLAY_KEEP}>${summaryWithPreview(label, { adapted: true, preview: evPreview })}<div class="section-body">`;
+      if (ev.occurring) h += `<div class="sub-label" style="color:var(--text-dim);margin-top:6px">When it begins</div><div class="read-aloud">${esc(ev.occurring)}</div>`;
+      if (ev.happyResolution) h += `<div class="sub-label" style="color:var(--teal);margin-top:8px">If it goes well</div><div class="read-aloud">${esc(ev.happyResolution)}</div>`;
+      if (ev.sadResolution) h += `<div class="sub-label" style="color:var(--orange);margin-top:8px">If it goes badly</div><div class="read-aloud">${esc(ev.sadResolution)}</div>`;
       h += `</div></details>`;
     }
   }
@@ -1304,7 +1671,7 @@ function renderWBtWScene(sceneId, scene) {
     const itaPreview = renderList.length === 1
       ? snip(renderList[0].question, 70)
       : `${renderList.length} questions · ${snip(renderList[0].question, 50)}`;
-    h += `<details>${summaryWithPreview('If They Ask', { adapted: itaIsAdapted, preview: itaPreview })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('If They Ask', { adapted: itaIsAdapted, preview: itaPreview })}<div class="section-body">`;
     renderList.forEach((q, i) => {
       const key = `ita-scene:${sceneId}:${itaIsAdapted ? 'a' : 's'}:${i}`;
       h += `<div class="ita-item markable" data-mark-key="${esc(key)}">`;
@@ -1325,13 +1692,13 @@ function renderWBtWScene(sceneId, scene) {
   if (scene.trial) {
     const t = scene.trial;
     const tBits = [t.dc ? `DC ${t.dc}` : '', t.difficulty || '', t.goal ? snip(t.goal, 50) : ''].filter(Boolean);
-    h += `<details>${summaryWithPreview('Trial Mechanics', { preview: tBits.join(' · ') })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Trial Mechanics', { preview: tBits.join(' · ') })}<div class="section-body">`;
     if (t.goal) h += `<div class="kv"><span class="k">Goal:</span> ${esc(t.goal)}</div>`;
     if (t.dc) h += `<div class="kv"><span class="k">DC:</span> ${t.dc}</div>`;
     if (t.difficulty) h += `<div class="kv"><span class="k">Difficulty:</span> ${esc(t.difficulty)}</div>`;
     if (t.pace) h += `<div class="kv"><span class="k">Pace:</span> ${esc(t.pace)}</div>`;
     if (t.tasks && t.tasks.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Tasks</div>`;
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:10px">Tasks</div>`;
       for (const task of t.tasks) {
         h += `<div class="poi-card" style="margin-top:6px"><h4>${esc(task.name)}</h4>`;
         if (task.skills && task.skills.length) h += `<div class="poi-type">${task.skills.join(' / ')}</div>`;
@@ -1341,15 +1708,15 @@ function renderWBtWScene(sceneId, scene) {
       }
     }
     if (t.outcomes && t.outcomes.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Outcomes</div>`;
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:10px">Outcomes</div>`;
       for (const out of t.outcomes) h += `<div class="kv"><span class="k">${esc(out.tier || String(out.failures || '?'))}:</span> ${esc(out.description)}</div>`;
     }
     if (t.challenges && t.challenges.length) {
-      h += `<div style="font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Complications</div>`;
+      h += `<div class="sub-label" style="color:var(--orange);margin-top:10px">Complications</div>`;
       for (const ch of t.challenges) h += `<div class="dm-note" style="margin-top:6px"><strong>${esc(ch.name)}:</strong> ${esc(ch.description)}</div>`;
     }
     if (t.specialResourceSlots && t.specialResourceSlots.length) {
-      h += `<div style="font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Special Resource Slots</div>`;
+      h += `<div class="sub-label" style="color:var(--blue);margin-top:10px">Special Resource Slots</div>`;
       for (const sr of t.specialResourceSlots) h += `<div class="kv" style="font-size:12px"><span class="k">${esc(sr.criterion)}:</span> ${esc(sr.effect)}</div>`;
     }
     h += `</div></details>`;
@@ -1359,7 +1726,7 @@ function renderWBtWScene(sceneId, scene) {
   if (scene.social) {
     const s = scene.social;
     const npcs = (s.npcs || []).slice(0,3).join(', ');
-    h += `<details>${summaryWithPreview('Social Mechanics', { preview: npcs || (s.talent || '') })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Social Mechanics', { preview: npcs || (s.talent || '') })}<div class="section-body">`;
     if (s.mechanics && typeof s.mechanics === 'object') {
       for (const [k, v] of Object.entries(s.mechanics)) {
         const label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
@@ -1369,7 +1736,7 @@ function renderWBtWScene(sceneId, scene) {
     if (s.talent) h += `<div class="kv"><span class="k">Talent:</span> ${esc(s.talent)}</div>`;
     if (s.triggers && s.triggers.length) h += `<div class="kv"><span class="k">Triggers:</span> ${s.triggers.map(t => esc(t)).join(', ')}</div>`;
     if (s.moodShifts && Object.keys(s.moodShifts).length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Mood Shifts</div>`;
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Mood Shifts</div>`;
       for (const [event, delta] of Object.entries(s.moodShifts)) {
         const color = delta > 0 ? 'var(--green)' : delta < 0 ? 'var(--red)' : 'var(--text-dim)';
         const label = event.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
@@ -1377,7 +1744,7 @@ function renderWBtWScene(sceneId, scene) {
       }
     }
     if (s.outcomes && s.outcomes.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Outcomes</div>`;
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Outcomes</div>`;
       for (const out of s.outcomes) h += `<div class="kv"><span class="k">${esc(out.tier)}:</span> ${esc(out.description)}</div>`;
     }
     h += `</div></details>`;
@@ -1387,14 +1754,14 @@ function renderWBtWScene(sceneId, scene) {
   if (scene.negotiation) {
     const n = scene.negotiation;
     const nBits = [n.npc || '', n.attitude || ''].filter(Boolean);
-    h += `<details>${summaryWithPreview('Negotiation', { preview: nBits.join(' · ') })}<div class="section-body">`;
+    h += `<details${PLAY_KEEP}>${summaryWithPreview('Negotiation', { preview: nBits.join(' · ') })}<div class="section-body">`;
     if (n.npc) h += `<div class="kv"><span class="k">NPC:</span> ${esc(n.npc)}</div>`;
     if (n.attitude) h += `<div class="kv"><span class="k">Attitude:</span> ${esc(n.attitude)}</div>`;
     if (n.request) h += `<p style="font-size:13px;margin:6px 0">${esc(n.request)}</p>`;
     if (n.motivations && n.motivations.length) h += `<div class="kv"><span class="k">Motivations:</span> ${n.motivations.map(m => esc(m)).join(' · ')}</div>`;
     if (n.pitfalls && n.pitfalls.length) h += `<div class="kv"><span class="k" style="color:var(--red)">Pitfalls:</span> ${n.pitfalls.map(p => esc(p)).join(' · ')}</div>`;
     if (n.outcomes && n.outcomes.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:10px">Outcomes by Interest</div>`;
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:10px">Outcomes by Interest</div>`;
       n.outcomes.forEach((out, i) => {
         const narration = n.outcomeNarrations && n.outcomeNarrations[i]
           ? `<div class="read-aloud" style="margin-top:4px;font-size:12px">"${esc(n.outcomeNarrations[i])}"</div>` : '';
@@ -1403,7 +1770,7 @@ function renderWBtWScene(sceneId, scene) {
     }
     if (n.subTrial) {
       const st = n.subTrial;
-      h += `<div style="font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Sub-Trial: ${esc(st.name)}</div>`;
+      h += `<div class="sub-label" style="color:var(--blue);margin-top:12px">Sub-Trial: ${esc(st.name)}</div>`;
       h += `<p style="font-size:13px;margin:4px 0">${esc(st.description)}</p>`;
       if (st.outcomes && st.outcomes.length) {
         for (const out of st.outcomes) h += `<div class="kv" style="font-size:12px"><span class="k">${esc(out.tier)}:</span> ${esc(out.description)}</div>`;
@@ -1442,7 +1809,7 @@ function renderTriggerScene(id) {
 
   // Preamble
   if (scene.preamble && scene.preamble.length) {
-    h += `<details><summary>Preamble (Read Aloud)</summary><div class="section-body">`;
+    h += `<details${PLAY_KEEP}><summary>Preamble (Read Aloud)</summary><div class="section-body">`;
     for (const p of scene.preamble) h += `<div class="read-aloud">${esc(p)}</div>`;
     if (scene.suggestedLocations) h += `<div class="kv"><span class="k">Suggested locations:</span> ${scene.suggestedLocations.join(', ')}</div>`;
     h += `</div></details>`;
@@ -1450,7 +1817,7 @@ function renderTriggerScene(id) {
 
   // Creatures
   if (scene.creatures && scene.creatures.length) {
-    h += `<details><summary>Creatures</summary><div class="section-body">`;
+    h += `<details${PLAY_KEEP}><summary>Creatures</summary><div class="section-body">`;
     h += `<ul class="creature-list">`;
     for (const c of scene.creatures) {
       const name = source.bestiary[c.id] ? source.bestiary[c.id].name : c.id;
@@ -1461,111 +1828,9 @@ function renderTriggerScene(id) {
     h += `</div></details>`;
   }
 
-  // Passive Revelations (adaptation) — same render path as locations
-  if (adpt && adpt.passiveRevelations && Object.keys(adpt.passiveRevelations).length) {
-    h += `<details><summary>Passive Revelations <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
-    for (const [topic, block] of Object.entries(adpt.passiveRevelations)) {
-      const label = topic.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/\b\w/g, c => c.toUpperCase()).trim();
-      h += `<div class="pr-block"><div class="pr-block-title">${esc(label)}</div>`;
-      if (block.partyAgnostic && block.partyAgnostic.length) {
-        block.partyAgnostic.forEach((pa, i) => {
-          const key = `pr-pa:${id}:${topic}:${i}`;
-          h += `<div class="pr-item markable" data-mark-key="${esc(key)}"><span class="pr-threshold">${esc(pa.threshold)}</span><div class="pr-reveals">${linkText(pa.reveals)}</div></div>`;
-        });
-      }
-      if (block.namedPcAccess && block.namedPcAccess.length) {
-        block.namedPcAccess.forEach((pc, i) => {
-          const key = `pr-pc:${id}:${topic}:${i}`;
-          h += `<div class="pr-item markable" data-mark-key="${esc(key)}" style="border-left-color:var(--teal)"><span class="pr-pc-name">${esc(pc.pc)}</span><div class="pr-reveals">${linkText(pc.access)}</div></div>`;
-        });
-      }
-      h += `</div>`;
-    }
-    h += `</div></details>`;
-  }
-
-  // Combat Briefing (adaptation)
-  if (adpt && adpt.combatBriefing) {
-    const cb = adpt.combatBriefing;
-    h += `<details><summary>Combat Briefing <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
-    if (cb.sceneSummary) h += `<p style="font-size:13px;margin-bottom:10px">${linkText(cb.sceneSummary)}</p>`;
-    if (cb.sceneLevelHazards && cb.sceneLevelHazards.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Hazards</div>`;
-      cb.sceneLevelHazards.forEach((hz, i) => {
-        const key = `hazard:${id}:${i}`;
-        h += `<div class="cb-hazard markable" data-mark-key="${esc(key)}">`;
-        h += `<h4>${esc(hz.name)}</h4>`;
-        if (hz.detail) h += `<div class="cb-detail">${linkText(hz.detail)}</div>`;
-        if (hz.pcImpact) h += `<div class="cb-impact">${linkText(hz.pcImpact)}</div>`;
-        if (hz.ruling) h += `<div class="dm-note" style="margin-top:6px"><strong>Ruling:</strong> ${linkText(hz.ruling)}</div>`;
-        if (hz.recommendedRuling) h += `<div class="dm-note" style="margin-top:6px"><strong>Recommended ruling:</strong> ${linkText(hz.recommendedRuling)}</div>`;
-        if (hz.holyWaterSourcing) h += `<div class="cb-impact">${linkText(hz.holyWaterSourcing)}</div>`;
-        h += `</div>`;
-      });
-    }
-    if (cb.creatures && Object.keys(cb.creatures).length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Creatures</div>`;
-      for (const [creatureKey, cr] of Object.entries(cb.creatures)) {
-        h += `<div class="cb-creature">`;
-        h += `<h4>${esc(creatureKey)}${cr.count ? ` <span style="font-weight:400;color:var(--text-dim);font-size:12px">× ${esc(String(cr.count))}</span>` : ''}</h4>`;
-        if (cr.stats) h += `<div class="cb-stats">${esc(cr.stats)}</div>`;
-        if (cr.notes) h += `<div class="cb-stats" style="color:var(--text)">${linkText(cr.notes)}</div>`;
-        if (cr.signatureMechanics) {
-          h += `<div class="cb-sub-title">Signature Mechanics</div>`;
-          if (Array.isArray(cr.signatureMechanics)) {
-            h += `<ul class="plain">`;
-            for (const m of cr.signatureMechanics) h += `<li>${linkText(m)}</li>`;
-            h += `</ul>`;
-          } else {
-            h += `<p style="font-size:12px">${linkText(cr.signatureMechanics)}</p>`;
-          }
-        }
-        if (cr.damageProfile) {
-          h += `<div class="cb-sub-title">Damage Profile</div>`;
-          if (cr.damageProfile.immunities) h += `<div class="kv" style="font-size:12px"><span class="k">Immune:</span> ${cr.damageProfile.immunities.join(', ')}</div>`;
-          if (cr.damageProfile.resistances) h += `<div class="kv" style="font-size:12px"><span class="k">Resist:</span> ${cr.damageProfile.resistances.join(', ')}</div>`;
-          if (cr.damageProfile.vulnerabilities && cr.damageProfile.vulnerabilities.length) h += `<div class="kv" style="font-size:12px"><span class="k">Vulnerable:</span> ${cr.damageProfile.vulnerabilities.join(', ')}</div>`;
-          if (cr.damageProfile.notes) h += `<div class="cb-impact">${linkText(cr.damageProfile.notes)}</div>`;
-          if (cr.damageProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.damageProfile.notesFromSession)}</div>`;
-        }
-        if (cr.conditionProfile) {
-          h += `<div class="cb-sub-title">Condition Profile</div>`;
-          if (cr.conditionProfile.immunities) h += `<div class="kv" style="font-size:12px"><span class="k">Immune:</span> ${cr.conditionProfile.immunities.join(', ')}</div>`;
-          if (cr.conditionProfile.vulnerable) h += `<div class="kv" style="font-size:12px"><span class="k">Vulnerable:</span> ${cr.conditionProfile.vulnerable.join(', ')}</div>`;
-          if (cr.conditionProfile.notes) h += `<div class="cb-impact">${linkText(cr.conditionProfile.notes)}</div>`;
-          if (cr.conditionProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.conditionProfile.notesFromSession)}</div>`;
-        }
-        if (cr.rulesAmbiguitiesToPreEmpt && cr.rulesAmbiguitiesToPreEmpt.length) {
-          h += `<div class="cb-sub-title">Pre-Empt Rulings</div>`;
-          cr.rulesAmbiguitiesToPreEmpt.forEach((amb, i) => {
-            const key = `ambig:${id}:${creatureKey}:${i}`;
-            h += `<div class="cb-ambig markable" data-mark-key="${esc(key)}">${linkText(amb)}</div>`;
-          });
-        }
-        if (cr.killPriority) h += `<div class="kv" style="margin-top:6px;font-size:12px"><span class="k">Kill priority:</span> ${linkText(cr.killPriority)}</div>`;
-        if (cr.tacticalNotes) {
-          h += `<div class="cb-sub-title">Tactical Notes</div>`;
-          if (Array.isArray(cr.tacticalNotes)) {
-            h += `<ul class="plain">`;
-            for (const t of cr.tacticalNotes) h += `<li>${linkText(t)}</li>`;
-            h += `</ul>`;
-          } else {
-            h += `<p style="font-size:12px">${linkText(cr.tacticalNotes)}</p>`;
-          }
-        }
-        if (cr.tacticalNote) h += `<div class="cb-impact">${linkText(cr.tacticalNote)}</div>`;
-        h += `</div>`;
-      }
-    }
-    if (cb.creatureSynergies && cb.creatureSynergies.length) {
-      h += `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:12px">Creature Synergies</div>`;
-      cb.creatureSynergies.forEach((syn, i) => {
-        const key = `synergy:${id}:${i}`;
-        h += `<div class="cb-synergy markable" data-mark-key="${esc(key)}">${linkText(syn)}</div>`;
-      });
-    }
-    h += `</div></details>`;
-  }
+  h += renderPassiveRevelations(id, adpt);
+  h += renderCombatBriefing(id, adpt);
+  h += renderTableRulings(id);
 
   // Tactical Notes (adaptation) — key:value pairs, also markable
   if (adpt && adpt.tacticalNotes) {
@@ -1581,7 +1846,7 @@ function renderTriggerScene(id) {
   // IF THEY ASK
   const itaAdapt = adpt && adpt.ifTheyAsk_additions ? adpt.ifTheyAsk_additions : [];
   if (itaAdapt.length) {
-    h += `<details><summary>If They Ask <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    h += `<details${PLAY_KEEP}><summary>If They Ask <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
     itaAdapt.forEach((q, i) => {
       const key = `ita-adpt:${id}:${i}`;
       h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
@@ -1593,7 +1858,7 @@ function renderTriggerScene(id) {
 
   // Special Resources
   if (adpt && adpt.specialResources && adpt.specialResources.length) {
-    h += `<details><summary>Special Resources <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+    h += `<details${PLAY_KEEP}><summary>Special Resources <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
     adpt.specialResources.forEach((sr, i) => {
       const key = `sr:${id}:${i}`;
       h += `<div class="sr-card markable" data-mark-key="${esc(key)}">`;
@@ -1610,6 +1875,139 @@ function renderTriggerScene(id) {
   return h;
 }
 
+// ===================== RENDER: SHARED ADAPTATION BLOCKS =====================
+// Table Rulings — locked rulings from the append-only rulings log whose
+// sceneRefs include this view (or one of the scenes rendered on it). Shared by
+// renderLocation and renderTriggerScene. Rulings matter at the table, so the
+// block stays visible in play mode.
+function renderTableRulings(ids) {
+  if (!adaptation || !adaptation.rulings || !adaptation.rulings.length) return '';
+  const idSet = new Set(Array.isArray(ids) ? ids : [ids]);
+  const hits = adaptation.rulings.filter(r => (r.sceneRefs || []).some(ref => idSet.has(ref)));
+  if (!hits.length) return '';
+  const preview = hits.length === 1 ? snip(hits[0].ruling, 90) : `${hits.length} locked rulings`;
+  let h = `<details${PLAY_KEEP}>${summaryWithPreview('Table Rulings', { adapted: true, preview })}<div class="section-body">`;
+  hits.forEach(r => {
+    h += `<div class="kv" style="margin-bottom:8px"><span class="k">${esc(r.date)}:</span> ${linkText(r.ruling)}</div>`;
+  });
+  h += `</div></details>`;
+  return h;
+}
+
+// Passive Revelations — inline thresholds + PC shortcuts. Shared by
+// renderLocation and renderTriggerScene.
+function renderPassiveRevelations(id, adpt) {
+  if (!adpt || !adpt.passiveRevelations || !Object.keys(adpt.passiveRevelations).length) return '';
+  let h = `<details${PLAY_KEEP}><summary>Passive Revelations <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+  for (const [topic, block] of Object.entries(adpt.passiveRevelations)) {
+    const label = topic.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/\b\w/g, c => c.toUpperCase()).trim();
+    h += `<div class="pr-block"><div class="pr-block-title">${esc(label)}</div>`;
+    if (block.partyAgnostic && block.partyAgnostic.length) {
+      block.partyAgnostic.forEach((pa, i) => {
+        const key = `pr-pa:${id}:${topic}:${i}`;
+        h += `<div class="pr-item markable" data-mark-key="${esc(key)}"><span class="pr-threshold">${esc(pa.threshold)}</span><div class="pr-reveals">${linkText(pa.reveals)}</div></div>`;
+      });
+    }
+    if (block.namedPcAccess && block.namedPcAccess.length) {
+      block.namedPcAccess.forEach((pc, i) => {
+        const key = `pr-pc:${id}:${topic}:${i}`;
+        h += `<div class="pr-item markable" data-mark-key="${esc(key)}" style="border-left-color:var(--teal)"><span class="pr-pc-name">${esc(pc.pc)}</span><div class="pr-reveals">${linkText(pc.access)}</div></div>`;
+      });
+    }
+    h += `</div>`;
+  }
+  h += `</div></details>`;
+  return h;
+}
+
+// Combat Briefing — hazards + creatures + synergies + pre-empt rulings.
+// Shared by renderLocation and renderTriggerScene (union of both old copies).
+function renderCombatBriefing(id, adpt) {
+  if (!adpt || !adpt.combatBriefing) return '';
+  const cb = adpt.combatBriefing;
+  let h = `<details${PLAY_KEEP}><summary>Combat Briefing <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+  if (cb.sceneSummary) h += paraText(cb.sceneSummary, 'font-size:14px;margin-bottom:10px');
+  if (cb.sceneLevelHazards && cb.sceneLevelHazards.length) {
+    h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Hazards</div>`;
+    cb.sceneLevelHazards.forEach((hz, i) => {
+      const key = `hazard:${id}:${i}`;
+      h += `<div class="cb-hazard markable" data-mark-key="${esc(key)}">`;
+      h += `<h4>${esc(hz.name)}</h4>`;
+      if (hz.detail) h += `<div class="cb-detail">${linkText(hz.detail)}</div>`;
+      if (hz.pcImpact) h += `<div class="cb-impact">${linkText(hz.pcImpact)}</div>`;
+      if (hz.ruling) h += `<div class="dm-note" style="margin-top:6px"><strong>Ruling:</strong> ${linkText(hz.ruling)}</div>`;
+      if (hz.recommendedRuling) h += `<div class="dm-note" style="margin-top:6px"><strong>Recommended ruling:</strong> ${linkText(hz.recommendedRuling)}</div>`;
+      if (hz.holyWaterSourcing) h += `<div class="cb-impact">${linkText(hz.holyWaterSourcing)}</div>`;
+      h += `</div>`;
+    });
+  }
+  if (cb.creatures && Object.keys(cb.creatures).length) {
+    h += `<div class="sub-label" style="color:var(--text-dim);margin-top:12px">Creatures</div>`;
+    for (const [creatureKey, cr] of Object.entries(cb.creatures)) {
+      h += `<div class="cb-creature">`;
+      h += `<h4>${esc(creatureKey)}${cr.count ? ` <span style="font-weight:400;color:var(--text-dim);font-size:12px">× ${esc(String(cr.count))}</span>` : ''}</h4>`;
+      if (cr.stats) h += `<div class="cb-stats">${esc(cr.stats)}</div>`;
+      if (cr.notes) h += `<div class="cb-stats" style="color:var(--text)">${linkText(cr.notes)}</div>`;
+      if (cr.signatureMechanics) {
+        h += `<div class="cb-sub-title">Signature Mechanics</div>`;
+        if (Array.isArray(cr.signatureMechanics)) {
+          h += `<ul class="plain">`;
+          for (const m of cr.signatureMechanics) h += `<li>${linkText(m)}</li>`;
+          h += `</ul>`;
+        } else {
+          h += `<p style="font-size:13px">${linkText(cr.signatureMechanics)}</p>`;
+        }
+      }
+      if (cr.damageProfile) {
+        h += `<div class="cb-sub-title">Damage Profile</div>`;
+        if (cr.damageProfile.immunities) h += `<div class="kv" style="font-size:13px"><span class="k">Immune:</span> ${cr.damageProfile.immunities.join(', ')}</div>`;
+        if (cr.damageProfile.resistances) h += `<div class="kv" style="font-size:13px"><span class="k">Resist:</span> ${cr.damageProfile.resistances.join(', ')}</div>`;
+        if (cr.damageProfile.vulnerabilities && cr.damageProfile.vulnerabilities.length) h += `<div class="kv" style="font-size:13px"><span class="k">Vulnerable:</span> ${cr.damageProfile.vulnerabilities.join(', ')}</div>`;
+        if (cr.damageProfile.notes) h += `<div class="cb-impact">${linkText(cr.damageProfile.notes)}</div>`;
+        if (cr.damageProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.damageProfile.notesFromSession)}</div>`;
+      }
+      if (cr.conditionProfile) {
+        h += `<div class="cb-sub-title">Condition Profile</div>`;
+        if (cr.conditionProfile.immunities) h += `<div class="kv" style="font-size:13px"><span class="k">Immune:</span> ${cr.conditionProfile.immunities.join(', ')}</div>`;
+        if (cr.conditionProfile.vulnerable) h += `<div class="kv" style="font-size:13px"><span class="k">Vulnerable:</span> ${cr.conditionProfile.vulnerable.join(', ')}</div>`;
+        if (cr.conditionProfile.notes) h += `<div class="cb-impact">${linkText(cr.conditionProfile.notes)}</div>`;
+        if (cr.conditionProfile.notesFromSession) h += `<div class="cb-impact"><strong>From session:</strong> ${linkText(cr.conditionProfile.notesFromSession)}</div>`;
+      }
+      if (cr.rulesAmbiguitiesToPreEmpt && cr.rulesAmbiguitiesToPreEmpt.length) {
+        h += `<div class="cb-sub-title">Pre-Empt Rulings</div>`;
+        cr.rulesAmbiguitiesToPreEmpt.forEach((amb, i) => {
+          const key = `ambig:${id}:${creatureKey}:${i}`;
+          h += `<div class="cb-ambig markable" data-mark-key="${esc(key)}">${linkText(amb)}</div>`;
+        });
+      }
+      if (cr.killPriority) h += `<div class="kv" style="margin-top:6px;font-size:13px"><span class="k">Kill priority:</span> ${linkText(cr.killPriority)}</div>`;
+      if (cr.tacticalNotes) {
+        h += `<div class="cb-sub-title">Tactical Notes</div>`;
+        if (Array.isArray(cr.tacticalNotes)) {
+          h += `<ul class="plain">`;
+          for (const t of cr.tacticalNotes) h += `<li>${linkText(t)}</li>`;
+          h += `</ul>`;
+        } else {
+          h += `<p style="font-size:13px">${linkText(cr.tacticalNotes)}</p>`;
+        }
+      }
+      if (cr.tacticalNote) h += `<div class="cb-impact">${linkText(cr.tacticalNote)}</div>`;
+      if (cr.combatRole) h += `<div class="cb-impact"><strong>Combat role:</strong> ${linkText(cr.combatRole)}</div>`;
+      if (cr.recognition) h += `<div class="cb-impact"><strong>Recognition:</strong> ${linkText(cr.recognition)}</div>`;
+      h += `</div>`;
+    }
+  }
+  if (cb.creatureSynergies && cb.creatureSynergies.length) {
+    h += `<div class="sub-label" style="color:var(--text-dim);margin-top:12px">Creature Synergies</div>`;
+    cb.creatureSynergies.forEach((syn, i) => {
+      const key = `synergy:${id}:${i}`;
+      h += `<div class="cb-synergy markable" data-mark-key="${esc(key)}">${linkText(syn)}</div>`;
+    });
+  }
+  h += `</div></details>`;
+  return h;
+}
+
 // ===================== RENDER: REFERENCE PAGES =====================
 function renderReference(view) {
   switch (view) {
@@ -1623,51 +2021,82 @@ function renderReference(view) {
     case 'ref-dc': return renderDC();
     case 'ref-callbacks': return renderCallbacks();
     case 'ref-voice': return renderVoice();
+    case 'ref-rulings': return renderRulingsLog();
     default: return '<p>Unknown reference section.</p>';
   }
 }
 
+// The "Tonight" landing view: what matters at the next session, from the
+// adaptation's continuityBriefing. Action-oriented sections open by default;
+// recap/reference sections collapsed with preview chips. Unknown briefing
+// fields render through a generic fallback so update passes can add fields
+// without renderer edits.
 function renderSessionPickup() {
-  let h = `<div class="room-header"><h1>Session Pickup</h1><div class="room-meta">Resume state after last session</div></div>`;
-  if (!adaptation || !adaptation.continuityBriefing) return h + '<p>No continuity briefing on this adaptation.</p>';
-  const cb = adaptation.continuityBriefing;
-  h += `<div class="continuity-briefing">`;
-  if (cb.lastSessionDate) h += `<div class="cb-kv"><span class="k">Last session:</span> ${esc(cb.lastSessionDate)}</div>`;
-  if (cb.lastSessionSummary) h += `<p style="margin-top:8px">${linkText(cb.lastSessionSummary)}</p>`;
-  h += `</div>`;
-  if (cb.whereTheyAre) {
-    h += `<details><summary>Where They Are</summary><div class="section-body"><p>${linkText(cb.whereTheyAre)}</p></div></details>`;
-  }
-  if (cb.whatTheyAreDoing) {
-    h += `<details><summary>What They're Doing</summary><div class="section-body"><p>${linkText(cb.whatTheyAreDoing)}</p></div></details>`;
-  }
+  const cb = adaptation && adaptation.continuityBriefing;
+  let h = `<div class="room-header"><h1>Tonight</h1><div class="room-meta">Resume state after last session${cb && cb.lastSessionDate ? ' · ' + esc(cb.lastSessionDate) : ''}</div></div>`;
+  if (!cb) return h + '<p>No continuity briefing on this adaptation.</p>';
+  const handled = new Set(['lastSessionDate']);
+  const section = (key, label, body, opts) => {
+    handled.add(key);
+    if (!body) return '';
+    opts = opts || {};
+    return `<details${opts.open ? ' open' : ''}>${summaryWithPreview(label, { preview: opts.preview })}<div class="section-body">${body}</div></details>`;
+  };
+  const list = arr => `<ul class="plain">${arr.map(i => `<li>${linkText(i)}</li>`).join('')}</ul>`;
+  const listPreview = arr => `${arr.length} item${arr.length === 1 ? '' : 's'} · ${snip(arr[0], 60)}`;
+
+  // Action-oriented: open
+  h += section('whereTheyAre', 'Where They Are', cb.whereTheyAre ? paraText(cb.whereTheyAre) : '', { open: true });
+  h += section('whatTheyAreDoing', "What They're Doing", cb.whatTheyAreDoing ? paraText(cb.whatTheyAreDoing) : '', { open: true });
+  h += section('mostLikelyNextActions', 'Most Likely Next Actions',
+    (cb.mostLikelyNextActions && cb.mostLikelyNextActions.length) ? list(cb.mostLikelyNextActions) : '', { open: true });
+  h += section('prepFocus', 'Prep Focus', cb.prepFocus ? paraText(cb.prepFocus) : '', { open: true });
+
+  // Combat state: collapsed, status line as preview
+  handled.add('currentCombatState');
   if (cb.currentCombatState) {
     const ccs = cb.currentCombatState;
-    h += `<details><summary>Current Combat State</summary><div class="section-body">`;
+    h += `<details>${summaryWithPreview('Current Combat State', { preview: snip(ccs.status || ccs.note || '', 90) })}<div class="section-body">`;
     if (ccs.note) h += `<div class="dm-note" style="border-top:none;padding-top:0;margin-bottom:6px">${esc(ccs.note)}</div>`;
-    if (ccs.status) h += `<div class="kv"><span class="k">Status:</span> ${linkText(ccs.status)}</div>`;
-    if (ccs.wraith3_stunned) h += `<div class="kv"><span class="k">Wraith #3 (stunned):</span> ${linkText(ccs.wraith3_stunned)}</div>`;
-    if (ccs.wraith4_outOfLOS) h += `<div class="kv"><span class="k">Wraith #4 (offscreen):</span> ${linkText(ccs.wraith4_outOfLOS)}</div>`;
-    if (ccs.partyNarrativeState) h += `<div class="kv"><span class="k">Party:</span> ${linkText(ccs.partyNarrativeState)}</div>`;
+    for (const [k, v] of Object.entries(ccs)) {
+      if (k === 'note' || typeof v !== 'string') continue;
+      h += `<div style="margin-top:8px"><div class="k" style="margin-bottom:2px">${esc(humanizeKey(k))}</div>${paraText(v)}</div>`;
+    }
     h += `</div></details>`;
   }
-  if (cb.whatTheyKnowNow && cb.whatTheyKnowNow.length) {
-    h += `<details><summary>What They Know Now</summary><div class="section-body"><ul class="plain">`;
-    for (const item of cb.whatTheyKnowNow) h += `<li>${linkText(item)}</li>`;
-    h += `</ul></div></details>`;
-  }
-  if (cb.mostLikelyNextActions && cb.mostLikelyNextActions.length) {
-    h += `<details><summary>Most Likely Next Actions</summary><div class="section-body"><ul class="plain">`;
-    for (const item of cb.mostLikelyNextActions) h += `<li>${linkText(item)}</li>`;
-    h += `</ul></div></details>`;
-  }
-  if (cb.prepFocus) {
-    h += `<details><summary>Prep Focus</summary><div class="section-body"><p>${linkText(cb.prepFocus)}</p></div></details>`;
-  }
+
+  // Recap / reference: collapsed with previews
+  h += section('lastSessionSummary', 'Last Session Recap',
+    cb.lastSessionSummary ? paraText(cb.lastSessionSummary) : '', { preview: snip(cb.lastSessionSummary, 90) });
+  h += section('whatTheyKnowNow', 'What They Know Now',
+    (cb.whatTheyKnowNow && cb.whatTheyKnowNow.length) ? list(cb.whatTheyKnowNow) : '',
+    { preview: cb.whatTheyKnowNow && cb.whatTheyKnowNow.length ? listPreview(cb.whatTheyKnowNow) : '' });
+  h += section('geographyReconciliation', 'Map / Layout Note',
+    cb.geographyReconciliation ? paraText(cb.geographyReconciliation) : '', { preview: snip(cb.geographyReconciliation, 90) });
+  handled.add('openThreadsForDM');
   if (cb.openThreadsForDM && cb.openThreadsForDM.length) {
-    h += `<details><summary>Open Threads (DM-only)</summary><div class="section-body">`;
+    h += `<details>${summaryWithPreview('Open Threads (DM-only)', { preview: listPreview(cb.openThreadsForDM) })}<div class="section-body">`;
     for (const t of cb.openThreadsForDM) h += `<div class="secret"><div class="secret-label">Open Thread</div>${linkText(t)}</div>`;
     h += `</div></details>`;
+  }
+
+  // Generic fallback for briefing fields this renderer doesn't know about
+  for (const [k, v] of Object.entries(cb)) {
+    if (handled.has(k) || v === null || v === undefined) continue;
+    const label = humanizeKey(k);
+    if (typeof v === 'string') {
+      h += `<details>${summaryWithPreview(label, { preview: snip(v, 90) })}<div class="section-body">${paraText(v)}</div></details>`;
+    } else if (Array.isArray(v)) {
+      const items = v.filter(x => typeof x === 'string');
+      if (items.length) h += `<details>${summaryWithPreview(label, { preview: listPreview(items) })}<div class="section-body">${list(items)}</div></details>`;
+    } else if (typeof v === 'object') {
+      const rows = Object.entries(v).filter(([, vv]) => typeof vv === 'string');
+      if (rows.length) {
+        h += `<details>${summaryWithPreview(label, { preview: `${rows.length} entr${rows.length === 1 ? 'y' : 'ies'}` })}<div class="section-body">`;
+        for (const [kk, vv] of rows) h += `<div style="margin-top:8px"><div class="k" style="margin-bottom:2px">${esc(humanizeKey(kk))}</div>${paraText(vv)}</div>`;
+        h += `</div></details>`;
+      }
+    }
   }
   return h;
 }
@@ -1719,12 +2148,19 @@ function renderLore() {
 
 function renderFeatures() {
   let h = `<div class="room-header"><h1>Common Features</h1></div>`;
-  if (source.commonFeatures) {
-    for (const f of source.commonFeatures) {
-      h += `<div class="poi-card"><h4>${esc(f.name)}</h4>`;
-      h += `<div class="poi-type">${esc(f.summary)}</div>`;
-      h += `<p style="font-size:13px">${esc(f.detail)}</p></div>`;
-    }
+  const cf = source.commonFeatures;
+  // Shadowkeep: array of {id, name, summary, detail}. WBtW: object keyed by id
+  // with {name, text} values — normalize to the array shape.
+  const feats = !cf ? []
+    : Array.isArray(cf) ? cf
+    : Object.entries(cf)
+        .filter(([k, v]) => !k.startsWith('_') && v && typeof v === 'object')
+        .map(([k, v]) => ({ id: k, name: v.name || k, summary: v.summary, detail: v.detail != null ? v.detail : v.text }));
+  for (const f of feats) {
+    h += `<div class="poi-card"><h4>${esc(f.name)}</h4>`;
+    if (f.summary) h += `<div class="poi-type">${esc(f.summary)}</div>`;
+    if (f.detail) h += `<p style="font-size:13px">${esc(f.detail)}</p></div>`;
+    else h += `</div>`;
   }
   return h;
 }
@@ -1855,35 +2291,34 @@ function renderBestiary() {
   let h = `<div class="room-header"><h1>Bestiary</h1></div>`;
   if (!source.bestiary) return h + '<p>No bestiary data.</p>';
   for (const [id, cr] of Object.entries(source.bestiary)) {
-    h += renderStatBlock(cr);
+    h += renderCreatureCard(cr);
   }
   return h;
 }
 
-function renderStatBlock(cr) {
-  let h = `<details><summary style="font-size:14px;text-transform:none;letter-spacing:0">${esc(cr.name)} <span style="color:var(--text-dim);font-weight:400;font-size:12px">${esc(cr.cr ? 'CR ' + cr.cr : '')}</span></summary>`;
-  h += `<div class="stat-block">`;
-  h += `<h3>${esc(cr.name)}</h3>`;
-  h += `<div class="stat-sub">${esc(cr.size || '')} ${esc(cr.type || '')}${cr.alignment ? ', ' + esc(cr.alignment) : ''}</div>`;
-  h += `<hr class="stat-divider">`;
+function fmtMod(v) {
+  const m = Math.floor((v - 10) / 2);
+  return (m >= 0 ? '+' : '') + m;
+}
 
+// Shared stat-block body used by both the full (bestiary) and inline (right
+// panel) creature cards. Markup is identical; CSS scales the compact variant.
+function statBody(cr) {
+  let h = `<div class="stat-sub">${esc(cr.size || '')} ${esc(cr.type || '')}${cr.alignment ? ', ' + esc(cr.alignment) : ''}${cr.cr ? ' · CR ' + cr.cr : ''}</div>`;
+  h += `<hr class="stat-divider">`;
   if (cr.ac) h += `<div class="stat-row"><span class="stat-label">AC</span> ${cr.ac}${cr.acType ? ' (' + esc(cr.acType) + ')' : ''}</div>`;
   if (cr.hp) h += `<div class="stat-row"><span class="stat-label">HP</span> ${typeof cr.hp === 'string' ? esc(cr.hp) : cr.hp}${cr.hpFormula ? ' (' + esc(cr.hpFormula) + ')' : ''}</div>`;
   if (cr.speed) {
     const spd = Object.entries(cr.speed).filter(([k,v]) => v && k !== 'hover').map(([k,v]) => k === 'walk' ? v + ' ft.' : k + ' ' + v + ' ft.').join(', ');
     h += `<div class="stat-row"><span class="stat-label">Speed</span> ${esc(spd)}${cr.speed.hover ? ' (hover)' : ''}</div>`;
   }
-
   if (cr.abilities) {
-    h += `<hr class="stat-divider">`;
-    h += `<div class="ability-scores">`;
+    h += `<hr class="stat-divider"><div class="ability-scores">`;
     for (const [ab, val] of Object.entries(cr.abilities)) {
-      const mod = Math.floor((val - 10) / 2);
-      h += `<div><div class="ab-name">${ab}</div><div class="ab-val">${val}</div><div class="ab-mod">(${mod >= 0 ? '+' : ''}${mod})</div></div>`;
+      h += `<div><div class="ab-name">${ab}</div><div class="ab-val">${val}</div><div class="ab-mod">(${fmtMod(val)})</div></div>`;
     }
     h += `</div>`;
   }
-
   h += `<hr class="stat-divider">`;
   if (cr.savingThrows) h += `<div class="stat-row"><span class="stat-label">Saves</span> ${Object.entries(cr.savingThrows).map(([k,v]) => k + ' +' + v).join(', ')}</div>`;
   if (cr.skills) h += `<div class="stat-row"><span class="stat-label">Skills</span> ${Object.entries(cr.skills).map(([k,v]) => k + ' +' + v).join(', ')}</div>`;
@@ -1892,16 +2327,12 @@ function renderStatBlock(cr) {
   if (cr.conditionImmunities) h += `<div class="stat-row"><span class="stat-label">Cond. Immune</span> ${cr.conditionImmunities.join(', ')}</div>`;
   if (cr.senses) h += `<div class="stat-row"><span class="stat-label">Senses</span> ${Object.entries(cr.senses).map(([k,v]) => k.replace(/([A-Z])/g, ' $1').trim() + ' ' + v + (typeof v === 'number' ? ' ft.' : '')).join(', ')}</div>`;
   if (cr.languages) h += `<div class="stat-row"><span class="stat-label">Languages</span> ${cr.languages.join(', ')}</div>`;
-
-  // Traits
   if (cr.traits && cr.traits.length) {
     h += `<hr class="stat-divider">`;
     for (const t of cr.traits) h += `<div class="stat-row"><span class="stat-label">${esc(t.name)}.</span> ${esc(t.description)}</div>`;
   }
-
-  // Actions
   if (cr.actions && cr.actions.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--red);font-weight:700;font-size:14px;margin:4px 0">Actions</div>`;
+    h += `<div class="stat-sec">Actions</div>`;
     for (const a of cr.actions) {
       h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> `;
       if (a.type) h += `<em>${esc(a.type)}:</em> `;
@@ -1916,55 +2347,42 @@ function renderStatBlock(cr) {
       h += `</div>`;
     }
   }
-
-  // Bonus Actions
   if (cr.bonusActions && cr.bonusActions.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--orange);font-weight:700;font-size:14px;margin:4px 0">Bonus Actions</div>`;
-    for (const a of cr.bonusActions) {
-      h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
-    }
+    h += `<div class="stat-sec">Bonus Actions</div>`;
+    for (const a of cr.bonusActions) h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
   }
-
-  // Reactions
   if (cr.reactions && cr.reactions.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--blue);font-weight:700;font-size:14px;margin:4px 0">Reactions</div>`;
+    h += `<div class="stat-sec">Reactions</div>`;
     for (const r of cr.reactions) {
       h += `<div class="stat-row"><span class="stat-label">${esc(r.name)}.</span> `;
       if (r.trigger) h += `<em>Trigger: ${esc(r.trigger)}.</em> `;
-      h += esc(r.description);
-      h += `</div>`;
+      h += esc(r.description) + `</div>`;
     }
   }
-
-  // Villain Actions
   if (cr.villainActions && cr.villainActions.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--purple);font-weight:700;font-size:14px;margin:4px 0">Villain Actions</div>`;
-    for (const a of cr.villainActions) {
-      h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
-    }
+    h += `<div class="stat-sec">Villain Actions</div>`;
+    for (const a of cr.villainActions) h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
   }
-
-  // Spells
   if (cr.spells) {
-    h += `<hr class="stat-divider"><div style="color:var(--purple);font-weight:700;font-size:14px;margin:4px 0">Spellcasting</div>`;
-    if (cr.spells.saveDC) h += `<div class="stat-row">Spell save DC ${cr.spells.saveDC} (${esc(cr.spells.ability || '')})</div>`;
+    h += `<div class="stat-sec">Spellcasting</div>`;
+    if (cr.spells.saveDC) h += `<div class="stat-row">Spell save DC ${cr.spells.saveDC}${cr.spells.ability ? ' (' + esc(cr.spells.ability) + ')' : ''}</div>`;
     if (cr.spells.atWill) h += `<div class="stat-row"><span class="stat-label">At will:</span> ${cr.spells.atWill.join(', ')}</div>`;
     if (cr.spells.perDay3) h += `<div class="stat-row"><span class="stat-label">3/day:</span> ${cr.spells.perDay3.join(', ')}</div>`;
     if (cr.spells.perDay1) h += `<div class="stat-row"><span class="stat-label">1/day:</span> ${cr.spells.perDay1.join(', ')}</div>`;
   }
-
-  // Features (retainer)
   if (cr.features && cr.features.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--teal);font-weight:700;font-size:14px;margin:4px 0">Features</div>`;
-    for (const f of cr.features) {
-      h += `<div class="stat-row"><span class="stat-label">${esc(f.name)} (Lv${f.level}).</span> ${esc(f.description)}</div>`;
-    }
+    h += `<div class="stat-sec">Features</div>`;
+    for (const f of cr.features) h += `<div class="stat-row"><span class="stat-label">${esc(f.name)} (Lv${f.level}).</span> ${esc(f.description)}</div>`;
   }
-
   if (cr.note) h += `<div class="dm-note">${esc(cr.note)}</div>`;
-
-  h += `</div></details>`;
   return h;
+}
+
+// Single creature card renderer. mode: 'full' (bestiary page, collapsible
+// classic PHB block) or 'inline' (right panel, compact).
+function renderCreatureCard(cr, mode) {
+  if (mode === 'inline') return `<div class="rp-stat"><h3>${esc(cr.name)}</h3>` + statBody(cr) + `</div>`;
+  return `<details><summary class="stat-summary">${esc(cr.name)} <span class="stat-cr">${esc(cr.cr ? 'CR ' + cr.cr : '')}</span></summary><div class="stat-block"><h3>${esc(cr.name)}</h3>` + statBody(cr) + `</div></details>`;
 }
 
 function renderDC() {
@@ -1984,6 +2402,24 @@ function renderDC() {
     }
     h += `</div></details>`;
   }
+  return h;
+}
+
+// Rulings Log — chronological, append-only record of locked table rulings from
+// the adaptation's rulings layer. Scene-scoped copies render on their scenes
+// via renderTableRulings.
+function renderRulingsLog() {
+  if (!adaptation || !adaptation.rulings || !adaptation.rulings.length) return '<p>No table rulings recorded.</p>';
+  let h = `<div class="room-header"><h1>Rulings Log</h1><div class="room-meta">Locked table rulings, oldest first. Append-only — update passes add entries but never rewrite them.</div></div>`;
+  adaptation.rulings.forEach(r => {
+    h += `<div class="callback-card">`;
+    h += `<h4>${esc(r.date)}</h4>`;
+    h += `<p style="font-size:13px">${linkText(r.ruling)}</p>`;
+    if (r.sceneRefs && r.sceneRefs.length) {
+      h += `<div class="callback-option">Applies to: ${linkText(r.sceneRefs.join(', '))}</div>`;
+    }
+    h += `</div>`;
+  });
   return h;
 }
 
@@ -2032,7 +2468,7 @@ function renderVoice() {
 // ===================== COMPONENT RENDERERS =====================
 function renderConnections(connections, label) {
   if (!connections || !Object.keys(connections).length) return '';
-  let h = `<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${esc(label)}</div>`;
+  let h = `<div class="sub-label" style="color:var(--text-dim);margin-bottom:4px">${esc(label)}</div>`;
   h += `<div class="connections">`;
   for (const [targetId, info] of Object.entries(connections)) {
     const targetName = getLocationName(targetId);
@@ -2180,83 +2616,13 @@ function updateRightPanel(view) {
   }
 
   let h = `<div class="rp-title">Creatures Here</div>`;
-  for (const id of creatureIds) h += renderStatBlockInline(source.bestiary[id]);
+  for (const id of creatureIds) h += renderCreatureCard(source.bestiary[id], 'inline');
   panel.innerHTML = h;
   panel.classList.add('visible');
   main.style.marginRight = '280px';
 }
 
-function renderStatBlockInline(cr) {
-  let h = `<div class="rp-stat">`;
-  h += `<h3>${esc(cr.name)}</h3>`;
-  h += `<div class="stat-sub">${esc(cr.size || '')} ${esc(cr.type || '')}${cr.alignment ? ', ' + esc(cr.alignment) : ''}${cr.cr ? ' · CR ' + cr.cr : ''}</div>`;
-  h += `<hr class="stat-divider">`;
-  if (cr.ac) h += `<div class="stat-row"><span class="stat-label">AC</span> ${cr.ac}${cr.acType ? ' (' + esc(cr.acType) + ')' : ''}</div>`;
-  if (cr.hp) h += `<div class="stat-row"><span class="stat-label">HP</span> ${typeof cr.hp === 'string' ? esc(cr.hp) : cr.hp}${cr.hpFormula ? ' (' + esc(cr.hpFormula) + ')' : ''}</div>`;
-  if (cr.speed) {
-    const spd = Object.entries(cr.speed).filter(([k,v]) => v && k !== 'hover').map(([k,v]) => k === 'walk' ? v + ' ft.' : k + ' ' + v + ' ft.').join(', ');
-    h += `<div class="stat-row"><span class="stat-label">Speed</span> ${esc(spd)}</div>`;
-  }
-  if (cr.abilities) {
-    h += `<hr class="stat-divider"><div class="ability-scores">`;
-    for (const [ab, val] of Object.entries(cr.abilities)) {
-      const mod = Math.floor((val - 10) / 2);
-      h += `<div><div class="ab-name">${ab}</div><div class="ab-val">${val}</div><div class="ab-mod">(${mod >= 0 ? '+' : ''}${mod})</div></div>`;
-    }
-    h += `</div>`;
-  }
-  h += `<hr class="stat-divider">`;
-  if (cr.savingThrows) h += `<div class="stat-row"><span class="stat-label">Saves</span> ${Object.entries(cr.savingThrows).map(([k,v]) => k + ' +' + v).join(', ')}</div>`;
-  if (cr.damageResistances) h += `<div class="stat-row"><span class="stat-label">Resist</span> ${cr.damageResistances.join(', ')}</div>`;
-  if (cr.damageImmunities) h += `<div class="stat-row"><span class="stat-label">Immune</span> ${cr.damageImmunities.join(', ')}</div>`;
-  if (cr.conditionImmunities) h += `<div class="stat-row"><span class="stat-label">Cond. Immune</span> ${cr.conditionImmunities.join(', ')}</div>`;
-  if (cr.senses) h += `<div class="stat-row"><span class="stat-label">Senses</span> ${Object.entries(cr.senses).map(([k,v]) => k.replace(/([A-Z])/g, ' $1').trim() + ' ' + v + (typeof v === 'number' ? ' ft.' : '')).join(', ')}</div>`;
-  if (cr.traits && cr.traits.length) {
-    h += `<hr class="stat-divider">`;
-    for (const t of cr.traits) h += `<div class="stat-row"><span class="stat-label">${esc(t.name)}.</span> ${esc(t.description)}</div>`;
-  }
-  if (cr.actions && cr.actions.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--red);font-weight:700;font-size:12px;margin:3px 0">Actions</div>`;
-    for (const a of cr.actions) {
-      h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> `;
-      if (a.type) h += `<em>${esc(a.type)}:</em> `;
-      if (a.toHit) h += `+${a.toHit} to hit, `;
-      if (a.reach) h += `reach ${a.reach} ft., `;
-      if (a.damage) h += `${esc(a.damage)}. `;
-      if (a.effect) h += esc(a.effect);
-      if (a.description) h += esc(a.description);
-      h += `</div>`;
-    }
-  }
-  if (cr.bonusActions && cr.bonusActions.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--orange);font-weight:700;font-size:12px;margin:3px 0">Bonus Actions</div>`;
-    for (const a of cr.bonusActions) h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
-  }
-  if (cr.reactions && cr.reactions.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--blue);font-weight:700;font-size:12px;margin:3px 0">Reactions</div>`;
-    for (const r of cr.reactions) {
-      h += `<div class="stat-row"><span class="stat-label">${esc(r.name)}.</span> `;
-      if (r.trigger) h += `<em>Trigger: ${esc(r.trigger)}.</em> `;
-      h += esc(r.description) + `</div>`;
-    }
-  }
-  if (cr.villainActions && cr.villainActions.length) {
-    h += `<hr class="stat-divider"><div style="color:var(--purple);font-weight:700;font-size:12px;margin:3px 0">Villain Actions</div>`;
-    for (const a of cr.villainActions) h += `<div class="stat-row"><span class="stat-label">${esc(a.name)}.</span> ${esc(a.description)}</div>`;
-  }
-  if (cr.spells) {
-    h += `<hr class="stat-divider"><div style="color:var(--purple);font-weight:700;font-size:12px;margin:3px 0">Spellcasting</div>`;
-    if (cr.spells.saveDC) h += `<div class="stat-row">Spell save DC ${cr.spells.saveDC}</div>`;
-    if (cr.spells.atWill) h += `<div class="stat-row"><span class="stat-label">At will:</span> ${cr.spells.atWill.join(', ')}</div>`;
-    if (cr.spells.perDay3) h += `<div class="stat-row"><span class="stat-label">3/day:</span> ${cr.spells.perDay3.join(', ')}</div>`;
-    if (cr.spells.perDay1) h += `<div class="stat-row"><span class="stat-label">1/day:</span> ${cr.spells.perDay1.join(', ')}</div>`;
-  }
-  if (cr.note) h += `<div class="stat-row" style="color:var(--orange);margin-top:4px">${esc(cr.note)}</div>`;
-  h += `</div>`;
-  return h;
-}
-
-// ===================== HELPERS =====================
+// ===================== HELPERS =====================// ===================== HELPERS =====================
 function linkText(str) {
   if (str === null || str === undefined) return '';
   const s = esc(str);
@@ -2267,6 +2633,24 @@ function linkText(str) {
   if (!allIds.length) return s;
   const pattern = new RegExp(`\\b(${allIds.map(id => id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'g');
   return s.replace(pattern, id => `<button class="loc-link" onclick="navigate('${id}')">${id}</button>`);
+}
+
+// Render a (possibly multi-paragraph) string as separate <p> blocks, splitting
+// on blank lines. Single-paragraph strings render as one <p>, so this is a safe
+// drop-in for linkText anywhere text can pile up. Pass an optional inline style
+// applied to every paragraph.
+function paraText(str, style) {
+  if (str === null || str === undefined || str === '') return '';
+  const sty = style ? ` style="${style}"` : '';
+  return String(str).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
+    .map(p => `<p${sty}>${linkText(p)}</p>`).join('');
+}
+
+// Humanize a camelCase or snake_case key into a label
+// ("nextSessionOpener" -> "Next Session Opener", "wraith3_stunned" -> "Wraith3 Stunned").
+function humanizeKey(k) {
+  return String(k).replace(/_/g, ' ').replace(/([A-Z])/g, ' $1')
+    .replace(/\s+/g, ' ').trim().replace(/^./, c => c.toUpperCase());
 }
 
 function esc(str) {

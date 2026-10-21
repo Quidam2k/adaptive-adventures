@@ -43,6 +43,14 @@ the adaptation to "— None (generic) —" to see the bare source by comparison.
 Requirements: Python 3 (for the static server) and any modern browser. That's it —
 no install, no database, no API key needed just to explore.
 
+**Fonts (optional).** The dashboard is styled like a page from a published 5e book
+and looks best with the classic book fonts (Bookinsanity, Mr Eaves Small Caps,
+Scaly Sans, Nodesto). Those aren't committed to this repo — if you have a local
+[Homebrewery](https://github.com/naturalcrit/homebrewery) install, run
+`setup-fonts.ps1` (or `setup-fonts.bat`) once to copy them into a gitignored
+`fonts/` folder. Without them the dashboard falls back to system serif/sans fonts
+and remains fully usable.
+
 ---
 
 ## What's in this repo

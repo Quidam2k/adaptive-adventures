@@ -11,33 +11,76 @@ How the LLM runtime transforms a party-agnostic adventure into a party-specific 
 
 ## Output
 
-A **companion adaptation file** at `adventures/[name]/adapted/[campaign]-[YYYY-MM-DD].js`. Never mutate the source.
+**Three companion files** at `adventures/[name]/adapted/`, split by lifecycle so an update pass rewrites only what actually changes. Never mutate the source. Each file assigns its own global; the dashboard loads them in order (via the manifest entry's `files: [...]` array) and deep-merges them.
 
-Structure:
+### 1. `[party].party.js` → `window.ADVENTURE_ADAPTATION_PARTY`
+
+The **stable layer** — changes rarely (new item, level-up, roster change):
 
 ```js
 {
   sourceRef: "adventures/[name]/source.js",
   campaign: "CFK | AoA | Undermountain",
   party: ["Alkali", "Briarheart", ...],
+  partyLevel: 12,
   adaptedAt: "2026-04-15",
+  adapterPolicies: { /* standing rules the adapter follows */ },
+  campaignIntegration: { /* hook status, thread mapping */ },
 
-  // Layered additions/overrides keyed by scene id
+  // Stable additions keyed by scene id — add to, don't replace, source fields
   scenes: {
     [sceneId]: {
-      // Add to, don't replace, source fields
       ifTheyAsk_additions: [ /* new Q&As tied to party capabilities */ ],
       specialResources: [ /* filled-in resources with named PC owners */ ],
-      taskNarrations_overrides: { /* optional voice/tone matching campaign */ },
-      dcAdjustments: { /* scaled to party level */ },
-      skillSubstitutions: { /* reshape task skills to party's strengths */ }
+      passiveRevelations: { /* what passive scores reveal here */ },
+      combatBriefing: { /* DM-side combat prep for this scene */ },
+      tacticalNotes: { /* optional */ }
     }
   },
 
-  // Adapter's rationale — useful for debugging and iteration
+  narrationVoice: { /* campaign tone + per-PC voice notes */ },
+  dcAdjustments: { /* scaled to party level */ },
+  campaignCallbacks: { /* DM-decision intersections with campaign threads */ },
+  adaptationHistory: [ { date, note }, ... ],
   notes: "Why the adapter made the choices it made."
 }
 ```
+
+### 2. `[party].state.js` → `window.ADVENTURE_ADAPTATION_STATE`
+
+The **volatile layer** — **rewritten wholesale** at every post-session update pass:
+
+```js
+{
+  continuityBriefing: { /* the Tonight view: where they are, what's next, prep focus */ },
+  scenes: {
+    [sceneId]: {
+      sessionState: { /* status, resolved/unresolved/pending, NPC status, cliffhanger */ }
+    }
+  }
+}
+```
+
+### 3. `[party].rulings.js` → `window.ADVENTURE_ADAPTATION_RULINGS`
+
+The **append-only layer** — update passes append entries, never edit or delete old ones:
+
+```js
+{
+  campaign: "...",
+  rulings: [
+    { date: "2026-04-23",
+      ruling: "The holy blade's light persists in magical darkness — locked, no hedging.",
+      sceneRefs: ["S3", "L2"] }  // source scene/location ids
+  ]
+}
+```
+
+The dashboard surfaces rulings on their referenced scenes (a Table Rulings block, visible in Play mode) and on the Rulings Log reference page.
+
+**Single source of truth:** each fact lives in exactly one layer. The renderer may display a fact in two places; the data stores it once. Old single-file adaptations (`{ file: "..." }` manifest entries assigning `window.ADVENTURE_ADAPTATION`) remain loadable for archival snapshots.
+
+**Completion gate:** an initial adaptation is not complete until `python adaptation_lint.py <prefix>` PASSes **and** the fact-check gate ([`fact_check_protocol.md`](fact_check_protocol.md)) reports zero Critical findings (findings file: `adventures/[name]/adapted/deltas/YYYY-MM-DD_factcheck_initial.md`). The same gate runs on every subsequent update pass — see [`update_pass_protocol.md`](update_pass_protocol.md).
 
 ## Transformation Rules
 
@@ -80,7 +123,7 @@ Adaptation MUST preserve the player-safe tagging from the source. Anything added
 ## Prompt Template (stub — to be built after first import)
 
 ```
-SYSTEM: You are an adventure adaptation runtime. Read the source adventure, the campaign context, and the character contexts. Produce an adaptation file per the schema in schema/scene_schema.md and the rules in runtime/adaptation_protocol.md. Preserve source fields; only add or override per the rules. Return a single JSON object.
+SYSTEM: You are an adventure adaptation runtime. Read the source adventure, the campaign context, and the character contexts. Produce the three adaptation layer files (party / state / rulings) per the schema in schema/scene_schema.md and the rules in runtime/adaptation_protocol.md. Preserve source fields; only add or override per the rules.
 
 USER:
 <source adventure>

@@ -28,6 +28,10 @@
 /NEXT_SESSION_PLAN_*.md
 /cascades/
 
+# Book fonts copied from the local Homebrewery install (see setup-fonts.ps1) —
+# not redistributed here for license caution
+/fonts/
+
 # Tooling scratch
 /.playwright-mcp/
 
@@ -35,3 +39,7 @@
 Thumbs.db
 .DS_Store
 *.swp
+
+# Local agent state / Python cache
+/.claude/
+__pycache__/

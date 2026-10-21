@@ -63,7 +63,7 @@ Same pattern as the two prototypes: HTML + vanilla JS, localStorage for state, p
 
 ## Adaptation Quality Rules
 
-When generating or editing adaptation files, these rules are mandatory:
+When generating or editing adaptation files, these rules are mandatory. They are enforced by the fact-check gate (`runtime/fact_check_protocol.md`), which runs on every pass — including initial adaptation — and blocks completion while Critical findings remain.
 
 ### Location references are navigable
 Any mention of a location ID (V1, V3, etc.) in narrative text — hook status, campaign integration, If They Ask answers, special resource moments — will automatically become a clickable link in the dashboard. **Use location IDs consistently** when referring to where something or someone is. Don't write "the war room" when you mean V3; write "V3 (War Room)" so the link renders correctly and the DM can navigate there instantly.
