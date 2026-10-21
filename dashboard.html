@@ -1554,6 +1554,7 @@ function renderLocation(id) {
 
   h += renderPassiveRevelations(id, adpt);
   h += renderCombatBriefing(id, adpt);
+  h += renderTacticalNotes(id, adpt);
   h += renderTableRulings([id,
     ...((loc.scenesHere && loc.scenesHere.length) ? loc.scenesHere
       : (loc.scenes && loc.scenes.length) ? loc.scenes
@@ -1593,21 +1594,7 @@ function renderLocation(id) {
   }
 
   // Special Resources (adaptation)
-  if (adpt && adpt.specialResources && adpt.specialResources.length) {
-    const srPreview = adpt.specialResources.map(sr => sr.pc).filter(Boolean).join(', ');
-    h += `<details${PLAY_KEEP}>${summaryWithPreview('Special Resources', { adapted: true, preview: srPreview })}<div class="section-body">`;
-    adpt.specialResources.forEach((sr, i) => {
-      const key = `sr:${id}:${i}`;
-      h += `<div class="sr-card markable" data-mark-key="${esc(key)}">`;
-      h += `<div class="sr-pc">${esc(sr.pc)}</div>`;
-      h += `<div class="sr-cap">${esc(sr.capability)}</div>`;
-      h += `<div class="sr-moment">${linkText(sr.moment)}</div>`;
-      if (sr.narrativeHook) h += `<div class="sr-hook">${linkText(sr.narrativeHook)}</div>`;
-      if (sr.dmNote) h += `<div class="sr-dm-note">${linkText(sr.dmNote)}</div>`;
-      h += `</div>`;
-    });
-    h += `</div></details>`;
-  }
+  h += renderSpecialResources(id, adpt);
 
   // Common Features (reference, collapsed)
   if (source.commonFeatures && source.commonFeatures.length) {
@@ -1687,6 +1674,12 @@ function renderWBtWScene(sceneId, scene) {
     });
     h += `</div></details>`;
   }
+
+  // Scene-keyed adaptation blocks (some adaptations key these by scene id, not location id)
+  h += renderPassiveRevelations(sceneId, sceneAdpt);
+  h += renderCombatBriefing(sceneId, sceneAdpt);
+  h += renderTacticalNotes(sceneId, sceneAdpt);
+  h += renderSpecialResources(sceneId, sceneAdpt);
 
   // Trial block
   if (scene.trial) {
@@ -1831,17 +1824,7 @@ function renderTriggerScene(id) {
   h += renderPassiveRevelations(id, adpt);
   h += renderCombatBriefing(id, adpt);
   h += renderTableRulings(id);
-
-  // Tactical Notes (adaptation) — key:value pairs, also markable
-  if (adpt && adpt.tacticalNotes) {
-    h += `<details><summary>Tactical Breakdown <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
-    for (const [tKey, val] of Object.entries(adpt.tacticalNotes)) {
-      const label = tKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      const mkey = `tac:${id}:${tKey}`;
-      h += `<div class="tactical-card markable" data-mark-key="${esc(mkey)}"><h4>${esc(label)}</h4><p>${linkText(val)}</p></div>`;
-    }
-    h += `</div></details>`;
-  }
+  h += renderTacticalNotes(id, adpt);
 
   // IF THEY ASK
   const itaAdapt = adpt && adpt.ifTheyAsk_additions ? adpt.ifTheyAsk_additions : [];
@@ -1857,25 +1840,47 @@ function renderTriggerScene(id) {
   }
 
   // Special Resources
-  if (adpt && adpt.specialResources && adpt.specialResources.length) {
-    h += `<details${PLAY_KEEP}><summary>Special Resources <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
-    adpt.specialResources.forEach((sr, i) => {
-      const key = `sr:${id}:${i}`;
-      h += `<div class="sr-card markable" data-mark-key="${esc(key)}">`;
-      h += `<div class="sr-pc">${esc(sr.pc)}</div>`;
-      h += `<div class="sr-cap">${esc(sr.capability)}</div>`;
-      h += `<div class="sr-moment">${linkText(sr.moment)}</div>`;
-      if (sr.narrativeHook) h += `<div class="sr-hook">${linkText(sr.narrativeHook)}</div>`;
-      if (sr.dmNote) h += `<div class="sr-dm-note">${linkText(sr.dmNote)}</div>`;
-      h += `</div>`;
-    });
-    h += `</div></details>`;
-  }
+  h += renderSpecialResources(id, adpt);
 
   return h;
 }
 
 // ===================== RENDER: SHARED ADAPTATION BLOCKS =====================
+// Special Resources — per-PC moments. Title is `capability`, or `name` in
+// adaptations that use that field instead. Shared by renderLocation,
+// renderWBtWScene and renderTriggerScene.
+function renderSpecialResources(id, adpt) {
+  if (!adpt || !adpt.specialResources || !adpt.specialResources.length) return '';
+  const srPreview = adpt.specialResources.map(sr => sr.pc).filter(Boolean).join(', ');
+  let h = `<details${PLAY_KEEP}>${summaryWithPreview('Special Resources', { adapted: true, preview: srPreview })}<div class="section-body">`;
+  adpt.specialResources.forEach((sr, i) => {
+    const key = `sr:${id}:${i}`;
+    h += `<div class="sr-card markable" data-mark-key="${esc(key)}">`;
+    h += `<div class="sr-pc">${esc(sr.pc)}</div>`;
+    h += `<div class="sr-cap">${esc(sr.capability || sr.name || '')}</div>`;
+    h += `<div class="sr-moment">${linkText(sr.moment)}</div>`;
+    if (sr.narrativeHook) h += `<div class="sr-hook">${linkText(sr.narrativeHook)}</div>`;
+    if (sr.dmNote) h += `<div class="sr-dm-note">${linkText(sr.dmNote)}</div>`;
+    h += `</div>`;
+  });
+  h += `</div></details>`;
+  return h;
+}
+
+// Tactical Notes — key:value pairs rendered as DM-only cards, also markable.
+// Not kept in play mode. Shared by renderLocation, renderWBtWScene and
+// renderTriggerScene.
+function renderTacticalNotes(id, adpt) {
+  if (!adpt || !adpt.tacticalNotes) return '';
+  let h = `<details><summary>Tactical Breakdown <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
+  for (const [tKey, val] of Object.entries(adpt.tacticalNotes)) {
+    const label = tKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const mkey = `tac:${id}:${tKey}`;
+    h += `<div class="tactical-card markable" data-mark-key="${esc(mkey)}"><h4>${esc(label)}</h4><p>${linkText(val)}</p></div>`;
+  }
+  h += `</div></details>`;
+  return h;
+}
 // Table Rulings — locked rulings from the append-only rulings log whose
 // sceneRefs include this view (or one of the scenes rendered on it). Shared by
 // renderLocation and renderTriggerScene. Rulings matter at the table, so the
