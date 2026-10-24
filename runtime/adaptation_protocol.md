@@ -53,6 +53,8 @@ The **volatile layer** — **rewritten wholesale** at every post-session update 
 ```js
 {
   continuityBriefing: { /* the Tonight view: where they are, what's next, prep focus */ },
+  partyAt: "<source or improvised id>",          // optional: the ◆ party marker
+  improvisedLocations: { /* table-invented places, see update_pass_protocol.md */ },
   scenes: {
     [sceneId]: {
       sessionState: { /* status, resolved/unresolved/pending, NPC status, cliffhanger */ }

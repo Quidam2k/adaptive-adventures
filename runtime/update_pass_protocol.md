@@ -53,6 +53,29 @@ What goes where, codified from the Phase 3 split (2026-07-17). `adaptation_lint.
 | `storyTracker` | Cross-scene narrative state (WBtW) |
 | `forSession` | Next-session framing block (WBtW) |
 | `scenes` | Per-scene state container |
+| `partyAt` | Where the party is right now: a source location id or an `improvisedLocations` id. Drives the ◆ party marker in the sidebar. Omit it when unsure; no marker is better than a guessed one. |
+| `improvisedLocations` | Places the table invented that the book doesn't have (see below) |
+
+### Improvised places (since 2026-10-23, #9287)
+
+When the party goes somewhere the source has no location for (a cave the DM improvised, a side room), give it its own entry instead of burying it in the nearest location's `sessionState`:
+
+```json
+"partyAt": "I_l12_minotaur_gate",
+"improvisedLocations": {
+  "I_l12_minotaur_gate": {
+    "parent": "L_l12_tunnel_top",
+    "name": "The minotaur gate",
+    "summary": "One line, shown in hover previews and the sidebar.",
+    "readAloud": "...", "sessionState": { }, "creatures": [ ], "connections": [ ]
+  }
+}
+```
+
+- Ids start with `I_`. `parent` must be a **source** location id; the dashboard files the page under it (key = parent key + a, b, … unless you set `key`) and no longer lists it as an orphan.
+- Allowed keys: `parent`, `name`, `key`, `summary`, `readAloud`, `sessionState`, `creatures`, `connections` (`IMPROVISED_KEYS` in `adaptation_lint.py`). `name` is required.
+- Both fields are additive: a state file without them renders exactly as before.
+- This supersedes the older rule "put the improvised place under the nearest source location's `sessionState`". Migrate such entries when you next touch that adaptation.
 
 ### state.js per-scene keys
 
