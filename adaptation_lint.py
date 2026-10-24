@@ -25,6 +25,9 @@ Checks (all deterministic, no LLM):
      Source ids are extracted by shelling out to node (source.js is hand-written JS).
   6. Mojibake — cp1252 double-encoding sequences in any layer file or source.js.
   7. Currency — state.js has continuityBriefing.lastSessionDate (ISO date).
+  8. Improvised places — every state.js improvisedLocations entry names a `parent`
+     that is a source id and carries only known keys; partyAt resolves to a source
+     id or an improvised id. Improvised ids are valid sceneRefs.
 
 Exit code 0 = all prefixes PASS, 1 = any finding (or usage error).
 
@@ -51,7 +54,11 @@ LAYERS = {
 }
 
 # Layer classification (see runtime/update_pass_protocol.md "Layer classification").
-STATE_TOP_ALLOW = {'continuityBriefing', 'storyTracker', 'forSession', 'scenes'}
+STATE_TOP_ALLOW = {'continuityBriefing', 'storyTracker', 'forSession', 'scenes',
+                   'improvisedLocations', 'partyAt'}
+# Improvised places: table-made rooms the source doesn't have (#9287).
+IMPROVISED_KEYS = {'parent', 'name', 'key', 'summary', 'readAloud', 'sessionState',
+                   'creatures', 'connections'}
 STATE_SCENE_KEYS = {
     'sessionState',                    # Shadowkeep pattern (default for new adventures)
     'status', 'currentState', 'openingBeatsForNextSession',
@@ -262,7 +269,27 @@ def lint_prefix(prefix):
         for doc in (party, state):
             if doc is not None:
                 adaptation_ids |= set(doc.get('scenes') or {})
+        source_only = set(valid_ids)
         valid_ids |= adaptation_ids
+        improvised = (state or {}).get('improvisedLocations') or {}
+        for iid, place in improvised.items():
+            p = '$.improvisedLocations.%s' % iid
+            if not isinstance(place, dict):
+                findings.add(relp('state'), p, 'entry is not an object')
+                continue
+            if place.get('parent') not in source_only:
+                findings.add(relp('state'), p + '.parent',
+                             'parent %r is not a source id' % place.get('parent'))
+            for k in sorted(set(place) - IMPROVISED_KEYS):
+                findings.add(relp('state'), p + '.' + k,
+                             'unknown improvised-place key (allowed: %s)' % sorted(IMPROVISED_KEYS))
+            if not (isinstance(place.get('name'), str) and place['name'].strip()):
+                findings.add(relp('state'), p + '.name', 'missing or empty')
+        valid_ids |= set(improvised)
+        party_at = (state or {}).get('partyAt')
+        if party_at is not None and party_at not in valid_ids:
+            findings.add(relp('state'), '$.partyAt',
+                         'partyAt %r is not a source or improvised id' % party_at)
         for i, e in enumerate(entries):
             if isinstance(e, dict) and isinstance(e.get('sceneRefs'), list):
                 for ref in e['sceneRefs']:

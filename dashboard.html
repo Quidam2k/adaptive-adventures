@@ -9,169 +9,158 @@
 <script src="adventures/manifest.local.js" onerror="this.remove()"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════════
-   PHB / Homebrewery book styling.
-   Fonts are copied locally by setup-fonts.ps1 (fonts/ is gitignored);
-   every face has a graceful system fallback.
+   FIELD LEDGER — rag paper, iron-gall ink, ONE vermilion rubric.
+   No decorative gradients, no pills, no drop shadows. DM-only material is
+   flagged with a manicule (☞); read-aloud is set apart by voice (¶ + italic).
+   Fonts are bundled in ledger-fonts/ (SIL OFL) so file:// works offline.
    ════════════════════════════════════════════════════════════════════ */
-@font-face { font-family: 'Bookinsanity'; src: url('fonts/Bookinsanity.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Bookinsanity'; src: url('fonts/Bookinsanity Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Bookinsanity'; src: url('fonts/Bookinsanity Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Bookinsanity'; src: url('fonts/Bookinsanity Bold Italic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Mr Eaves Small Caps'; src: url('fonts/Mr Eaves Small Caps.woff2') format('woff2'); font-weight: 400 800; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Scaly Sans'; src: url('fonts/Scaly Sans.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Scaly Sans'; src: url('fonts/Scaly Sans Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Scaly Sans'; src: url('fonts/Scaly Sans Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Scaly Sans'; src: url('fonts/Scaly Sans Bold Italic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Scaly Sans Caps'; src: url('fonts/Scaly Sans Caps.woff2') format('woff2'); font-weight: 400 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Nodesto Caps Condensed'; src: url('fonts/Nodesto Caps Condensed Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IM Fell Double Pica SC'; src: url('ledger-fonts/IMFellDoublePicaSC-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Spectral'; src: url('ledger-fonts/Spectral-400.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Spectral'; src: url('ledger-fonts/Spectral-500.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Spectral'; src: url('ledger-fonts/Spectral-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Spectral'; src: url('ledger-fonts/Spectral-400-italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Spectral'; src: url('ledger-fonts/Spectral-700-italic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Barlow Semi Condensed'; src: url('ledger-fonts/BarlowSemiCondensed-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Barlow Semi Condensed'; src: url('ledger-fonts/BarlowSemiCondensed-500.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Barlow Semi Condensed'; src: url('ledger-fonts/BarlowSemiCondensed-600.woff2') format('woff2'); font-weight: 600 700; font-display: swap; }
 
 :root {
-  --font-body: 'Bookinsanity', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
-  --font-heading: 'Mr Eaves Small Caps', 'Palatino Linotype', Georgia, serif;
-  --font-sans: 'Scaly Sans', 'Segoe UI', 'Trebuchet MS', sans-serif;
-  --font-caps: 'Scaly Sans Caps', 'Scaly Sans', 'Segoe UI', sans-serif;
-  --font-title: 'Nodesto Caps Condensed', 'Mr Eaves Small Caps', 'Palatino Linotype', serif;
-  --sidebar-w: 230px;
+  --font-body: 'Spectral', 'Iowan Old Style', Georgia, serif;
+  --font-heading: 'IM Fell Double Pica SC', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Barlow Semi Condensed', 'Arial Narrow', sans-serif;
+  --font-caps: 'Barlow Semi Condensed', 'Arial Narrow', sans-serif;
+  --font-title: 'IM Fell Double Pica SC', 'Iowan Old Style', Georgia, serif;
+  --sidebar-w: 236px;
 }
 
-/* ── Parchment (default): a page from a published book ─────────────── */
+/* ── Paper (default) ───────────────────────────────────────────────── */
 :root, :root[data-theme="parchment"] {
-  --bg: #EEE5CE;             /* page parchment */
-  --surface: #F6EEDC;        /* quiet card */
-  --surface2: #E9DDBE;       /* deeper panel / sidebar */
-  --statblock-bg: #FDF1DC;   /* classic tan stat block */
-  --readaloud-bg: #FAF7EA;   /* read-aloud cream */
-  --border: #D6C7A2;         /* tan hairline */
-  --rule: #C9AD6A;           /* gold rule */
-  --sb-bar: #E69A28;         /* stat-block orange bars */
-  --text: #231A10;           /* ink */
-  --text-dim: #7A6C51;       /* faded ink */
-  --header: #58180D;         /* red-brown headings */
-  --shadow: rgba(80, 60, 20, 0.18);
-  --page-hi: rgba(255, 252, 240, 0.55);
-  --page-lo: rgba(120, 90, 40, 0.10);
+  --paper: #F1EADB;
+  --paper-2: #E8DFCB;        /* index column, selected rows */
+  --ink: #2A231B;            /* iron-gall */
+  --ink-2: #574D3F;          /* faded ink */
+  --ink-3: #635949;          /* pencil — >= 4.5:1 on paper AND paper-2 */
+  --rubric: #A8321A;         /* vermilion: keys, status, the ONE accent */
+  --wash: rgba(168, 50, 26, 0.07);
+  --rule-line: #B9AC93;      /* hairline (decorative, not text) */
+  --tooth: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
 
-  /* Legacy accent names (used throughout render JS) re-pointed to book ink */
-  --gold: #58180D;           /* key labels / emphasis — matches headings */
-  --red: #922610;            /* combat / danger / stat-block red */
-  --green: #4A6741;          /* success / used */
-  --blue: #1D4E89;           /* location links */
-  --purple: #5E3A66;         /* questions / villain */
-  --orange: #7C4A03;         /* umber — DM notes */
-  --teal: #2F5D50;           /* adapted-content marker */
+  /* Legacy names used throughout the render JS, re-pointed to ledger ink */
+  --bg: var(--paper);
+  --surface: var(--paper);
+  --surface2: var(--paper-2);
+  --statblock-bg: var(--paper);
+  --readaloud-bg: var(--paper);
+  --border: var(--rule-line);
+  --rule: var(--rule-line);
+  --sb-bar: var(--ink);
+  --text: var(--ink);
+  --text-dim: var(--ink-3);
+  --header: var(--ink);
+  --shadow: transparent;
+  --gold: var(--rubric);
+  --red: var(--rubric);
+  --green: #3B6235;          /* used / success — >= 4.5:1 on paper */
+  --blue: var(--ink);
+  --purple: var(--ink-2);
+  --orange: var(--ink-2);
+  --teal: var(--ink-2);
 }
 
-/* ── Candlelight: the same book, read by candle. Dimmed parchment, warm
-     shadows, identical typography — NOT a generic dark theme. ───────── */
+/* ── Candlelight: the same ledger read by candle (dark) ────────────── */
 :root[data-theme="candlelight"] {
-  --bg: #262019;
-  --surface: #2E2719;
-  --surface2: #211B12;
-  --statblock-bg: #332A18;
-  --readaloud-bg: #322B1D;
-  --border: #55452B;
-  --rule: #8A6D3B;
-  --sb-bar: #A9741F;
-  --text: #DCCFA8;
-  --text-dim: #9A8A64;
-  --header: #D07347;
-  --shadow: rgba(0, 0, 0, 0.45);
-  --page-hi: rgba(255, 220, 150, 0.045);
-  --page-lo: rgba(0, 0, 0, 0.35);
-
-  --gold: #D07347;
-  --red: #D46A4C;
-  --green: #93B27A;
-  --blue: #86AFD3;
-  --purple: #B491C4;
-  --orange: #CF9D53;
-  --teal: #82B29A;
+  --paper: #1F1A14;
+  --paper-2: #29231B;
+  --ink: #E8DEC8;
+  --ink-2: #CDBFA3;
+  --ink-3: #B3A586;
+  --rubric: #EE8A66;
+  --wash: rgba(238, 138, 102, 0.10);
+  --rule-line: #4F4535;
+  --tooth: none;
+  --green: #9CC28F;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: var(--font-body);
   background-color: var(--bg);
-  background-image:
-    radial-gradient(ellipse 120% 80% at 15% 0%, var(--page-hi), transparent 60%),
-    radial-gradient(ellipse 100% 90% at 90% 100%, var(--page-lo), transparent 55%);
-  background-attachment: fixed;
+  background-image: var(--tooth);
   color: var(--text);
-  line-height: 1.5;
-  font-size: 15px;
+  line-height: 1.55;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
 }
-a { color: var(--blue); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--rubric); text-underline-offset: 3px; }
 p { margin: 0 0 0.6em; }
 p:last-child { margin-bottom: 0; }
+:focus-visible { outline: 2px solid var(--rubric); outline-offset: 2px; }
 
-/* ── Loading screen: book cover ────────────────────────────────────── */
+/* ── Loading screen: title page ────────────────────────────────────── */
 #load-screen {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  gap: 20px;
-  padding: 40px;
+  gap: 18px;
+  padding: 40px 16px;
 }
 #load-screen h1 {
   font-family: var(--font-title);
   font-size: 52px;
-  font-weight: 700;
-  color: var(--header);
-  letter-spacing: 2px;
-  text-shadow: 0 2px 3px var(--shadow);
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: .01em;
+  line-height: 1;
+  text-align: center;
 }
 #load-screen p { color: var(--text-dim); max-width: 480px; text-align: center; }
 .load-card {
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  outline: 1px solid var(--border);
-  outline-offset: 4px;
-  padding: 32px 40px;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 22px 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-width: 400px;
-  box-shadow: 0 6px 18px var(--shadow);
+  width: min(440px, 100%);
 }
 .load-row { display: flex; flex-direction: column; gap: 6px; }
 .load-row label {
   font-family: var(--font-caps);
   font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--header);
+  letter-spacing: .16em;
+  color: var(--rubric);
 }
 .load-row select {
-  background: var(--readaloud-bg);
-  border: 1px solid var(--border);
+  background: var(--paper);
+  border: 1px solid var(--rule);
   color: var(--text);
-  padding: 8px 12px;
-  font-size: 14px;
+  padding: 8px 10px;
+  font-size: 15px;
   font-family: var(--font-sans);
   cursor: pointer;
   width: 100%;
 }
-.load-row select:focus { outline: none; border-color: var(--header); }
+.load-row select:focus { outline: none; border-color: var(--ink); }
 #launch-btn {
-  background: var(--header);
-  color: var(--statblock-bg);
+  background: var(--ink);
+  color: var(--paper);
   border: none;
   padding: 10px 0;
-  font-size: 17px;
-  font-weight: 700;
-  font-family: var(--font-heading);
-  letter-spacing: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-caps);
+  letter-spacing: .2em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: opacity 0.15s;
   margin-top: 4px;
 }
-#launch-btn:hover { opacity: 0.85; }
-#launch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-#load-error { color: var(--red); font-size: 13px; min-height: 20px; text-align: center; font-family: var(--font-sans); }
+#launch-btn:hover { background: var(--rubric); }
+#launch-btn:disabled { opacity: 0.4; cursor: not-allowed; background: var(--ink); }
+#load-error { color: var(--red); font-size: 14px; min-height: 20px; text-align: center; font-family: var(--font-sans); }
 
 /* ── Layout ────────────────────────────────────────────────────────── */
 #dashboard { display: none; }
@@ -180,518 +169,580 @@ p:last-child { margin-bottom: 0; }
   top: 0; left: 0;
   width: var(--sidebar-w);
   height: 100vh;
-  background: var(--surface2);
+  background: var(--paper-2);
   border-right: 1px solid var(--rule);
   overflow-y: auto;
-  padding: 12px 0;
+  padding: 14px 0 20px;
   z-index: 10;
 }
 #main {
   margin-left: var(--sidebar-w);
-  padding: 28px 36px 60px;
-  max-width: 900px;
+  padding: 0 40px 60px;
+  max-width: 940px;
 }
 
-/* ── Sidebar: table of contents ────────────────────────────────────── */
+/* ── Index column (sidebar) ────────────────────────────────────────── */
 .sb-title {
   font-family: var(--font-heading);
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--header);
-  letter-spacing: 1px;
-  padding: 8px 16px 2px;
-  line-height: 1.15;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--ink);
+  padding: 8px 18px 2px;
+  line-height: 1.1;
 }
-.sb-divider {
-  border: none;
-  border-top: 1px solid var(--rule);
-  margin: 8px 12px;
-}
+.sb-sub { font-family: var(--font-sans); font-size: 13px; letter-spacing: .04em; color: var(--ink-3); padding: 2px 18px 4px; }
+.sb-divider { border: none; border-top: 1px solid var(--rule); margin: 10px 18px; }
 .sb-item {
-  display: block;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   width: 100%;
   text-align: left;
   background: none;
   border: none;
   color: var(--text);
-  font-size: 13px;
+  font-size: 15px;
   font-family: var(--font-sans);
-  padding: 4px 16px 4px 20px;
+  padding: 3px 18px;
   cursor: pointer;
-  transition: background 0.15s;
 }
-.sb-item:hover { background: var(--surface); }
-.sb-item.active { background: var(--surface); color: var(--header); border-left: 3px solid var(--header); padding-left: 17px; font-weight: 700; }
+.sb-item:hover { background: var(--wash); }
+.sb-item.active { color: var(--rubric); font-weight: 600; box-shadow: inset 3px 0 0 var(--rubric); }
 .sb-item .sb-id {
-  display: block;
+  flex: none;
+  min-width: 34px;
   font-family: var(--font-caps);
-  font-weight: 700;
-  color: var(--text-dim);
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  line-height: 1.2;
+  font-weight: 500;
+  color: var(--ink-3);
+  font-size: 13px;
 }
 .sb-item .sb-name {
-  display: block;
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1.3;
 }
-.sb-item.active .sb-id { color: var(--header); }
+.sb-item.active .sb-id { color: var(--rubric); }
+.sb-item.sb-improvised .sb-name { font-style: italic; }
+.sb-item.sb-back { color: var(--ink-3); font-size: 13px; padding-bottom: 6px; }
+.sb-party { flex: none; color: var(--rubric); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
 .sb-section {
   font-family: var(--font-caps);
   font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--header);
-  padding: 10px 16px 2px;
+  letter-spacing: .18em;
+  color: var(--ink-3);
+  padding: 14px 18px 4px;
 }
 #theme-toggle-btn, #play-toggle-btn {
   display: block;
-  width: calc(100% - 24px);
-  margin: 8px 12px;
+  width: calc(100% - 36px);
+  margin: 8px 18px;
   background: none;
   border: 1px solid var(--rule);
-  color: var(--text-dim);
+  color: var(--ink-2);
   font-family: var(--font-caps);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
   padding: 6px 10px;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: border-color 0.15s, color 0.15s;
+  letter-spacing: .14em;
 }
-#theme-toggle-btn:hover, #play-toggle-btn:hover { border-color: var(--header); color: var(--header); }
-#play-toggle-btn.on { border-color: var(--header); color: var(--header); font-weight: 700; }
+#theme-toggle-btn:hover, #play-toggle-btn:hover { border-color: var(--ink); color: var(--ink); }
+#play-toggle-btn.on { border-color: var(--rubric); color: var(--rubric); }
+
+/* ── Running head: back + breadcrumb + search ──────────────────────── */
+.run-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 -40px 26px;
+  padding: 10px 40px;
+  background: var(--bg);
+  background-image: var(--tooth);
+  border-bottom: 1px solid var(--rule);
+  font: 14px var(--font-sans);
+  color: var(--ink-2);
+}
+.run-head .rh-back {
+  background: none; border: none; cursor: pointer; padding: 0;
+  font: inherit; color: var(--ink-2); white-space: nowrap;
+}
+.run-head .rh-back:hover { color: var(--rubric); }
+.run-head .rh-back:disabled { visibility: hidden; }
+.run-head .crumbs { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.run-head .crumbs b { color: var(--ink); font-weight: 600; }
+.run-head .crumbs .crumb-link { background: none; border: none; padding: 0; font: inherit; color: var(--ink-2); cursor: pointer; text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+.run-head .crumbs .crumb-link:hover { color: var(--ink); text-decoration-color: var(--rubric); }
+.run-head .rh-seek {
+  margin-left: auto; flex: none;
+  background: none; border: 1px solid var(--rule); cursor: pointer;
+  padding: 4px 10px; min-width: 200px; text-align: left;
+  font: 14px var(--font-sans); color: var(--ink-3);
+}
+.run-head .rh-seek kbd { font: 12px var(--font-sans); float: right; color: var(--ink-3); margin-left: 12px; }
+.run-head .rh-seek:hover { border-color: var(--ink); color: var(--ink-2); }
 
 /* ── Page headers ──────────────────────────────────────────────────── */
-.room-header { margin-bottom: 18px; border-bottom: 2px solid var(--rule); padding-bottom: 8px; }
+.room-header { margin-bottom: 18px; }
+.room-key {
+  font: 600 13px var(--font-caps);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--rubric);
+}
 .room-header h1 {
   font-family: var(--font-heading);
-  font-size: 34px;
-  font-weight: 700;
-  color: var(--header);
-  line-height: 1.1;
-  margin-bottom: 2px;
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.02;
+  margin: 4px 0 6px;
 }
 .room-header .room-meta {
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  color: var(--text-dim);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--ink-2);
 }
+.room-header .room-meta .badge { font-style: normal; }
+.party-here {
+  display: flex; gap: 10px; align-items: baseline;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 7px 0; margin: 14px 0 0;
+  font: 15px var(--font-sans);
+}
+.party-here .conn-id { font: 600 15px var(--font-caps); color: var(--rubric); }
+.party-here .lab { font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: 12px; color: var(--rubric); white-space: nowrap; }
 
-/* ── Connections ───────────────────────────────────────────────────── */
-.connections { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 18px; }
+/* ── Connections: route list ───────────────────────────────────────── */
+.connections { display: flex; flex-wrap: wrap; gap: 0 28px; margin: 4px 0 22px; }
 .conn-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 6px 12px;
+  background: none;
+  border: none;
+  border-bottom: 1px dotted var(--rule);
+  padding: 5px 0;
   color: var(--text);
-  font-size: 12.5px;
+  font-size: 15px;
   cursor: pointer;
   font-family: var(--font-sans);
-  box-shadow: 0 1px 2px var(--shadow);
-  transition: border-color 0.15s;
+  text-align: left;
 }
-.conn-btn:hover { border-color: var(--header); }
-.conn-btn .conn-id { font-family: var(--font-caps); font-weight: 700; color: var(--header); }
-.conn-btn .conn-via { color: var(--text-dim); font-size: 11px; }
-.conn-note { font-size: 11px; color: var(--orange); margin-top: 2px; font-family: var(--font-sans); }
+.conn-btn:hover { border-bottom-color: var(--rubric); }
+.conn-btn .conn-id { font-family: var(--font-caps); font-weight: 600; color: var(--rubric); }
+.conn-btn .conn-name { font-weight: 600; }
+.conn-btn .conn-via { color: var(--text-dim); font-size: 13px; }
+.conn-note { font-size: 13px; color: var(--ink-2); margin-top: 1px; font-family: var(--font-sans); }
 
-/* ── Collapsible sections: book section heads ──────────────────────── */
-details { margin-bottom: 14px; }
+/* ── Collapsible sections: ledger section heads ────────────────────── */
+details { margin-bottom: 10px; }
 summary {
   font-family: var(--font-heading);
-  font-size: 21px;
-  font-weight: 700;
-  color: var(--header);
+  font-size: 25px;
+  font-weight: 400;
+  color: var(--ink);
   cursor: pointer;
-  padding: 4px 0 2px;
+  padding: 10px 0 3px;
   border-bottom: 1px solid var(--rule);
   list-style: none;
   user-select: none;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 summary::-webkit-details-marker { display: none; }
 summary::before {
   content: '\25B8';
   display: inline-block;
-  margin-right: 7px;
+  margin-right: 8px;
+  font-family: var(--font-sans);
   font-size: 13px;
-  color: var(--rule);
-  transition: transform 0.2s;
-  vertical-align: 2px;
+  color: var(--ink-3);
+  transition: transform 0.15s;
+  vertical-align: 3px;
 }
 details[open] > summary::before { transform: rotate(90deg); }
-details[open] > summary { border-bottom: 2px solid var(--rule); }
-.section-body { padding: 10px 0 4px; }
+details[open] > summary { border-bottom-color: transparent; }
+summary:hover::before { color: var(--rubric); }
+.section-body { padding: 6px 0 8px; }
 
-/* Collapsed-section preview chip */
+/* Collapsed-section preview */
 .sum-preview {
   display: inline;
-  margin-left: 10px;
-  font-family: var(--font-body);
-  font-size: 12.5px;
+  margin-left: 12px;
+  font-family: var(--font-sans);
+  font-size: 14px;
   font-weight: 400;
   color: var(--text-dim);
-  font-style: italic;
   text-transform: none;
   letter-spacing: 0;
-  vertical-align: 2px;
+  vertical-align: 3px;
 }
 details[open] > summary .sum-preview { display: none; }
 
-/* Small run-in labels inside sections (was inline-styled uppercase divs) */
+/* Small run-in labels inside sections */
 .sub-label {
   font-family: var(--font-caps);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: .16em;
 }
 .pr-block-title, .cb-sub-title {
   font-family: var(--font-caps);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: .16em;
 }
 .pr-block-title { margin-bottom: 4px; }
-.cb-sub-title { color: var(--header); margin-top: 8px; }
+.cb-sub-title { color: var(--rubric); margin-top: 8px; }
 
 /* ════════════════════════════════════════════════════════════════════
-   PATTERN 1 — READ-ALOUD: the boxed descriptive text of a printed page
+   READ-ALOUD: set apart by voice, not a box — rubric pilcrow + italic
    ════════════════════════════════════════════════════════════════════ */
 .read-aloud {
-  background: var(--readaloud-bg);
-  border-top: 2px solid var(--text);
-  border-bottom: 2px solid var(--text);
-  padding: 12px 18px;
-  margin: 10px 0;
+  position: relative;
+  padding: 2px 0 2px 34px;
+  margin: 10px 0 16px;
   font-family: var(--font-body);
-  font-size: 15.5px;
+  font-style: italic;
+  font-size: 18px;
   line-height: 1.6;
-  box-shadow: 1px 3px 6px var(--shadow);
 }
-.taunt-msg { font-style: italic; font-size: 15px; margin: 6px 0; }
+.read-aloud::before {
+  content: '\00B6';
+  position: absolute;
+  left: 4px; top: -4px;
+  font: 400 30px var(--font-heading);
+  font-style: normal;
+  color: var(--rubric);
+}
+.taunt-msg { font-style: italic; font-size: 16px; margin: 6px 0; }
 
 /* ════════════════════════════════════════════════════════════════════
-   PATTERN 2 — DM-ONLY: red-brown frame + generated small-caps flag
+   DM-ONLY: a margin note flagged with a manicule
    ════════════════════════════════════════════════════════════════════ */
 .secret, .tactical-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--header);
-  padding: 8px 12px;
-  margin: 8px 0;
-  font-size: 14px;
-  box-shadow: 0 1px 2px var(--shadow);
+  border-left: 1px solid var(--rule);
+  padding: 2px 0 2px 16px;
+  margin: 10px 0;
+  font-size: 15.5px;
 }
 .secret::before, .tactical-card::before {
-  content: 'DM only';
+  content: '\261E\00A0 DM only';
   display: block;
   font-family: var(--font-caps);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--header);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--rubric);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: .16em;
   margin-bottom: 2px;
 }
 .secret-label {
   font-family: var(--font-caps);
-  color: var(--header);
-  font-weight: 700;
-  font-size: 11px;
+  color: var(--ink-2);
+  font-weight: 600;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: .12em;
   margin-bottom: 2px;
 }
-.tactical-card h4 { font-family: var(--font-heading); color: var(--header); font-size: 17px; margin-bottom: 2px; }
-.tactical-card p { font-size: 14px; }
-.dm-note {
+.tactical-card h4 { font-family: var(--font-heading); font-weight: 400; color: var(--ink); font-size: 20px; margin-bottom: 2px; }
+.tactical-card p { font-size: 15.5px; }
+.dm-note, .sr-dm-note, .callback-dm-note {
   font-family: var(--font-sans);
-  font-size: 12.5px;
-  color: var(--orange);
-  margin-top: 4px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  margin-top: 6px;
   padding-top: 4px;
-  border-top: 1px solid var(--border);
+  border-top: 1px dotted var(--rule);
 }
-.sr-dm-note { font-family: var(--font-sans); font-size: 12.5px; color: var(--orange); margin-top: 4px; border-top: 1px solid var(--border); padding-top: 4px; }
-.callback-dm-note { font-family: var(--font-sans); font-size: 12.5px; color: var(--orange); margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
+.dm-note::before, .sr-dm-note::before, .callback-dm-note::before { content: '\261E\00A0'; color: var(--rubric); }
 
 /* ════════════════════════════════════════════════════════════════════
-   PATTERN 3 — ROLLABLE / CHECK: Scaly Sans, DC prominent
+   ROLLABLE / CHECK: the mechanics face, DC in rubric
    ════════════════════════════════════════════════════════════════════ */
 .check-entry {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  margin: 4px 0;
+  border-bottom: 1px dotted var(--rule);
+  padding: 5px 0;
+  margin: 2px 0;
   font-family: var(--font-sans);
-  font-size: 13.5px;
+  font-size: 15px;
 }
-.check-dc { font-family: var(--font-caps); font-weight: 700; color: var(--header); }
+.check-dc { font-family: var(--font-caps); font-weight: 600; color: var(--rubric); }
 
 /* ════════════════════════════════════════════════════════════════════
-   PATTERN 4 — REFERENCE: quiet parchment cards, small-caps name line.
-   Semantic meaning carried by the label color, not 20 card treatments.
+   REFERENCE ENTRIES: ruled, not boxed. Meaning carried by the head line.
    ════════════════════════════════════════════════════════════════════ */
 .encounter-card, .poi-card, .hazard-card, .sr-card, .ita-item,
 .taunt-card, .callback-card, .voice-card, .pr-item,
 .cb-hazard, .cb-creature, .cb-synergy, .cb-ambig, .treasure-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  margin: 8px 0;
-  box-shadow: 0 1px 2px var(--shadow);
+  background: none;
+  border: none;
+  border-top: 1px solid var(--rule);
+  padding: 8px 0 6px;
+  margin: 6px 0;
 }
 .encounter-card h4, .poi-card h4, .hazard-card h4, .callback-card h4,
 .cb-hazard h4, .cb-creature h4 {
   font-family: var(--font-heading);
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 21px;
+  font-weight: 400;
   margin-bottom: 3px;
   line-height: 1.15;
+  color: var(--ink);
 }
-.encounter-card h4, .cb-creature h4 { color: var(--red); }
-.hazard-card h4, .cb-hazard h4 { color: var(--orange); }
-.poi-card h4 { color: var(--header); }
-.callback-card h4 { color: var(--header); }
+.encounter-card { border-top: 1px solid var(--ink); }
 
 .creature-list { list-style: none; padding: 0; font-family: var(--font-sans); }
-.creature-list li { font-size: 13.5px; padding: 2px 0; }
-.creature-list li::before { content: '\2694'; margin-right: 6px; color: var(--red); }
-.tactics { font-size: 14px; color: var(--text-dim); margin-top: 6px; font-style: italic; }
+.creature-list li { font-size: 15px; padding: 2px 0; }
+.creature-list li::before { content: '\2694'; margin-right: 6px; color: var(--rubric); }
+.tactics { font-size: 15px; color: var(--ink-2); margin-top: 6px; font-style: italic; }
 .poi-type {
   font-family: var(--font-caps);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: .12em;
   margin-bottom: 6px;
 }
 
-.ita-item { border-left: 3px solid var(--purple); }
-.ita-q { font-weight: 700; color: var(--purple); font-size: 14.5px; margin-bottom: 4px; font-style: italic; }
-.ita-a { font-size: 14px; }
-.ita-thread { font-family: var(--font-sans); font-size: 11.5px; color: var(--teal); margin-top: 4px; }
+.ita-q { font-weight: 500; color: var(--ink); font-size: 16px; margin-bottom: 3px; font-style: italic; }
+.ita-q::before { content: 'Q\00A0'; font: 600 13px var(--font-caps); font-style: normal; color: var(--rubric); }
+.ita-a { font-size: 15.5px; }
+.ita-thread { font-family: var(--font-sans); font-size: 13.5px; color: var(--ink-3); margin-top: 4px; }
 
-.sr-card { border-left: 3px solid var(--teal); }
-.sr-pc { font-family: var(--font-heading); font-weight: 700; color: var(--teal); font-size: 17px; }
-.sr-cap { font-family: var(--font-caps); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 6px; }
-.sr-moment { font-size: 14px; margin-bottom: 4px; }
-.sr-hook { font-size: 13.5px; color: var(--header); font-style: italic; }
+.sr-pc { font-family: var(--font-heading); font-weight: 400; color: var(--ink); font-size: 20px; }
+.sr-cap { font-family: var(--font-caps); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--text-dim); margin-bottom: 6px; }
+.sr-moment { font-size: 15.5px; margin-bottom: 4px; }
+.sr-hook { font-size: 15px; color: var(--ink-2); font-style: italic; }
 
-.treasure-item { border-left: 3px solid var(--rule); font-size: 14px; }
+.treasure-item { font-size: 15.5px; }
 
-.taunt-card { border-left: 3px solid var(--purple); }
-.taunt-trigger { font-family: var(--font-caps); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-.taunt-target { font-family: var(--font-sans); font-size: 12px; color: var(--teal); margin-bottom: 4px; }
-.taunt-note { font-family: var(--font-sans); font-size: 12.5px; color: var(--orange); }
+.taunt-trigger { font-family: var(--font-caps); font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: .12em; }
+.taunt-target { font-family: var(--font-sans); font-size: 14px; color: var(--ink-2); margin-bottom: 4px; }
+.taunt-note { font-family: var(--font-sans); font-size: 14.5px; color: var(--ink-2); }
 
 .callback-option {
-  background: var(--readaloud-bg);
-  border: 1px solid var(--border);
-  padding: 8px 10px;
+  border-left: 1px solid var(--rule);
+  padding: 4px 0 4px 12px;
   margin: 6px 0;
-  font-size: 13.5px;
+  font-size: 15px;
 }
-.callback-option strong { color: var(--teal); }
+.callback-option strong { color: var(--ink); }
 
-.voice-card { border-left: 3px solid var(--blue); padding: 8px 12px; margin: 6px 0; }
-.voice-card .voice-name { font-family: var(--font-heading); font-weight: 700; color: var(--header); font-size: 16px; }
-.voice-card .voice-desc { font-size: 14px; font-style: italic; }
+.voice-card .voice-name { font-family: var(--font-heading); font-weight: 400; color: var(--ink); font-size: 19px; }
+.voice-card .voice-desc { font-size: 15.5px; font-style: italic; }
 
-.pr-item { border-left: 3px solid var(--blue); padding: 8px 28px 8px 12px; margin: 4px 0; font-size: 14px; }
-.pr-threshold { font-family: var(--font-caps); font-weight: 700; color: var(--blue); font-size: 12px; }
+.pr-item { font-size: 15.5px; padding-right: 28px; }
+.pr-threshold { font-family: var(--font-caps); font-weight: 600; color: var(--rubric); font-size: 13px; }
 .pr-reveals { margin-top: 2px; }
-.pr-pc-name { font-family: var(--font-caps); font-weight: 700; color: var(--teal); font-size: 12px; }
+.pr-pc-name { font-family: var(--font-caps); font-weight: 600; color: var(--ink-2); font-size: 13px; letter-spacing: .06em; }
 .pr-block { margin: 10px 0; }
 
-.cb-hazard { border-left: 3px solid var(--orange); padding-right: 28px; }
-.cb-hazard .cb-detail { font-size: 14px; }
-.cb-hazard .cb-impact { font-size: 13px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
-.cb-creature { border-top: 2px solid var(--red); margin: 10px 0 6px; }
-.cb-creature .cb-stats { font-family: var(--font-sans); font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
-.cb-creature .cb-impact { font-size: 13px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
-.cb-creature ul.plain li { font-size: 13px; padding: 2px 0; }
-.cb-ambig { border-left: 3px solid var(--purple); padding: 6px 28px 6px 10px; margin: 4px 0; font-size: 13px; }
-.cb-synergy { border-left: 3px solid var(--teal); padding: 8px 28px 8px 12px; margin: 6px 0; font-size: 13.5px; }
+.cb-hazard { padding-right: 28px; }
+.cb-hazard .cb-detail { font-size: 15.5px; }
+.cb-hazard .cb-impact, .cb-creature .cb-impact { font-size: 15px; color: var(--ink-2); margin-top: 4px; font-style: italic; }
+.cb-creature { border-top: 1px solid var(--ink); margin: 10px 0 6px; }
+.cb-creature .cb-stats { font-family: var(--font-sans); font-size: 14px; color: var(--ink-2); margin-bottom: 6px; }
+.cb-creature ul.plain li { font-size: 15px; padding: 2px 0; }
+.cb-ambig { padding-right: 28px; font-size: 15px; }
+.cb-synergy { padding-right: 28px; font-size: 15px; }
 
-/* ── Stat blocks: the classic tan PHB monster block ────────────────── */
+/* ── Stat strips: mechanics in the condensed face, never a tan card ─ */
 .stat-block {
-  background: var(--statblock-bg);
-  border-top: 4px solid var(--sb-bar);
-  border-bottom: 4px solid var(--sb-bar);
-  outline: 1px solid var(--text);
-  outline-offset: -5px;
-  padding: 14px 18px;
+  border-top: 1px solid var(--ink);
+  padding: 8px 0 6px;
   margin: 10px 0;
   font-family: var(--font-sans);
-  box-shadow: 1px 3px 8px var(--shadow);
 }
 .stat-block h3 {
   font-family: var(--font-heading);
-  color: var(--header);
+  color: var(--ink);
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 400;
   margin-bottom: 0;
   line-height: 1.1;
 }
-.stat-block .stat-sub, .rp-stat .stat-sub { font-size: 12px; color: var(--text-dim); font-style: italic; margin-bottom: 6px; }
-.stat-row { font-size: 13.5px; padding: 2px 0; }
-.stat-label { font-weight: 700; color: var(--header); }
+.stat-block .stat-sub, .rp-stat .stat-sub { font-size: 14px; color: var(--ink-2); font-style: italic; margin-bottom: 6px; }
+.stat-row { font-size: 15px; padding: 2px 0; }
+.stat-label { font-weight: 600; color: var(--rubric); }
 .stat-sec {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--header);
-  border-bottom: 1px solid var(--header);
-  margin: 6px 0 4px;
+  font-family: var(--font-caps);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  margin: 8px 0 4px;
 }
-.ability-scores { display: flex; gap: 12px; margin: 8px 0; text-align: center; }
+.ability-scores { display: flex; gap: 12px; margin: 8px 0; text-align: center; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 4px 0; }
 .ability-scores div { flex: 1; }
-.ability-scores .ab-name { font-family: var(--font-caps); font-size: 11px; font-weight: 700; color: var(--header); }
-.ability-scores .ab-val { font-size: 15px; font-weight: 700; }
-.ability-scores .ab-mod { font-size: 12px; color: var(--text-dim); }
-.stat-divider {
-  border: none;
-  height: 3px;
-  margin: 7px 0;
-  background: linear-gradient(to right, var(--red) 0%, var(--red) 60%, transparent 100%);
-  clip-path: polygon(0 0, 100% 50%, 0 100%);
-}
-.stat-summary { font-size: 17px; }
-.stat-cr { font-family: var(--font-sans); color: var(--text-dim); font-weight: 400; font-size: 12.5px; }
+.ability-scores .ab-name { font-family: var(--font-caps); font-size: 12px; font-weight: 600; letter-spacing: .1em; color: var(--rubric); }
+.ability-scores .ab-val { font-size: 16px; font-weight: 600; }
+.ability-scores .ab-mod { font-size: 13px; color: var(--text-dim); }
+.stat-divider { border: none; border-top: 1px solid var(--rule); margin: 7px 0; }
+.stat-summary { font-size: 18px; }
+.stat-cr { font-family: var(--font-sans); color: var(--text-dim); font-weight: 400; font-size: 14px; }
 
 /* ── General helpers ───────────────────────────────────────────────── */
-.kv { font-size: 14px; padding: 2px 0; }
-.kv .k { font-weight: 700; color: var(--header); }
+.kv { font-size: 15.5px; padding: 2px 0; }
+.kv .k, .k { font-family: var(--font-caps); font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--rubric); }
 .muted { color: var(--text-dim); }
 .badge {
   display: inline-block;
   font-family: var(--font-caps);
-  padding: 1px 7px;
-  border: 1px solid currentColor;
-  border-radius: 8px;
-  font-size: 10px;
-  font-weight: 700;
+  padding: 0;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  vertical-align: 1px;
+  letter-spacing: .14em;
+  vertical-align: 2px;
+  color: var(--ink-3);
 }
-.badge-combat { color: var(--red); }
-.badge-exploration { color: var(--blue); }
-.badge-puzzle { color: var(--purple); }
-.badge-social { color: var(--green); }
-.badge-safe { color: var(--green); font-size: 9px; margin-left: 6px; }
+.badge-combat { color: var(--rubric); }
+.badge-exploration, .badge-puzzle, .badge-social { color: var(--ink-3); }
+.badge-safe { color: var(--green); margin-left: 10px; }
+.badge-safe::before { content: '\2713\00A0'; }
 ul.plain { list-style: none; padding: 0; }
-ul.plain li { padding: 3px 0; font-size: 14px; }
-ul.plain li::before { content: '\2022'; margin-right: 8px; color: var(--rule); }
+ul.plain li { padding: 4px 0 4px 18px; font-size: 15.5px; position: relative; border-bottom: 1px dotted var(--rule); }
+ul.plain li:last-child { border-bottom: none; }
+ul.plain li::before { content: '\2022'; position: absolute; left: 2px; color: var(--rubric); }
 
-/* Location links in narrative text */
+/* Location links in running text: the NAME, underlined in rubric */
 .loc-link {
   display: inline;
+  position: relative;
   background: none;
   border: none;
-  padding: 0 1px;
-  color: var(--blue);
+  padding: 0;
+  color: var(--ink);
   font-size: inherit;
   font-family: inherit;
-  font-weight: 700;
+  font-style: inherit;
+  font-weight: inherit;
   cursor: pointer;
   text-decoration: underline;
-  text-decoration-style: dotted;
-  text-underline-offset: 2px;
+  text-decoration-color: var(--rubric);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
-.loc-link:hover { color: var(--header); text-decoration-style: solid; }
+.loc-link:hover { color: var(--rubric); }
+.loc-link.is-key { font-family: var(--font-caps); font-weight: 600; font-style: normal; color: var(--rubric); }
 
-/* Adaptation badge */
+/* Hover / focus / first-tap preview of a place */
+.place-tip {
+  position: fixed;
+  z-index: 200;
+  max-width: 320px;
+  padding: 8px 12px 9px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  font: 14.5px/1.4 var(--font-body);
+  font-style: normal;
+  color: var(--ink);
+  pointer-events: none;
+  display: none;
+}
+.place-tip.on { display: block; }
+.place-tip .tip-key { font: 600 12px var(--font-caps); letter-spacing: .14em; text-transform: uppercase; color: var(--rubric); }
+.place-tip .tip-name { font: 400 19px/1.15 var(--font-heading); margin: 1px 0 3px; }
+.place-tip .tip-sum { color: var(--ink-2); }
+.place-tip .tip-hint { margin-top: 4px; font: 12px var(--font-sans); color: var(--ink-3); }
+
+/* Adaptation marker: a quiet tag, not a pill */
 .adapt-badge {
   display: inline-block;
   font-family: var(--font-caps);
-  padding: 1px 7px;
-  border: 1px solid var(--teal);
-  border-radius: 8px;
-  font-size: 10px;
-  font-weight: 700;
+  padding: 0;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--teal);
-  margin-left: 8px;
-  vertical-align: 3px;
+  letter-spacing: .16em;
+  color: var(--ink-3);
+  margin-left: 10px;
+  vertical-align: 4px;
 }
-.sb-adapt { font-size: 10px; color: var(--teal); margin-left: 6px; vertical-align: middle; }
+.adapt-badge::before { content: '\2726\00A0'; color: var(--rubric); }
+.sb-adapt { font-size: 11px; color: var(--rubric); margin-left: 6px; vertical-align: middle; }
 
-/* ── Right panel ───────────────────────────────────────────────────── */
+/* ── Right panel: creatures here ───────────────────────────────────── */
 #right-panel {
   position: fixed;
   top: 0; right: 0;
-  width: 280px;
+  width: 290px;
   height: 100vh;
-  background: var(--statblock-bg);
+  background: var(--paper);
   border-left: 1px solid var(--rule);
   overflow-y: auto;
   z-index: 10;
   display: none;
+  padding: 0 18px;
 }
 #right-panel.visible { display: block; }
 .rp-title {
   font-family: var(--font-caps);
   font-size: 11px;
-  font-weight: 700;
-  color: var(--header);
+  font-weight: 600;
+  color: var(--ink-3);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  padding: 12px 16px 8px;
-  border-bottom: 2px solid var(--sb-bar);
+  letter-spacing: .18em;
+  padding: 14px 0 8px;
   position: sticky;
   top: 0;
-  background: var(--statblock-bg);
+  background: var(--paper);
+  background-image: var(--tooth);
   z-index: 1;
 }
-.rp-stat { padding: 12px 14px; border-bottom: 2px solid var(--sb-bar); font-family: var(--font-sans); }
-.rp-stat h3 { font-family: var(--font-heading); color: var(--header); font-size: 18px; font-weight: 700; margin-bottom: 1px; line-height: 1.1; }
-.rp-stat .stat-row { font-size: 12px; padding: 2px 0; }
-.rp-stat .stat-sec { font-size: 15px; margin: 4px 0 3px; }
+.rp-stat { padding: 8px 0 12px; border-top: 1px solid var(--ink); font-family: var(--font-sans); }
+.rp-stat h3 { font-family: var(--font-heading); color: var(--ink); font-size: 20px; font-weight: 400; margin-bottom: 1px; line-height: 1.12; }
+.rp-stat .stat-row { font-size: 14px; padding: 2px 0; }
+.rp-stat .stat-sec { font-size: 11px; margin: 6px 0 3px; }
 .rp-stat .ability-scores { display: flex; gap: 4px; margin: 6px 0; text-align: center; }
 .rp-stat .ability-scores div { flex: 1; }
-.rp-stat .ability-scores .ab-name { font-size: 9px; }
-.rp-stat .ability-scores .ab-val { font-size: 13px; font-weight: 700; }
-.rp-stat .ability-scores .ab-mod { font-size: 10px; }
-.rp-stat .stat-divider { height: 2px; margin: 5px 0; }
+.rp-stat .ability-scores .ab-name { font-size: 11px; }
+.rp-stat .ability-scores .ab-val { font-size: 14px; font-weight: 600; }
+.rp-stat .ability-scores .ab-mod { font-size: 12px; }
+.rp-stat .stat-divider { margin: 5px 0; }
 
 /* ── Scrollbar ─────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 9px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: var(--rule); }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
-/* ── Mark-as-used (tuned for parchment: fade to pencil-check) ──────── */
+/* ── Mark-as-used: struck through in pencil, ticked in green ───────── */
 .markable {
   position: relative;
   cursor: pointer;
-  transition: opacity 0.15s, filter 0.15s;
 }
 .markable:hover::after {
   content: '\2713';
   position: absolute;
-  top: 6px; right: 8px;
+  top: 6px; right: 0;
   color: var(--text-dim);
   font-size: 14px;
   font-weight: 700;
-  opacity: 0.45;
   pointer-events: none;
 }
 .markable.marked {
-  opacity: 0.55;
-  filter: grayscale(0.5) sepia(0.15);
+  color: var(--ink-3);
   text-decoration: line-through;
   text-decoration-color: var(--green);
   text-decoration-thickness: 1px;
@@ -699,73 +750,63 @@ ul.plain li::before { content: '\2022'; margin-right: 8px; color: var(--rule); }
 .markable.marked::after {
   content: '\2713 used';
   position: absolute;
-  top: 6px; right: 8px;
-  background: var(--green);
-  color: var(--statblock-bg);
+  top: 6px; right: 0;
+  color: var(--green);
   font-family: var(--font-caps);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
   text-decoration: none;
-  letter-spacing: 0.5px;
+  letter-spacing: .1em;
   text-transform: uppercase;
-  opacity: 1;
   pointer-events: none;
 }
-.markable.marked:hover::after {
-  content: '\2713 used \2022 click to unmark';
-  opacity: 1;
-}
-.markable .loc-link { position: relative; z-index: 2; }
+.markable.marked:hover::after { content: '\2713 used \2022 click to unmark'; }
+.markable .loc-link { z-index: 2; }
 
-/* ── Scene divider (WBtW linked scenes) ────────────────────────────── */
+/* ── Scene divider (linked scenes) ─────────────────────────────────── */
 .scene-divider {
-  border-top: 2px solid var(--rule);
-  margin: 22px 0 10px;
-  padding-top: 10px;
+  border-top: 2px solid var(--ink);
+  margin: 30px 0 8px;
+  padding-top: 8px;
   font-family: var(--font-heading);
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--header);
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--ink);
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: baseline;
+  gap: 12px;
 }
 
 /* ── Continuity briefing (top of scene view) ───────────────────────── */
 .continuity-briefing {
-  background: var(--readaloud-bg);
-  border: 1px solid var(--rule);
-  border-left: 3px solid var(--header);
-  padding: 12px 16px;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 10px 0;
   margin-bottom: 16px;
-  font-size: 14px;
-  box-shadow: 0 1px 3px var(--shadow);
+  font-size: 15.5px;
 }
-.continuity-briefing h3 { font-family: var(--font-heading); color: var(--header); font-size: 17px; margin-bottom: 6px; }
+.continuity-briefing h3 { font-family: var(--font-heading); font-weight: 400; color: var(--ink); font-size: 21px; margin-bottom: 6px; }
 .continuity-briefing .cb-kv { margin: 4px 0; }
-.continuity-briefing .cb-kv .k { font-weight: 700; color: var(--header); }
 
 /* ── Clear-marks button ────────────────────────────────────────────── */
 #clear-marks-btn {
   display: block;
-  width: calc(100% - 24px);
-  margin: 8px 12px 4px;
+  width: calc(100% - 36px);
+  margin: 8px 18px 4px;
   background: none;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
   font-family: var(--font-caps);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
   padding: 6px 10px;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: border-color 0.15s, color 0.15s;
+  letter-spacing: .14em;
 }
-#clear-marks-btn:hover { border-color: var(--red); color: var(--red); }
-#clear-marks-btn.empty { opacity: 0.4; cursor: default; }
-#clear-marks-btn.empty:hover { border-color: var(--border); color: var(--text-dim); }
+#clear-marks-btn:hover { border-color: var(--rubric); color: var(--rubric); }
+#clear-marks-btn.empty { color: var(--ink-3); cursor: default; }
+#clear-marks-btn.empty:hover { border-color: var(--rule); color: var(--ink-3); }
 
 /* ── Play mode: declutter location/scene views at the table ────────────
    Renderers stamp data-play="keep" on sections that matter mid-session
@@ -774,13 +815,13 @@ ul.plain li::before { content: '\2022'; margin-right: 8px; color: var(--rule); }
 body[data-play-mode="on"] #main[data-view-kind="location"] details:not([data-play="keep"]),
 body[data-play-mode="on"] #main[data-view-kind="scene"] details:not([data-play="keep"]) { display: none; }
 body[data-play-mode="on"] #main[data-view-kind="location"] .read-aloud,
-body[data-play-mode="on"] #main[data-view-kind="scene"] .read-aloud { font-size: 18px; line-height: 1.65; }
+body[data-play-mode="on"] #main[data-view-kind="scene"] .read-aloud { font-size: 20px; line-height: 1.65; }
 
 /* ── Command palette (Ctrl+K) ──────────────────────────────────────── */
 #palette-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(25, 15, 5, 0.45);
+  background: rgba(30, 22, 12, 0.40);
   z-index: 100;
   display: none;
 }
@@ -790,23 +831,21 @@ body[data-play-mode="on"] #main[data-view-kind="scene"] .read-aloud { font-size:
   top: 12vh;
   left: 50%;
   transform: translateX(-50%);
-  width: min(560px, 90vw);
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  outline: 1px solid var(--border);
-  outline-offset: 3px;
-  box-shadow: 0 10px 30px var(--shadow);
+  width: min(580px, 92vw);
+  background: var(--paper);
+  border: 1px solid var(--ink);
 }
 #palette-input {
   width: 100%;
-  background: var(--readaloud-bg);
+  background: var(--paper);
   border: none;
-  border-bottom: 2px solid var(--rule);
+  border-bottom: 2px solid var(--ink);
   padding: 12px 16px;
-  font-family: var(--font-sans);
-  font-size: 16px;
+  font-family: var(--font-body);
+  font-size: 18px;
   color: var(--text);
 }
+#palette-input::placeholder { color: var(--ink-3); }
 #palette-input:focus { outline: none; }
 #palette-results {
   list-style: none;
@@ -818,29 +857,31 @@ body[data-play-mode="on"] #main[data-view-kind="scene"] .read-aloud { font-size:
 #palette-results li {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 12px;
   padding: 7px 16px;
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 15px;
 }
-#palette-results li.sel { background: var(--surface2); box-shadow: inset 3px 0 0 var(--header); }
-#palette-results li:hover { background: var(--surface2); }
+#palette-results li.sel { background: var(--wash); box-shadow: inset 3px 0 0 var(--rubric); }
+#palette-results li:hover { background: var(--paper-2); }
 .pal-kind {
   font-family: var(--font-caps);
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--header);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0 6px;
+  letter-spacing: .14em;
+  color: var(--rubric);
+  min-width: 72px;
   flex-shrink: 0;
 }
 .pal-label { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pal-parent { color: var(--text-dim); font-size: 12px; margin-left: auto; flex-shrink: 0; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pal-empty { padding: 10px 16px; color: var(--text-dim); font-style: italic; font-size: 13px; font-family: var(--font-sans); }
+.pal-parent { color: var(--text-dim); font-size: 13px; margin-left: auto; flex-shrink: 0; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pal-empty { padding: 10px 16px; color: var(--text-dim); font-style: italic; font-size: 14px; font-family: var(--font-sans); }
+
+/* ── Improvised place page ─────────────────────────────────────────── */
+.improv-note { font: 14.5px var(--font-sans); color: var(--ink-2); margin: 8px 0 16px; }
+.improv-note::before { content: '\261E\00A0'; color: var(--rubric); }
 </style>
 </head>
 <body>
@@ -1128,16 +1169,23 @@ function launchDashboard() {
   document.getElementById('load-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
   loadPlayMode();
+  buildPlaceMeta();
   buildSidebar();
   buildSearchIndex();
-  const defaultView = (adaptation && adaptation.continuityBriefing)
-    ? 'ref-pickup'
-    : Object.keys(source.locations)[0];
-  navigate(defaultView);
+  const restoring = pendingView !== null;
+  const start = restoring && isKnownView(pendingView) ? pendingView : defaultView();
+  pendingView = null;
+  navigate(start, { history: restoring ? 'replace' : 'push-first' });
 }
 
-function returnToMenu() {
+function defaultView() {
+  return (adaptation && adaptation.continuityBriefing) ? 'ref-pickup' : Object.keys(placeMeta)[0];
+}
+
+function returnToMenu(fromHistory) {
   closePalette();
+  hideTip();
+  if (!fromHistory) history.pushState(null, '', location.pathname + location.search);
   source = null;
   adaptation = null;
   currentView = null;
@@ -1149,26 +1197,84 @@ function returnToMenu() {
   document.getElementById('load-error').textContent = '';
 }
 
-// Init dropdowns on load
+// ===================== HISTORY =====================
+// Every view change is a browser history entry (#adventure/adaptation/view),
+// so Back/Forward walk the dashboard and a reload reopens the same page.
+let pendingView = null;
+let navDepth = 0;
+function viewHash(view) {
+  return '#' + [currentAdventureId, currentAdaptationId || '-', view].map(encodeURIComponent).join('/');
+}
+function parseHash() {
+  const parts = location.hash.slice(1).split('/').map(decodeURIComponent);
+  if (parts.length !== 3 || !parts[0]) return null;
+  return { adv: parts[0], ad: parts[1] === '-' ? '' : parts[1], view: parts[2] };
+}
+function restoreFromHash() {
+  const h = parseHash();
+  if (!h || !(window.ADVENTURES_MANIFEST || []).some(a => a.id === h.adv)) return false;
+  document.getElementById('adventureSelect').value = h.adv;
+  onAdventureChange();
+  document.getElementById('adaptationSelect').value = h.ad;
+  pendingView = h.view;
+  launchSelected();
+  return true;
+}
+window.addEventListener('popstate', (e) => {
+  const st = e.state;
+  if (!st || !st.aa) {
+    if (source) returnToMenu(true);
+    return;
+  }
+  if (!source || st.adv !== currentAdventureId || (st.ad || null) !== currentAdaptationId) {
+    restoreFromHash();
+    return;
+  }
+  navDepth = st.depth || 0;
+  navigate(st.view, { history: 'none' });
+});
+function isKnownView(view) {
+  return !!(view && (placeMeta[view] || view === 'ref-pickup'
+    || (source.triggerScenes && source.triggerScenes.some(t => t.id === view))
+    || referencePages().some(([id]) => id === view)));
+}
+
+// Init dropdowns on load, then reopen the page a reload or bookmark points at
 populateDropdowns();
+restoreFromHash();
 
 // ===================== SIDEBAR =====================
 function buildSidebar() {
   const sb = document.getElementById('sidebar');
   let html = `<div class="sb-title">${esc(source.meta.title)}</div>`;
-  if (adaptation) {
-    html += `<div style="font-size:11px;color:var(--teal);padding:2px 16px 6px">${esc(adaptation.campaign)} adaptation</div>`;
-  } else {
-    html += `<div style="font-size:11px;color:var(--text-dim);padding:2px 16px 6px">Generic (no adaptation)</div>`;
-  }
-  html += `<button class="sb-item" style="color:var(--text-dim);font-size:11px;padding:4px 16px 8px" onclick="returnToMenu()">← Change Adventure</button>`;
+  html += `<div class="sb-sub">${adaptation ? esc(adaptation.campaign) + ' adaptation' : 'Generic (no adaptation)'}</div>`;
+  html += `<button class="sb-item sb-back" onclick="returnToMenu()">← Change adventure</button>`;
   if (adaptation && adaptation.continuityBriefing) {
     html += `<div class="sb-section">Tonight</div>`;
-    html += `<button class="sb-item" data-view="ref-pickup"><span class="sb-name">Tonight <span class="sb-adapt">✦</span></span></button>`;
+    html += `<button class="sb-item" data-view="ref-pickup"><span class="sb-id">${partyAt() ? '&#9670;' : ''}</span><span class="sb-name">Tonight</span></button>`;
   }
-  html += `<div class="sb-section">Locations</div>`;
-  for (const [id, loc] of Object.entries(source.locations)) {
-    html += `<button class="sb-item" data-view="${id}"><span class="sb-id">${id}</span><span class="sb-name">${esc(loc.name)}</span></button>`;
+  // Locations, grouped by level when the keys carry one; each source room is
+  // followed by the improvised places the table made under it.
+  const sbPlace = id => {
+    const m = placeMeta[id];
+    const party = partyAt() === id ? '<span class="sb-party">&#9670; party</span>' : '';
+    return `<button class="sb-item${m.improvised ? ' sb-improvised' : ''}" data-view="${esc(id)}"><span class="sb-id">${esc(m.key)}</span><span class="sb-name">${esc(m.name)}</span>${party}</button>`;
+  };
+  const imp = improvisedLocations();
+  const children = parentId => Object.keys(imp).filter(i => imp[i].parent === parentId);
+  const groups = new Map();
+  const anyGroup = Object.values(placeMeta).some(m => m.group && !m.improvised);
+  for (const id of Object.keys(source.locations)) {
+    if (!placeMeta[id]) continue;
+    const g = placeMeta[id].group || (anyGroup ? 'Elsewhere' : 'Locations');
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g).push(id, ...children(id));
+  }
+  const strays = Object.keys(imp).filter(i => !source.locations[imp[i].parent]);
+  if (strays.length) groups.set('Improvised', strays);
+  for (const [g, ids] of groups) {
+    html += `<div class="sb-section">${esc(g)}</div>`;
+    for (const id of ids) html += sbPlace(id);
   }
   if (source.triggerScenes && source.triggerScenes.length) {
     html += `<hr class="sb-divider">`;
@@ -1235,28 +1341,44 @@ function locSceneIds(loc) {
 function unplacedScenes() {
   const linked = new Set(Object.values(source.locations).flatMap(locSceneIds));
   const scenes = Object.entries(source.scenes || {}).filter(([sid]) => !linked.has(sid));
-  const known = sid => source.locations[sid] || (source.scenes && source.scenes[sid])
+  const known = sid => source.locations[sid] || isImprovised(sid) || (source.scenes && source.scenes[sid])
     || (source.triggerScenes && source.triggerScenes.some(t => t.id === sid));
   const orphans = Object.keys((adaptation && adaptation.scenes) || {}).filter(sid => !known(sid));
   return { scenes, orphans };
 }
 
-function navigate(view) {
+// opts.history: 'push' (default; only when the view changes), 'push-first'
+// (launch: the entry right after the menu), 'replace' (restoring a reload),
+// 'none' (Back/Forward already moved the history).
+function navigate(view, opts) {
+  const mode = (opts && opts.history) || 'push';
+  const prev = currentView;
+  if (mode === 'push-first' || mode === 'replace') navDepth = 0;
+  else if (mode === 'push' && view !== prev) navDepth++;
+  const st = { aa: 1, adv: currentAdventureId, ad: currentAdaptationId, view, prev: navDepth ? prev : null, depth: navDepth };
+  if (mode === 'replace') history.replaceState(st, '', viewHash(view));
+  else if (mode === 'push-first' || (mode === 'push' && view !== prev)) history.pushState(st, '', viewHash(view));
   currentView = view;
+  hideTip();
   // Update sidebar active
   document.querySelectorAll('.sb-item').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   // Render (+ stamp the view kind so play-mode CSS only filters location/scene views)
   const main = document.getElementById('main');
+  let body = '';
   if (source.locations[view]) {
     main.dataset.viewKind = 'location';
-    main.innerHTML = renderLocation(view);
+    body = renderLocation(view);
+  } else if (isImprovised(view)) {
+    main.dataset.viewKind = 'location';
+    body = renderImprovised(view);
   } else if (source.triggerScenes && source.triggerScenes.find(t => t.id === view)) {
     main.dataset.viewKind = 'scene';
-    main.innerHTML = renderTriggerScene(view);
+    body = renderTriggerScene(view);
   } else if (view.startsWith('ref-')) {
     main.dataset.viewKind = 'ref';
-    main.innerHTML = renderReference(view);
+    body = renderReference(view);
   }
+  main.innerHTML = renderRunHead(view) + body;
   main.scrollTop = 0;
   window.scrollTo(0, 0);
   updateRightPanel(view);
@@ -1276,17 +1398,20 @@ function buildSearchIndex() {
   if (adaptation && adaptation.continuityBriefing) {
     searchIndex.push({ kind: 'Tonight', label: 'Tonight', parent: 'Session pickup', view: 'ref-pickup', alt: 'session pickup resume tonight briefing' });
   }
-  for (const [id, loc] of Object.entries(source.locations)) {
-    searchIndex.push({ kind: 'Location', label: `${id}: ${loc.name}`, parent: loc.summary || '', view: id, alt: `${id} ${loc.name} ${loc.summary || ''}` });
+  for (const [id, m] of Object.entries(placeMeta)) {
+    const label = `${m.key ? m.key + ' ' : ''}${m.name}`;
+    searchIndex.push({ kind: m.improvised ? 'Improvised' : 'Location', label, parent: m.summary, view: id, alt: `${id} ${m.name} ${m.summary}` });
+    const loc = source.locations[id];
+    if (!loc) continue;
     const pois = loc.pointsOfInterest ? Object.values(loc.pointsOfInterest) : [];
     for (const poi of pois) {
-      if (poi.name) searchIndex.push({ kind: 'POI', label: poi.name, parent: `${id}: ${loc.name}`, view: id, alt: poi.type || '' });
+      if (poi.name) searchIndex.push({ kind: 'POI', label: poi.name, parent: label, view: id, alt: poi.type || '' });
     }
     if (source.scenes) {
       const sceneIds = locSceneIds(loc);
       for (const sid of sceneIds) {
         const sc = source.scenes[sid];
-        if (sc) searchIndex.push({ kind: 'Scene', label: sc.title || sid, parent: `${id}: ${loc.name}`, view: id, alt: `${sid} ${sc.summary || ''}` });
+        if (sc) searchIndex.push({ kind: 'Scene', label: sc.title || sid, parent: label, view: id, alt: `${sid} ${sc.summary || ''}` });
       }
     }
   }
@@ -1428,21 +1553,22 @@ function renderLocation(id) {
 
   // Header
   h += `<div class="room-header">`;
-  h += `<h1>${id}: ${esc(loc.name)}</h1>`;
-  h += `<div class="room-meta">${typeBadge(loc.type)} ${esc(loc.summary)}`;
+  h += `<div class="room-key">${esc([placeKey(id), placeMeta[id].group, loc.type].filter(Boolean).join(' · '))}</div>`;
+  h += `<h1>${esc(placeName(id))}</h1>`;
+  h += `<div class="room-meta">${esc(loc.summary)}`;
   if (loc.safeRest) h += `<span class="badge badge-safe">Safe Rest</span>`;
-  h += `</div></div>`;
+  h += `</div>${partyLine(id)}</div>`;
 
   // Session State (adaptation — per-scene pickup status)
   h += renderSessionState(adpt);
 
   // Connections (top)
-  h += renderConnections(loc.connections, 'From here');
+  h += renderConnections(exitsFor(id, loc.connections), 'From here');
 
   // Read Aloud
   const locRaArr = Array.isArray(loc.readAloud) ? loc.readAloud : (loc.readAloud ? [loc.readAloud] : []);
   if (locRaArr.length) {
-    h += `<details${PLAY_KEEP}>${summaryWithPreview('Read Aloud', { preview: snip(locRaArr[0], 90) })}<div class="section-body">`;
+    h += `<details open${PLAY_KEEP}>${summaryWithPreview('Read Aloud', { preview: snip(locRaArr[0], 90) })}<div class="section-body">`;
     if (loc.readAloudCondition) h += `<div class="dm-note" style="margin-bottom:8px;border-top:none;padding-top:0">${esc(loc.readAloudCondition)}</div>`;
     for (const ra of locRaArr) h += `<div class="read-aloud">${esc(ra)}</div>`;
     h += `</div></details>`;
@@ -1458,7 +1584,7 @@ function renderLocation(id) {
   // Encounters
   if (loc.encounters && loc.encounters.length) {
     const encPreview = loc.encounters.map(e => e.name || e.title || '').filter(Boolean).slice(0,3).join(', ');
-    h += `<details${PLAY_KEEP}>${summaryWithPreview('Encounters', { preview: encPreview || `${loc.encounters.length} encounter${loc.encounters.length===1?'':'s'}` })}<div class="section-body">`;
+    h += `<details open${PLAY_KEEP}>${summaryWithPreview('Encounters', { preview: encPreview || `${loc.encounters.length} encounter${loc.encounters.length===1?'':'s'}` })}<div class="section-body">`;
     for (const enc of loc.encounters) h += renderEncounter(enc);
     h += `</div></details>`;
   }
@@ -1584,7 +1710,7 @@ function renderLocation(id) {
   }
 
   // Connections (bottom)
-  h += renderConnections(loc.connections, 'Exits');
+  h += renderConnections(exitsFor(id, loc.connections), 'Exits');
 
   return h;
 }
@@ -1603,7 +1729,7 @@ function renderWBtWScene(sceneId, scene) {
   // Read Aloud (source)
   const raArr = Array.isArray(scene.readAloud) ? scene.readAloud : (scene.readAloud ? [scene.readAloud] : []);
   if (raArr.length) {
-    h += `<details${PLAY_KEEP}>${summaryWithPreview('Read Aloud', { preview: snip(raArr[0], 90) })}<div class="section-body">`;
+    h += `<details open${PLAY_KEEP}>${summaryWithPreview('Read Aloud', { preview: snip(raArr[0], 90) })}<div class="section-body">`;
     for (const ra of raArr) h += `<div class="read-aloud">${esc(ra)}</div>`;
     h += `</div></details>`;
   }
@@ -1778,7 +1904,7 @@ function renderTriggerScene(id) {
 
   // Preamble
   if (scene.preamble && scene.preamble.length) {
-    h += `<details${PLAY_KEEP}><summary>Preamble (Read Aloud)</summary><div class="section-body">`;
+    h += `<details open${PLAY_KEEP}><summary>Preamble (Read Aloud)</summary><div class="section-body">`;
     for (const p of scene.preamble) h += `<div class="read-aloud">${esc(p)}</div>`;
     if (scene.suggestedLocations) h += `<div class="kv"><span class="k">Suggested locations:</span> ${scene.suggestedLocations.join(', ')}</div>`;
     h += `</div></details>`;
@@ -1786,7 +1912,7 @@ function renderTriggerScene(id) {
 
   // Creatures
   if (scene.creatures && scene.creatures.length) {
-    h += `<details${PLAY_KEEP}><summary>Creatures</summary><div class="section-body">`;
+    h += `<details open${PLAY_KEEP}><summary>Creatures</summary><div class="section-body">`;
     h += `<ul class="creature-list">`;
     for (const c of scene.creatures) {
       const name = source.bestiary[c.id] ? source.bestiary[c.id].name : c.id;
@@ -1864,7 +1990,7 @@ function renderSessionState(adpt) {
   if (!adpt || !adpt.sessionState) return '';
   const ss = adpt.sessionState;
   const ssPreview = ss.status ? snip(ss.status, 90) : '';
-  let h = `<details${PLAY_KEEP}>${summaryWithPreview('Session State', { adapted: true, preview: ssPreview })}<div class="section-body">`;
+  let h = `<details open${PLAY_KEEP}>${summaryWithPreview('Session State', { adapted: true, preview: ssPreview })}<div class="section-body">`;
   if (ss.status) h += `<div class="kv"><span class="k">Status:</span> ${linkText(ss.status)}</div>`;
   if (ss.enteredVia) h += `<div class="kv"><span class="k">Entered via:</span> ${linkText(ss.enteredVia)}</div>`;
   if (ss.narrative) h += `<div style="margin-top:6px">${paraText(ss.narrative)}</div>`;
@@ -2064,7 +2190,10 @@ function renderReference(view) {
 // without renderer edits.
 function renderSessionPickup() {
   const cb = adaptation && adaptation.continuityBriefing;
-  let h = `<div class="room-header"><h1>Tonight</h1><div class="room-meta">Resume state after last session${cb && cb.lastSessionDate ? ' · ' + esc(cb.lastSessionDate) : ''}</div></div>`;
+  const at = partyAt();
+  let h = `<div class="room-header"><div class="room-key">${cb && cb.lastSessionDate ? 'Last played ' + esc(cb.lastSessionDate) : 'Session pickup'}</div><h1>Tonight</h1><div class="room-meta">Where the table stopped, and what comes next.</div>`;
+  if (at) h += `<div class="party-here"><span class="lab">&#9670; Party at</span><span>${placeKey(at) ? `<span class="conn-id">${esc(placeKey(at))}</span> ` : ''}${placeLink(at, placeName(at))}${placeMeta[at] && placeMeta[at].improvised ? ' <span class="muted">(improvised)</span>' : ''}</span></div>`;
+  h += `</div>`;
   if (!cb) return h + '<p>No continuity briefing on this adaptation.</p>';
   const handled = new Set(['lastSessionDate']);
   const section = (key, label, body, opts) => {
@@ -2522,10 +2651,11 @@ function renderConnections(connections, label) {
   let h = `<div class="sub-label" style="color:var(--text-dim);margin-bottom:4px">${esc(label)}</div>`;
   h += `<div class="connections">`;
   for (const [targetId, info] of Object.entries(connections)) {
-    const targetName = getLocationName(targetId);
-    h += `<button class="conn-btn" data-target="${targetId}" style="flex-direction:column;align-items:flex-start;gap:2px">`;
-    h += `<div><span class="conn-id">${esc(targetId)}</span> ${esc(targetName)}${info.via ? `<span class="conn-via"> ${esc(info.via)}</span>` : ''}</div>`;
-    if (info.note) h += `<div class="conn-note" style="font-size:11px">${esc(info.note)}</div>`;
+    const key = placeKey(targetId);
+    const party = partyAt() === targetId ? ' <span class="sb-party">&#9670; party</span>' : '';
+    h += `<button class="conn-btn" data-target="${esc(targetId)}" style="flex-direction:column;align-items:flex-start;gap:2px">`;
+    h += `<div>${key ? `<span class="conn-id">${esc(key)}</span> ` : ''}<span class="conn-name">${esc(placeName(targetId))}</span>${info.via ? `<span class="conn-via"> ${esc(info.via)}</span>` : ''}${party}</div>`;
+    if (info.note) h += `<div class="conn-note">${esc(namesText(info.note))}</div>`;
     h += `</button>`;
   }
   h += `</div>`;
@@ -2592,7 +2722,7 @@ function renderPOI(poi) {
   let h = `<div class="poi-card"><h4>${esc(poi.name)}</h4>`;
   if (poi.type) h += `<div class="poi-type">${esc(poi.type)}</div>`;
   if (poi.description) h += `<p style="font-size:13px">${linkText(poi.description)}</p>`;
-  if (poi.leadsTo) h += `<div class="kv"><span class="k">Leads to:</span> <button class="loc-link" onclick="navigate('${poi.leadsTo}')">${esc(poi.leadsTo)}</button> ${esc(getLocationName(poi.leadsTo))}</div>`;
+  if (poi.leadsTo) h += `<div class="kv"><span class="k">Leads to:</span> ${placeLink(poi.leadsTo, placeName(poi.leadsTo))}</div>`;
   if (poi.interaction) h += `<div class="kv"><span class="k">Interaction:</span> ${linkText(poi.interaction)}</div>`;
   if (poi.motivation) h += `<div class="kv"><span class="k">Motivation:</span> ${linkText(poi.motivation)}</div>`;
   if (poi.offers && poi.offers.length) {
@@ -2673,18 +2803,227 @@ function updateRightPanel(view) {
   main.style.marginRight = '280px';
 }
 
-// ===================== HELPERS =====================// ===================== HELPERS =====================
+// ===================== PLACES: keys, names, improvised places, party =====================
+// Locations show book-style keys ("12·2", "V3", "D1") and clean names instead
+// of raw ids. Improvised places (state layer `improvisedLocations`) are rooms
+// the table made that the source doesn't have; each hangs under its nearest
+// source location and takes its key plus a letter ("12·1a"). `partyAt` (state
+// layer) names where the party is: a source location or an improvised id.
+let placeMeta = {};
+let sceneHome = {};   // source scene id -> the location page that renders it
+function improvisedLocations() { return (adaptation && adaptation.improvisedLocations) || {}; }
+function isImprovised(id) { return Object.prototype.hasOwnProperty.call(improvisedLocations(), id); }
+function partyAt() {
+  const p = adaptation && adaptation.partyAt;
+  return p && (source.locations[p] || isImprovised(p)) ? p : null;
+}
+function buildPlaceMeta() {
+  placeMeta = {};
+  const perLevel = {};
+  for (const [id, loc] of Object.entries(source.locations)) {
+    if (!loc || typeof loc !== 'object' || !loc.name) continue;
+    let name = loc.name, key = '', group = '';
+    const prefixed = name.match(/^([A-Z]{1,3}\d+[a-z]?)\.\s+(.+)$/);           // "D1. Channel"
+    const level = name.match(/\(Level (\d+)\)\s*$/) || id.match(/^L_l(\d+)_/);  // "(Level 12)" / L_l12_…
+    if (/^[A-Z]{1,3}\d+[a-z]?$/.test(id)) key = id;                             // V3, T2 are book keys already
+    else if (prefixed) { key = prefixed[1]; name = prefixed[2]; }
+    else if (level) {
+      group = `Level ${level[1]}`;
+      perLevel[group] = (perLevel[group] || 0) + 1;
+      key = `${level[1]}·${perLevel[group]}`;
+      name = name.replace(/\s*\(Level \d+\)\s*$/, '');
+    }
+    placeMeta[id] = { key, name, group, summary: loc.summary || '' };
+  }
+  sceneHome = {};
+  for (const id of Object.keys(placeMeta)) {
+    for (const sid of locSceneIds(source.locations[id])) if (!sceneHome[sid]) sceneHome[sid] = id;
+  }
+  const letters = {};
+  for (const [id, p] of Object.entries(improvisedLocations())) {
+    const parent = placeMeta[p.parent];
+    letters[p.parent] = (letters[p.parent] || 0) + 1;
+    const derived = parent && parent.key ? parent.key + String.fromCharCode(96 + letters[p.parent]) : '';
+    placeMeta[id] = { key: p.key || derived, name: p.name || id, group: parent ? parent.group : '',
+      summary: p.summary || '', improvised: true, parent: p.parent };
+  }
+}
+function placeName(id) { return placeMeta[id] ? placeMeta[id].name : getLocationName(id); }
+function placeKey(id) { return placeMeta[id] ? placeMeta[id].key : ''; }
+
+// A navigable mention of a place. Short ids that are book keys (V3) keep the
+// key, so "V3 (War Room)" still reads right; long ids show the place's name.
+function placeLink(id, label) {
+  const asKey = !label && placeKey(id) === id;
+  const text = label || (asKey ? id : placeName(id));
+  return `<button class="loc-link${asKey ? ' is-key' : ''}" data-view="${esc(id)}">${esc(text)}</button>`;
+}
+
+// Every id prose can mention: places (source + improvised), trigger events,
+// and source scenes (which render under the room in sceneHome).
+function mentionPattern() {
+  if (!source || !source.locations) return null;
+  const triggerIds = source.triggerScenes ? source.triggerScenes.map(t => t.id) : [];
+  const sceneIds = source.scenes ? Object.keys(source.scenes) : [];
+  const allIds = [...Object.keys(placeMeta), ...triggerIds, ...sceneIds];
+  if (!allIds.length) return null;
+  return new RegExp(`\\b(${allIds.map(id => id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'g');
+}
+function sceneTitle(id) {
+  const sc = source.scenes && source.scenes[id];
+  return (sc && sc.title) || id;
+}
+
 function linkText(str) {
   if (str === null || str === undefined) return '';
   const s = esc(str);
-  if (!source || !source.locations) return s;
-  const locIds = Object.keys(source.locations);
-  const triggerIds = source.triggerScenes ? source.triggerScenes.map(t => t.id) : [];
-  const allIds = [...locIds, ...triggerIds];
-  if (!allIds.length) return s;
-  const pattern = new RegExp(`\\b(${allIds.map(id => id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'g');
-  return s.replace(pattern, id => `<button class="loc-link" onclick="navigate('${id}')">${id}</button>`);
+  const pattern = mentionPattern();
+  if (!pattern) return s;
+  return s.replace(pattern, id => {
+    if (!(source.scenes && source.scenes[id]) || placeMeta[id]) return placeLink(id);
+    return sceneHome[id] ? placeLink(sceneHome[id], sceneTitle(id)) : esc(sceneTitle(id));   // a scene: its title, linking to its room
+  });
 }
+
+// Plain-text version for previews and other unlinked text: ids become names.
+function namesText(str) {
+  if (str === null || str === undefined) return '';
+  const pattern = mentionPattern();
+  if (!pattern) return String(str);
+  return String(str).replace(pattern, id => (source.scenes && source.scenes[id] && !placeMeta[id])
+    ? sceneTitle(id) : (placeKey(id) === id ? id : placeName(id)));
+}
+
+// "◆ Party here" under a page title; on a parent room, points at the improvised
+// place the party is in.
+function partyLine(id) {
+  const at = partyAt();
+  if (!at) return '';
+  if (at === id) return `<div class="party-here"><span class="lab">&#9670; Party here</span><span>${esc(snip((adaptation.continuityBriefing && adaptation.continuityBriefing.whatTheyAreDoing) || '', 160))}</span></div>`;
+  if (placeMeta[at] && placeMeta[at].parent === id) return `<div class="party-here"><span class="lab">&#9670; Party nearby</span><span>${placeLink(at, placeName(at))}: ${esc(placeMeta[at].summary)}</span></div>`;
+  return '';
+}
+
+// Exits from a room, plus the improvised places the table made under it.
+function exitsFor(id, connections) {
+  const out = Object.assign({}, connections || {});
+  for (const [iid, p] of Object.entries(improvisedLocations())) {
+    if (p.parent === id && !out[iid]) out[iid] = { via: 'improvised', note: p.summary ? snip(p.summary, 110) : '' };
+  }
+  return out;
+}
+
+// An improvised place's page: same section language as a source room.
+function renderImprovised(id) {
+  const p = improvisedLocations()[id];
+  const m = placeMeta[id];
+  let h = `<div class="room-header"><div class="room-key">${esc([m.key, m.group, 'improvised'].filter(Boolean).join(' · '))}</div>`;
+  h += `<h1>${esc(m.name)}</h1>`;
+  if (p.summary) h += `<div class="room-meta">${esc(p.summary)}</div>`;
+  h += `${partyLine(id)}</div>`;
+  if (source.locations[p.parent]) h += `<div class="improv-note">Made at the table: the adventure doesn't have this place. It sits under ${placeLink(p.parent, placeName(p.parent))}.</div>`;
+  h += renderSessionState(p);
+  const ra = Array.isArray(p.readAloud) ? p.readAloud : (p.readAloud ? [p.readAloud] : []);
+  if (ra.length) {
+    h += `<details open${PLAY_KEEP}>${summaryWithPreview('Read Aloud', { preview: snip(ra[0], 90) })}<div class="section-body">`;
+    for (const r of ra) h += `<div class="read-aloud">${esc(r)}</div>`;
+    h += `</div></details>`;
+  }
+  if (p.creatures && p.creatures.length) {
+    h += `<details open${PLAY_KEEP}>${summaryWithPreview('Creatures', {})}<div class="section-body">`;
+    for (const c of p.creatures) {
+      const cr = typeof c === 'string' ? { name: c } : c;
+      h += `<div class="stat-block"><h3>${esc(cr.name)}</h3>${cr.note ? `<div class="stat-row">${linkText(cr.note)}</div>` : ''}</div>`;
+    }
+    h += `</div></details>`;
+  }
+  h += renderTableRulings([id]);
+  h += renderConnections(exitsFor(id, Object.assign(p.parent && source.locations[p.parent] ? { [p.parent]: { via: 'back' } } : {}, p.connections || {})), 'Exits');
+  return h;
+}
+
+// ===================== RUNNING HEAD: back + breadcrumb + search =====================
+function viewLabel(view) {
+  if (!view) return '';
+  if (view === 'ref-pickup') return 'Tonight';
+  if (placeMeta[view]) return placeName(view);
+  const ts = source.triggerScenes && source.triggerScenes.find(t => t.id === view);
+  if (ts) return ts.name;
+  const ref = referencePages().find(([id]) => id === view);
+  return ref ? ref[1] : view;
+}
+function renderRunHead(view) {
+  const st = history.state || {};
+  const back = st.depth > 0 && st.prev
+    ? `<button class="rh-back" onclick="history.back()" title="Back (Alt+Left)">&larr; ${esc(viewLabel(st.prev))}</button>`
+    : '';
+  const crumbs = [esc(source.meta.title)];
+  const m = placeMeta[view];
+  if (m) {
+    if (m.group) crumbs.push(esc(m.group));
+    if (m.improvised && placeMeta[m.parent]) crumbs.push(`<button class="crumb-link" data-view="${esc(m.parent)}">${esc(placeName(m.parent))}</button>`);
+  } else if (source.triggerScenes && source.triggerScenes.some(t => t.id === view)) {
+    crumbs.push('Events');
+  } else if (view !== 'ref-pickup') {
+    crumbs.push('Reference');
+  }
+  crumbs.push(`<b>${esc(viewLabel(view))}</b>`);
+  return `<div class="run-head">${back}<span class="crumbs">${crumbs.join(' &middot; ')}</span>`
+    + `<button class="rh-seek" onclick="openPalette()">Find a room, creature, ruling<kbd>Ctrl K</kbd></button></div>`;
+}
+
+// ===================== PLACE PREVIEWS + LINK CLICKS =====================
+// Hover or keyboard focus on a place link shows its key, name and summary.
+// On touch the first tap previews and a second tap on the same link goes there.
+let tipEl = null, tipArmed = null, lastPointer = 'mouse';
+function showTip(el, touch) {
+  const id = el.dataset.view;
+  const m = placeMeta[id];
+  if (!m) return;
+  if (!tipEl) { tipEl = document.createElement('div'); tipEl.className = 'place-tip'; document.body.appendChild(tipEl); }
+  tipEl.innerHTML = (m.key || m.improvised ? `<div class="tip-key">${esc([m.key, m.improvised ? 'improvised' : ''].filter(Boolean).join(' · '))}</div>` : '')
+    + `<div class="tip-name">${esc(m.name)}${partyAt() === id ? ' <span class="sb-party">&#9670; party</span>' : ''}</div>`
+    + (m.summary ? `<div class="tip-sum">${esc(snip(namesText(m.summary), 200))}</div>` : '')
+    + (touch ? `<div class="tip-hint">Tap again to open</div>` : '');
+  tipEl.classList.add('on');
+  const r = el.getBoundingClientRect(), tw = tipEl.offsetWidth, th = tipEl.offsetHeight;
+  const left = Math.max(8, Math.min(r.left, window.innerWidth - tw - 8));
+  const top = r.bottom + 6 + th > window.innerHeight ? r.top - th - 6 : r.bottom + 6;
+  tipEl.style.left = left + 'px';
+  tipEl.style.top = Math.max(8, top) + 'px';
+}
+function hideTip() { if (tipEl) tipEl.classList.remove('on'); tipArmed = null; }
+document.addEventListener('pointerdown', (e) => { lastPointer = e.pointerType || 'mouse'; }, true);
+document.addEventListener('mouseover', (e) => {
+  if (lastPointer === 'touch') return;
+  const el = e.target.closest('.loc-link[data-view]');
+  if (el) showTip(el);
+});
+document.addEventListener('mouseout', (e) => {
+  const el = e.target.closest('.loc-link[data-view]');
+  if (el && !el.contains(e.relatedTarget) && tipArmed !== el) hideTip();
+});
+document.addEventListener('focusin', (e) => {
+  const el = e.target.closest('.loc-link[data-view]');
+  if (el && el.matches(':focus-visible')) showTip(el);
+});
+document.addEventListener('focusout', (e) => { if (e.target.closest('.loc-link[data-view]')) hideTip(); });
+document.addEventListener('scroll', () => { if (!tipArmed) hideTip(); }, true);
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('.loc-link[data-view], .crumb-link[data-view]');
+  if (!link) {
+    if (tipArmed) hideTip();
+    return;
+  }
+  e.preventDefault();
+  if (lastPointer === 'touch' && link.classList.contains('loc-link') && tipArmed !== link) {
+    showTip(link, true);
+    tipArmed = link;
+    return;
+  }
+  hideTip();
+  navigate(link.dataset.view);
+});
 
 // Render a (possibly multi-paragraph) string as separate <p> blocks, splitting
 // on blank lines. Single-paragraph strings render as one <p>, so this is a safe
@@ -2720,7 +3059,7 @@ function snip(str, n) {
 function summaryWithPreview(label, opts) {
   opts = opts || {};
   const badge = opts.adapted ? ' <span class="adapt-badge">Adapted</span>' : '';
-  const preview = opts.preview ? `<span class="sum-preview">${esc(opts.preview)}</span>` : '';
+  const preview = opts.preview ? `<span class="sum-preview">${esc(namesText(opts.preview))}</span>` : '';
   return `<summary>${label}${badge}${preview}</summary>`;
 }
 
