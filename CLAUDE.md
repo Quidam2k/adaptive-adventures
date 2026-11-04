@@ -6,10 +6,10 @@ Adventures distributed as structured scene data + LLM adaptation. See `README.md
 
 ## Prior Art (read these first)
 
-Two working prototypes in the parent workspace define the patterns this project generalizes:
+Two sibling prototype projects define the patterns this project generalizes:
 
-- `Q:/DnD/trials_and_challenges/encounters/the_dark_door.js` — canonical trial scene. Study: `trial` metadata, `tasks`, `outcomes`, `scenes` (with IF THEY ASK blocks), `outcomeNarrations`, `taskNarrations` (crit-success / success / failure / crit-failure / complete), `specialResources`, `challenges`, `playerNarrations`.
-- `Q:/DnD/mcdm_negotiations/encounters/wands_light_project.js` — canonical negotiation scene. Study: `npc`, `request`, `motivations`, `pitfalls`, `outcomes` (by interest level), `outcomeNarrations`.
+- `../trials_and_challenges/encounters/the_dark_door.js` — canonical trial scene. Study: `trial` metadata, `tasks`, `outcomes`, `scenes` (with IF THEY ASK blocks), `outcomeNarrations`, `taskNarrations` (crit-success / success / failure / crit-failure / complete), `specialResources`, `challenges`, `playerNarrations`.
+- `../mcdm_negotiations/encounters/wands_light_project.js` — canonical negotiation scene. Study: `npc`, `request`, `motivations`, `pitfalls`, `outcomes` (by interest level), `outcomeNarrations`.
 
 Do **not** re-derive the conventions from those files — treat them as canon and extend.
 
@@ -40,7 +40,7 @@ Source stays untouched. Adaptation is additive metadata + derived fields.
 
 ## Where Evil Lives Import
 
-First real test case: import a one-shot from MCDM's *Where Evil Lives*. Source PDF lives in `reference/` once Todd provides it.
+First real test case: import a one-shot from MCDM's *Where Evil Lives*. Source PDF lives in `reference/` once the author provides it.
 
 Workflow:
 1. Read the source one-shot.
