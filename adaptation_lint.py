@@ -286,6 +286,19 @@ def lint_prefix(prefix):
             if not (isinstance(place.get('name'), str) and place['name'].strip()):
                 findings.add(relp('state'), p + '.name', 'missing or empty')
         valid_ids |= set(improvised)
+        # connections is a map {targetId: {via, note}}; the dashboard renders an array as exits "0", "1", "2".
+        for iid, place in improvised.items():
+            if not isinstance(place, dict) or 'connections' not in place:
+                continue
+            conns, p = place['connections'], '$.improvisedLocations.%s.connections' % iid
+            if not isinstance(conns, dict):
+                findings.add(relp('state'), p, 'must be an object {targetId: {via, note}}, not %s'
+                             % type(conns).__name__)
+                continue
+            for target in conns:
+                if target not in valid_ids:
+                    findings.add(relp('state'), p + '.' + target,
+                                 'unknown target %r (not a source or improvised id)' % target)
         party_at = (state or {}).get('partyAt')
         if party_at is not None and party_at not in valid_ids:
             findings.add(relp('state'), '$.partyAt',

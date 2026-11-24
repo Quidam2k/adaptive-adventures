@@ -67,13 +67,15 @@ When the party goes somewhere the source has no location for (a cave the DM impr
     "parent": "L_l12_tunnel_top",
     "name": "The minotaur gate",
     "summary": "One line, shown in hover previews and the sidebar.",
-    "readAloud": "...", "sessionState": { }, "creatures": [ ], "connections": [ ]
+    "readAloud": "...", "sessionState": { }, "creatures": [ ],
+    "connections": { "L_l12_drow_fortress": { "via": "optional label", "note": "one line" } }
   }
 }
 ```
 
 - Ids start with `I_`. `parent` must be a **source** location id; the dashboard files the page under it (key = parent key + a, b, … unless you set `key`) and no longer lists it as an orphan.
 - Allowed keys: `parent`, `name`, `key`, `summary`, `readAloud`, `sessionState`, `creatures`, `connections` (`IMPROVISED_KEYS` in `adaptation_lint.py`). `name` is required.
+- `connections` is a **map** `{targetId: {via, note}}`, the same shape as source locations, and every key must be a source or improvised id. An array renders as exits labelled "0", "1", "2" (the 11.19 gate did this); lint now fails it. The parent gets a "back" exit automatically.
 - Both fields are additive: a state file without them renders exactly as before.
 - This supersedes the older rule "put the improvised place under the nearest source location's `sessionState`". Migrate such entries when you next touch that adaptation.
 
