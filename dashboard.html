@@ -1680,14 +1680,14 @@ function renderLocation(id) {
     h += `<details${PLAY_KEEP}>${summaryWithPreview('If They Ask', { adapted: itaAdapt.length > 0, preview: itaPreview })}<div class="section-body">`;
     itaSource.forEach((q, i) => {
       const key = `ita-src:${id}:${i}`;
-      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
+      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div>${itaAnswerHtml(q.answer)}`;
       if (q.source) h += `<div class="ita-thread">Source: ${esc(q.source)}</div>`;
       h += `</div>`;
     });
     if (itaAdapt.length && itaSource.length) h += `<div class="sub-label" style="color:var(--teal);margin:10px 0 4px">Party-Specific <span class="adapt-badge">Adapted</span></div>`;
     itaAdapt.forEach((q, i) => {
       const key = `ita-adpt:${id}:${i}`;
-      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
+      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div>${itaAnswerHtml(q.answer)}`;
       if (q.campaignThread) h += `<div class="ita-thread">Thread: ${esc(q.campaignThread)}</div>`;
       h += `</div>`;
     });
@@ -1765,13 +1765,7 @@ function renderWBtWScene(sceneId, scene) {
       const key = `ita-scene:${sceneId}:${itaIsAdapted ? 'a' : 's'}:${i}`;
       h += `<div class="ita-item markable" data-mark-key="${esc(key)}">`;
       h += `<div class="ita-q">"${esc(q.question)}"</div>`;
-      const ans = q.answer;
-      if (typeof ans === 'string') {
-        h += `<div class="ita-a">${linkText(ans)}</div>`;
-      } else if (ans && typeof ans === 'object') {
-        if (ans.public) h += `<div class="ita-a">${linkText(ans.public)}</div>`;
-        if (ans.dm) h += `<div class="dm-note" style="margin-top:4px;border-top:none;padding-top:0">${esc(ans.dm)}</div>`;
-      }
+      h += itaAnswerHtml(q.answer);
       h += `</div>`;
     });
     h += `</div></details>`;
@@ -1934,7 +1928,7 @@ function renderTriggerScene(id) {
     h += `<details${PLAY_KEEP}><summary>If They Ask <span class="adapt-badge">Adapted</span></summary><div class="section-body">`;
     itaAdapt.forEach((q, i) => {
       const key = `ita-adpt:${id}:${i}`;
-      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div><div class="ita-a">${linkText(q.answer)}</div>`;
+      h += `<div class="ita-item markable" data-mark-key="${esc(key)}"><div class="ita-q">"${esc(q.question)}"</div>${itaAnswerHtml(q.answer)}`;
       if (q.campaignThread) h += `<div class="ita-thread">Thread: ${esc(q.campaignThread)}</div>`;
       h += `</div>`;
     });
@@ -2646,6 +2640,16 @@ function renderVoice() {
 }
 
 // ===================== COMPONENT RENDERERS =====================
+// An If They Ask answer is a string, or { public, dm } (source.js POIs and scenes use both shapes).
+function itaAnswerHtml(ans) {
+  if (typeof ans === 'string') return `<div class="ita-a">${linkText(ans)}</div>`;
+  if (!ans || typeof ans !== 'object') return '';
+  let h = '';
+  if (ans.public) h += `<div class="ita-a">${linkText(ans.public)}</div>`;
+  if (ans.dm) h += `<div class="dm-note" style="margin-top:4px;border-top:none;padding-top:0">${esc(ans.dm)}</div>`;
+  return h;
+}
+
 function renderConnections(connections, label) {
   if (!connections || !Object.keys(connections).length) return '';
   let h = `<div class="sub-label" style="color:var(--text-dim);margin-bottom:4px">${esc(label)}</div>`;
