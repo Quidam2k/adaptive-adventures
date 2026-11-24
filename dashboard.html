@@ -1988,6 +1988,11 @@ function renderSessionState(adpt) {
   if (ss.status) h += `<div class="kv"><span class="k">Status:</span> ${linkText(ss.status)}</div>`;
   if (ss.enteredVia) h += `<div class="kv"><span class="k">Entered via:</span> ${linkText(ss.enteredVia)}</div>`;
   if (ss.narrative) h += `<div style="margin-top:6px">${paraText(ss.narrative)}</div>`;
+  const ssRa = Array.isArray(ss.readAloud) ? ss.readAloud : (ss.readAloud ? [ss.readAloud] : []);
+  if (ssRa.length) {
+    h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Read Aloud</div>`;
+    for (const ra of ssRa) h += `<div class="read-aloud">${esc(ra)}</div>`;
+  }
   if (ss.keyPoints && ss.keyPoints.length) {
     h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">Key Points</div><ul class="plain">`;
     for (const kp of ss.keyPoints) h += `<li>${linkText(kp)}</li>`;
@@ -2021,6 +2026,19 @@ function renderSessionState(adpt) {
     }
   }
   if (ss.cliffhangerResolution) h += `<div class="dm-note" style="margin-top:8px"><strong>Cliffhanger:</strong> ${linkText(ss.cliffhangerResolution)}</div>`;
+  // Generic fallback: any other string or list-of-strings field renders rather than vanishing.
+  const ssKnown = new Set(['status', 'enteredVia', 'narrative', 'readAloud', 'keyPoints', 'notes', 'resolvedElements',
+    'unresolvedElements', 'pendingElements', 'npcStatus', 'cliffhangerResolution', 'dmNote']);
+  for (const [k, v] of Object.entries(ss)) {
+    if (ssKnown.has(k)) continue;
+    if (typeof v === 'string' && v) {
+      h += `<div class="kv" style="margin-top:8px"><span class="k">${esc(humanizeKey(k))}:</span> ${linkText(v)}</div>`;
+    } else if (Array.isArray(v) && v.some(x => typeof x === 'string')) {
+      h += `<div class="sub-label" style="color:var(--text-dim);margin-top:8px">${esc(humanizeKey(k))}</div><ul class="plain">`;
+      for (const x of v) if (typeof x === 'string') h += `<li>${linkText(x)}</li>`;
+      h += `</ul>`;
+    }
+  }
   if (ss.dmNote) h += `<div class="dm-note" style="margin-top:8px">${paraText(ss.dmNote)}</div>`;
   h += `</div></details>`;
   return h;
@@ -2213,8 +2231,12 @@ function renderSessionPickup() {
     h += `<details>${summaryWithPreview('Current Combat State', { preview: snip(ccs.status || ccs.note || '', 90) })}<div class="section-body">`;
     if (ccs.note) h += `<div class="dm-note" style="border-top:none;padding-top:0;margin-bottom:6px">${esc(ccs.note)}</div>`;
     for (const [k, v] of Object.entries(ccs)) {
-      if (k === 'note' || typeof v !== 'string') continue;
-      h += `<div style="margin-top:8px"><div class="k" style="margin-bottom:2px">${esc(humanizeKey(k))}</div>${paraText(v)}</div>`;
+      if (k === 'note') continue;
+      if (typeof v === 'string') {
+        h += `<div style="margin-top:8px"><div class="k" style="margin-bottom:2px">${esc(humanizeKey(k))}</div>${paraText(v)}</div>`;
+      } else if (Array.isArray(v) && v.some(x => typeof x === 'string')) {
+        h += `<div style="margin-top:8px"><div class="k" style="margin-bottom:2px">${esc(humanizeKey(k))}</div>${list(v.filter(x => typeof x === 'string'))}</div>`;
+      }
     }
     h += `</div></details>`;
   }
@@ -2600,10 +2622,22 @@ function renderUnplacedScenes() {
 function renderCallbacks() {
   if (!adaptation || !adaptation.campaignCallbacks) return '<p>No campaign callback data.</p>';
   let h = `<div class="room-header"><h1>Campaign Integration & Callbacks</h1></div>`;
+  // Two shapes: an object keyed by thread ({description, options|suggestions, dmNote}), or an array of
+  // per-PC entries ({pc, callback, watchOut, lookForward}). Any other string field renders as a labelled row.
+  const humanize = k => k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+  const handled = new Set(['pc', 'title', 'description', 'callback', 'options', 'suggestions', 'dmNote']);
   for (const [key, cb] of Object.entries(adaptation.campaignCallbacks)) {
+    if (!cb || typeof cb !== 'object') continue;
+    const title = cb.pc || cb.title || (Array.isArray(adaptation.campaignCallbacks) ? `Callback ${+key + 1}` : humanize(key));
     h += `<div class="callback-card">`;
-    h += `<h4>${esc(key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()))}</h4>`;
-    h += `<p style="font-size:13px">${linkText(cb.description)}</p>`;
+    h += `<h4>${esc(title)}</h4>`;
+    const body = cb.description || cb.callback;
+    if (body) h += `<p style="font-size:13px">${linkText(body)}</p>`;
+    for (const [field, val] of Object.entries(cb)) {
+      if (handled.has(field) && !(field === 'callback' && cb.description)) continue;  // both present: callback gets a row
+      if (typeof val !== 'string' || !val) continue;
+      h += `<div class="kv" style="font-size:13px;margin:4px 0"><span class="k">${esc(humanize(field))}:</span> ${linkText(val)}</div>`;
+    }
     const optList = cb.options || cb.suggestions;
     if (optList && optList.length) {
       for (const opt of optList) {
